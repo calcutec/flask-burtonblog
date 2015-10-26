@@ -3,7 +3,7 @@ function displayInbox() {
     var request = gapi.client.gmail.users.threads.list({
         'userId': 'me',
         'labelIds': 'INBOX',
-        'maxResults': 200
+        'maxResults': 50
     });
     var threadsList = new MailList([], { request: request, initialrequest: true });
     threadsList.executerequest();
