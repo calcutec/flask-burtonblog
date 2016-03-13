@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, session, url_for, request, g, abort, jsonify
+from flask import render_template, flash, redirect, session, url_for, g, abort, jsonify
 from werkzeug.utils import secure_filename
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from flask.ext.sqlalchemy import get_debug_queries
@@ -6,80 +6,102 @@ from datetime import datetime
 from app import app, db, lm
 from config import DATABASE_QUERY_TIMEOUT
 from slugify import slugify
-from .forms import SignupForm, LoginForm, EditForm, PostForm, SearchForm, CommentForm
+from .forms import SignupForm, LoginForm, EditForm, PostForm, SearchForm, CommentForm, PhotoForm
 from .models import User, Post, Comment
 from .emails import follower_notification
-from .utils import OAuthSignIn, pre_upload, ViewData, allowed_file, GenericListView
+from .utils import OAuthSignIn, pre_upload, ViewData, BasePage, allowed_file, GenericListView
 from PIL import Image
+from datetime import timedelta
+from flask import make_response, request, current_app
+from functools import update_wrapper
 import json
 from flask.views import MethodView
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-from datetime import timedelta
-from flask import make_response, request, current_app
-from functools import update_wrapper
-
 
 @app.route('/', methods=['GET'])
 def index():
-    return redirect(url_for('home'))
-
-# phonegap_data = ViewData(page_mark="phonegap")
-# app.add_url_rule('/phonegap/', view_func=GenericListView.as_view('phonegap', phonegap_data), methods=["GET", ])
+    return redirect(url_for('photos', page_mark="home"))
 
 
-def crossdomain(origin=None, methods=None, headers=None,
-                max_age=21600, attach_to_all=True,
-                automatic_options=True):
-    if methods is not None:
-        methods = ', '.join(sorted(x.upper() for x in methods))
-    if headers is not None and not isinstance(headers, basestring):
-        headers = ', '.join(x.upper() for x in headers)
-    if not isinstance(origin, basestring):
-        origin = ', '.join(origin)
-    if isinstance(max_age, timedelta):
-        max_age = max_age.total_seconds()
-
-    def get_methods():
-        if methods is not None:
-            return methods
-
-        options_resp = current_app.make_default_options_response()
-        return options_resp.headers['allow']
-
-    def decorator(f):
-        def wrapped_function(*args, **kwargs):
-            if automatic_options and request.method == 'OPTIONS':
-                resp = current_app.make_default_options_response()
+class PhotoAPI(MethodView):
+    # @login_required
+    def post(self, page_mark=None):
+        form = PhotoForm()
+        if form.validate_on_submit():
+            photo_name = form.entryPhotoName.data
+            thumbnail_name = "thumbnail" + photo_name
+            slug = slugify(form.header.data)
+            post = Post(body=form.body.data, timestamp=datetime.utcnow(),
+                        author=g.user, photo=photo_name, thumbnail=thumbnail_name, header=form.header.data,
+                        writing_type=form.writing_type.data, slug=slug)
+            db.session.add(post)
+            db.session.commit()
+            if request.is_xhr:
+                response = post.json_view()
+                response['savedsuccess'] = True
+                return json.dumps(response)
             else:
-                resp = make_response(f(*args, **kwargs))
-            if not attach_to_all and request.method != 'OPTIONS':
-                return resp
+                return redirect("/photos/"+page_mark)
+        else:
+            if request.is_xhr:
+                form.errors['iserror'] = True
+                return json.dumps(form.errors)
+            else:
+                context = {'assets': BasePage(page_mark=page_mark).assets}
+                return render_template("base.html", **context)
 
-            h = resp.headers
+    def get(self, page_mark=None, post_id=None):
+        # if current_user.is_authenticated() or page_mark == "login":
+        if post_id is None:    # Read all posts
+            if request.is_xhr:
+                result = {'iserror': False, 'savedsuccess': True}
+                return json.dumps(result)
+                # posts = Post.query.all()
+                # return jsonify(myPoems=[i.json_view() for i in posts])
+                # formerly rendered client-side; change to return json and render client-side
+            else:
+                # result = {'iserror': False, 'savedsuccess': True}
+                # return json.dumps(result)
+                return render_template("base.html")
+        else:
+            pass  # Todo create logic for xhr request for a single post
+        # else:
+        #     return current_app.login_manager.unauthorized()
 
-            h['Access-Control-Allow-Origin'] = origin
-            h['Access-Control-Allow-Methods'] = get_methods()
-            h['Access-Control-Max-Age'] = str(max_age)
-            if headers is not None:
-                h['Access-Control-Allow-Headers'] = headers
-            return resp
+    # Update Post
+    @login_required
+    def put(self, post_id):
+        form = PostForm()
+        if form.validate_on_submit():
+            update_post = Post.query.get(post_id)
+            update_post.body = form.data['body']
+            db.session.commit()
+            response = update_post.json_view()
+            response['updatedsuccess'] = True
+            return json.dumps(response)
+        else:
+            result = {'updatedsuccess': False}
+            return json.dumps(result)
 
-        f.provide_automatic_options = False
-        return update_wrapper(wrapped_function, f)
-    return decorator
+    # Delete Post
+    @login_required
+    def delete(self, post_id):
+        post = Post.query.get(post_id)
+        db.session.delete(post)
+        db.session.commit()
+        result = {'deletedsuccess': True}
+        return json.dumps(result)
 
 
-@app.route('/employees', methods=['GET'])
-@crossdomain(origin='*')
-def employees():
-        employee_dict = User.query.all()
-        return jsonify(employees=[i.json_view() for i in employee_dict])
-
-
-home_data = ViewData(page_mark="home")
-app.add_url_rule('/home/', view_func=GenericListView.as_view('home', home_data), methods=["GET", ])
+# urls for Photo API
+photo_api_view = PhotoAPI.as_view('photos')
+# Read all posts for a given page, Create a new post
+app.add_url_rule('/photos/<any("gallery", "members", "profile", "home"):page_mark>/',
+                 view_func=photo_api_view, methods=["GET", "POST"])
+# Update or Delete a single post
+app.add_url_rule('/photos/detail/<int:post_id>/', view_func=photo_api_view, methods=["GET", "PUT", "DELETE"])
 
 
 @app.route('/logout', methods=['GET'])
@@ -209,7 +231,7 @@ app.add_url_rule('/callback/<provider>', view_func=login_api_view, methods=["GET
 
 
 class MembersAPI(MethodView):
-    def post(self, nickname=None):
+    def post(self):
         form = EditForm()  # Update Member Data
         response = self.update_user(form)
         return response
@@ -279,13 +301,13 @@ class MembersAPI(MethodView):
     @login_required
     def update_user(self, form):
         if request.is_xhr:  # First validate form using an async request
-            if form.validate(g.user):
+            if form.validate():
                 result = {'iserror': False, 'savedsuccess': True}
                 return json.dumps(result)
             form.errors['iserror'] = True
             return json.dumps(form.errors)
         else:  # Once form is valid, original form is called and processed
-            if form.validate(g.user):
+            if form.validate():
                 profile_photo = request.files['profile_photo']
                 if profile_photo and allowed_file(profile_photo.filename):
                     filename = secure_filename(profile_photo.filename)
@@ -367,7 +389,7 @@ class PostAPI(MethodView):
             pass  # Todo create logic for xhr request for a single poem
 
     # Update Post
-    def put(self, post_id ):
+    def put(self, post_id):
         form = PostForm()
         if form.validate_on_submit():
             update_post = Post.query.get(post_id)
@@ -452,7 +474,7 @@ app.add_url_rule('/forms/<page_mark>/', view_func=forms_api_view, methods=["GET"
 
 
 class ActionsAPI(MethodView):
-        def post(self, page_mark=None, action=None, post_id=None):
+        def post(self, action=None, post_id=None):
             if action == 'vote':   # Vote on post
                 post_id = post_id
                 user_id = g.user.id
@@ -462,7 +484,7 @@ class ActionsAPI(MethodView):
                 vote_status = post.vote(user_id=user_id)
                 return jsonify(new_votes=post.votes, vote_status=vote_status)
 
-        def get(self, page_mark=None, action=None, post_id=None):
+        def get(self, action=None, post_id=None):
             if action == 'vote':   # Vote on post
                 post_id = post_id
                 user_id = g.user.id
@@ -485,10 +507,25 @@ def redirect_url(default='home'):
            url_for(default)
 
 
+# @app.context_processor
+# def inject_static_url():
+#     local_static_url = app.static_url_path
+#     static_url = 'https://s3.amazonaws.com/netbardus/'
+#     if os.environ.get('HEROKU') is not None:
+#         local_static_url = static_url
+#     if not static_url.endswith('/'):
+#         static_url += '/'
+#     if not local_static_url.endswith('/'):
+#         local_static_url += '/'
+#     return dict(
+#         static_url=static_url,
+#         local_static_url=local_static_url
+#     )
+
 @app.context_processor
 def inject_static_url():
     local_static_url = app.static_url_path
-    static_url = 'https://s3.amazonaws.com/netbardus/'
+    static_url = 'https://s3.amazonaws.com/aperturus/'
     if os.environ.get('HEROKU') is not None:
         local_static_url = static_url
     if not static_url.endswith('/'):
@@ -538,12 +575,61 @@ def internal_error(error):
     return render_template('500.html', error=error), 500
 
 
-@app.template_filter('curly')  # Filter to create curly braces
-def curly(value):
-    # Handle value as string  {{'foo'|curly}}
-    if isinstance(value,str):
-        return_value = value
-    # Handle value directly. {{foo|curly}}
-    else:
-        return_value = value._undefined_name
-    return "{{" + return_value + "}}"
+def crossdomain(origin=None, methods=None, headers=None,
+                max_age=21600, attach_to_all=True,
+                automatic_options=True):
+    if methods is not None:
+        methods = ', '.join(sorted(x.upper() for x in methods))
+    if headers is not None and not isinstance(headers, basestring):
+        headers = ', '.join(x.upper() for x in headers)
+    if not isinstance(origin, basestring):
+        origin = ', '.join(origin)
+    if isinstance(max_age, timedelta):
+        max_age = max_age.total_seconds()
+
+    def get_methods():
+        if methods is not None:
+            return methods
+
+        options_resp = current_app.make_default_options_response()
+        return options_resp.headers['allow']
+
+    def decorator(f):
+        def wrapped_function(*args, **kwargs):
+            if automatic_options and request.method == 'OPTIONS':
+                resp = current_app.make_default_options_response()
+            else:
+                resp = make_response(f(*args, **kwargs))
+            if not attach_to_all and request.method != 'OPTIONS':
+                return resp
+
+            h = resp.headers
+
+            h['Access-Control-Allow-Origin'] = origin
+            h['Access-Control-Allow-Methods'] = get_methods()
+            h['Access-Control-Max-Age'] = str(max_age)
+            if headers is not None:
+                h['Access-Control-Allow-Headers'] = headers
+            return resp
+
+        f.provide_automatic_options = False
+        return update_wrapper(wrapped_function, f)
+    return decorator
+
+
+@app.route('/employees', methods=['GET'])
+@crossdomain(origin='*')
+def employees():
+        employee_dict = User.query.all()
+        return jsonify(employees=[i.json_view() for i in employee_dict])
+
+
+# @app.template_filter('curly')  # Filter to create curly braces
+# def curly(value):
+#     # Handle value as string  {{'foo'|curly}}
+#     if isinstance(value,str):
+#         return_value = value
+#     # Handle value directly. {{foo|curly}}
+#     else:
+#         return_value = value._undefined_name
+#     return "{{" + return_value + "}}"

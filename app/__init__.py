@@ -1,5 +1,6 @@
 import os
 from flask import Flask
+from jinja2 import FileSystemLoader
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
 from flask.ext.mail import Mail
@@ -10,6 +11,8 @@ from flask.json import JSONEncoder
 from flask_wtf.csrf import CsrfProtect
 
 app = Flask(__name__)
+base_dir = os.path.dirname(os.path.realpath(__file__))
+app.jinja_loader = FileSystemLoader(os.path.join(base_dir, 'static', 'templates'))
 app.config.from_object('config')
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 db = SQLAlchemy(app)

@@ -12,6 +12,132 @@ from flask.views import View
 from flask.ext.login import login_required
 from models import User, Post
 from functools import wraps
+from datetime import timedelta
+from datetime import datetime
+import hmac
+from uuid import uuid4
+from base64 import b64encode
+import hashlib
+
+
+class BasePage(object):
+    def __init__(self, page_mark):
+        self.page_mark = page_mark
+        self.assets = self.getassets()
+
+    def getassets(self):
+        assets = {}
+        posts = self.getposts()
+        assets['title'] = render_template("title.html", page_mark=self.page_mark)
+        renderedform = self.getrenderedform()
+        assets['body_form'] = renderedform
+        if self.page_mark == "home":
+            assets['main_entry'] = render_template("main_entry.html", posts=posts)
+        else:
+            assets['main_entry'] = render_template("main_entry.html", posts=posts)
+            assets['archives'] = render_template("archives.html", posts=posts)
+        # assets['initial_data'] = json.dumps({'posts': [i.json_view() for i in posts[0:6]]})
+        return assets
+
+    def getposts(self):
+        posts = None
+        if self.page_mark == 'home':
+            posts = Post.query.filter_by(writing_type="op-ed").order_by(Post.timestamp.desc())
+        elif self.page_mark == 'gallery':
+            posts = Post.query.filter_by(writing_type="entry").order_by(Post.timestamp.desc())
+        elif self.page_mark == 'profile':
+            posts = Post.query.filter_by(author=g.user).order_by(Post.timestamp.desc())
+        elif self.page_mark == 'members':
+            posts = User.query.all()
+        elif self.page_mark == 'detail':
+            posts = User.query.all()
+        return posts
+
+    def getrenderedform(self):
+        rendered_form = None
+        if g.user.is_authenticated() is False:
+                rendered_form = render_template("assets/forms/login_form.html")
+        else:
+            if self.page_mark == 'profile':
+                form = EditForm()
+                form.nickname.data = g.user.nickname
+                form.about_me.data = g.user.about_me
+                rendered_form = render_template("assets/forms/profile_form.html", form=EditForm)
+            elif self.page_mark == 'detail':
+                rendered_form = render_template("assets/forms/comment_form.html", form=CommentForm(),
+                                                post=self.getposts)
+            # No file upload for users without javascript since validation not possible
+            # if self.page_mark == 'gallery':
+            #     s3_form = self.create_s3_form()
+            #     photo_text_form = render_template("assets/forms/photo_text_form.html", phototextform=PostForm())
+            #     rendered_form = render_template("assets/forms/photo_form.html", S3form=s3_form)
+        return rendered_form
+
+    def create_s3_form(self):
+        key = str(uuid4())
+        form = self.s3_upload_form(app.config['AWS_ACCESS_KEY_ID'], app.config['AWS_SECRET_ACCESS_KEY'],
+                                   app.config['S3_REGION'], 'aperturus', key=key)
+        ctx = {'region': app.config['S3_REGION'], 'bucket': 'aperturus', 'form': form}
+        return render_template('assets/forms/S3_upload_form.html', **ctx)
+
+    def hmac_sha256(self, key, msg):
+        return hmac.new(key, msg.encode('utf-8'), hashlib.sha256).digest()
+
+    def sign(self, key, date, region, service, msg):
+        date = date.strftime('%Y%m%d')
+        hash1 = self.hmac_sha256('AWS4'+key, date)
+        hash2 = self.hmac_sha256(hash1, region)
+        hash3 = self.hmac_sha256(hash2, service)
+        key = self.hmac_sha256(hash3, 'aws4_request')
+        return hmac.new(key, msg.encode('utf-8'), hashlib.sha256).hexdigest()
+
+    def s3_upload_form(self, access_key, secret_key, region, bucket, key=None, prefix=None):
+        assert (key is not None) or (prefix is not None)
+        if (key is not None) and (prefix is not None):
+            assert key.startswith(prefix)
+        now = datetime.utcnow()
+        form = {
+            'acl': 'private',
+            'success_action_status': '201',
+            # 'success_action_status_redirect': "http://www.netbard.com",
+            'x-amz-algorithm': 'AWS4-HMAC-SHA256',
+            'x-amz-credential': '{}/{}/{}/s3/aws4_request'.format(access_key, now.strftime('%Y%m%d'), region),
+            'x-amz-date': now.strftime('%Y%m%dT000000Z'),
+        }
+        expiration = now + timedelta(minutes=30)
+        policy = {
+          'expiration': expiration.strftime('%Y-%m-%dT%H:%M:%SZ'),
+          'conditions': [
+            {'bucket': bucket},
+            {'acl': 'private'},
+            ['content-length-range', 32, 10485760],
+            {'success_action_status': form['success_action_status']},
+            # {'success_action_status_redirect': form['success_action_status_redirect']},
+            {'x-amz-algorithm':       form['x-amz-algorithm']},
+            {'x-amz-credential':      form['x-amz-credential']},
+            {'x-amz-date':            form['x-amz-date']},
+          ]
+        }
+        if region == 'us-east-1':
+            form['action'] = 'https://{}.s3.amazonaws.com/'.format(bucket)
+        else:
+            form['action'] = 'https://{}.s3-{}.amazonaws.com/'.format(bucket, region)
+        if key is not None:
+            form['key'] = key
+            policy['conditions'].append(
+              {'key':    key},
+            )
+        if prefix is not None:
+            form['prefix'] = prefix
+            policy['conditions'].append(
+              ["starts-with", "$key", prefix],
+            )
+        form['policy'] = b64encode(json.dumps(policy))
+        form['x-amz-signature'] = self.sign(secret_key, now, region, 's3', form['policy'])
+        return form
+
+    def __str__(self):
+        return "This is the %s page" % self.page_mark
 
 
 class ViewData(object):
@@ -107,7 +233,7 @@ class ViewData(object):
                 rendered_form = render_template("assets/forms/profile_form.html", form=self.form)
         elif self.page_mark == 'portfolio':
             self.form = PostForm()
-            if self.render_form: # Only render post form on request, using button to show on noJS portfolio page
+            if self.render_form:  # Only render post form on request, using button to show on noJS portfolio page
                 rendered_form = render_template("assets/forms/poem_form.html", form=self.form)
         elif self.page_mark == 'detail':
             self.form = CommentForm()
