@@ -9,7 +9,7 @@ from slugify import slugify
 from .forms import SignupForm, LoginForm, EditForm, PostForm, SearchForm, CommentForm, PhotoForm
 from .models import User, Post, Comment
 from .emails import follower_notification
-from .utils import OAuthSignIn, pre_upload, ViewData, BasePage, allowed_file, GenericListView
+from .utils import OAuthSignIn, pre_upload, ViewData, BasePage, allowed_file
 from PIL import Image
 from datetime import timedelta
 from flask import make_response, request, current_app
@@ -53,22 +53,23 @@ class PhotoAPI(MethodView):
                 return render_template("base.html", **context)
 
     def get(self, page_mark=None, post_id=None):
-        # if current_user.is_authenticated() or page_mark == "login":
-        if post_id is None:    # Read all posts
-            if request.is_xhr:
-                result = {'iserror': False, 'savedsuccess': True}
-                return json.dumps(result)
-                # posts = Post.query.all()
-                # return jsonify(myPoems=[i.json_view() for i in posts])
-                # formerly rendered client-side; change to return json and render client-side
+        if current_user.is_authenticated() or page_mark == "login" or page_mark == "home":
+            if post_id is None:    # Read all posts
+                if request.is_xhr:
+                    result = {'iserror': False, 'savedsuccess': True}
+                    return json.dumps(result)
+                    # posts = Post.query.all()
+                    # return jsonify(myPoems=[i.json_view() for i in posts])
+                    # formerly rendered client-side; change to return json and render client-side
+                else:
+                    # result = {'iserror': False, 'savedsuccess': True}
+                    # return json.dumps(result)
+                    return render_template("base.html")
             else:
-                # result = {'iserror': False, 'savedsuccess': True}
-                # return json.dumps(result)
-                return render_template("base.html")
+                pass  # Todo create logic for xhr request for a single post
         else:
-            pass  # Todo create logic for xhr request for a single post
-        # else:
-        #     return current_app.login_manager.unauthorized()
+            # return current_app.login_manager.unauthorized()
+            return redirect(url_for('photos', page_mark="login"))
 
     # Update Post
     @login_required
@@ -107,7 +108,7 @@ app.add_url_rule('/photos/detail/<int:post_id>/', view_func=photo_api_view, meth
 @app.route('/logout', methods=['GET'])
 def logout():
         logout_user()
-        return redirect(url_for('login'))
+        return redirect(url_for('photos', page_mark="login"))
 
 
 class SignupAPI(MethodView):
@@ -205,7 +206,8 @@ class LoginAPI(MethodView):
                 remember_me = session['remember_me']
                 session.pop('remember_me', None)
             login_user(currentuser, remember=remember_me)
-            return redirect(request.args.get('next') or url_for('members'))
+            # return redirect(request.args.get('next') or url_for('photos', page_mark="gallery"))
+            return redirect(url_for('photos', page_mark="home"))
         else:   # LOGIN PAGE
             if g.user is not None and g.user.is_authenticated():
                 return redirect(url_for('members'))
@@ -507,25 +509,10 @@ def redirect_url(default='home'):
            url_for(default)
 
 
-# @app.context_processor
-# def inject_static_url():
-#     local_static_url = app.static_url_path
-#     static_url = 'https://s3.amazonaws.com/netbardus/'
-#     if os.environ.get('HEROKU') is not None:
-#         local_static_url = static_url
-#     if not static_url.endswith('/'):
-#         static_url += '/'
-#     if not local_static_url.endswith('/'):
-#         local_static_url += '/'
-#     return dict(
-#         static_url=static_url,
-#         local_static_url=local_static_url
-#     )
-
 @app.context_processor
 def inject_static_url():
     local_static_url = app.static_url_path
-    static_url = 'https://s3.amazonaws.com/netbard/'
+    static_url = 'https://s3.amazonaws.com/aperturus/'
     if os.environ.get('HEROKU') is not None:
         local_static_url = static_url
     if not static_url.endswith('/'):
