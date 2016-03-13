@@ -525,7 +525,7 @@ def redirect_url(default='home'):
 @app.context_processor
 def inject_static_url():
     local_static_url = app.static_url_path
-    static_url = 'https://s3.amazonaws.com/aperturus/'
+    static_url = 'https://s3.amazonaws.com/netbard/'
     if os.environ.get('HEROKU') is not None:
         local_static_url = static_url
     if not static_url.endswith('/'):
