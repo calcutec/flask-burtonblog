@@ -5,6 +5,7 @@ app.db
 test.db
 search.db
 flask
+venvburtonblog
 app/static/PhoneGap/hooks
 app/static/PhoneGap/platforms
 app/static/PhoneGap/plugins
