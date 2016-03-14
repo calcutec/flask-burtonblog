@@ -13,18 +13,16 @@ App.Router.MainRouter = Backbone.Router.extend({
         'edit/:id': 'edit' // http://netbard.com/photos/portfolio/#edit/7
     },
     start: function(){
+        var photolist = new App.Collections.PhotoList(initialdata); // loaded from data.js
         console.log('now in view' + Backbone.history.location.href);
         var page_mark = Backbone.history.location.pathname.split("/")[2];
         if ( page_mark == "gallery") {
-            var photolist = new App.Collections.PhotoList(initialdata); // loaded from data.js
             new App.Views.MainView({el: "#photoapp", collection: photolist, page_mark:page_mark});
-            window.s3formview = new App.Views.S3FormView();
+            new App.Views.PhotoFormView().render();
         } else if (page_mark == "login") {
             window.loginview = new App.Views.LoginFormView({el:'#body-form'}).render();
         }  else if (page_mark == "home") {
-            var photolist = new App.Collections.PhotoList(initialdata); // loaded from data.js
             new App.Views.MainView({el: "#photoapp", collection: photolist, page_mark:page_mark});
-            window.s3formview = new App.Views.S3FormView();
         }
         //var pgurl = "#" + Backbone.history.location.pathname.split("/")[2];
         //$("#nav ul li a").each(function(){
@@ -360,8 +358,25 @@ App.Collections.PhotoList = Backbone.Collection.extend({
     }
 });
 
+App.Views.PhotoFormView = Backbone.View.extend({
+    el: '#body-form',
+    initialize: function(){
+        this.on('render', this.afterRender);
+        this.render();
+    },
+    render: function() {
+        this.$el.html('');
+        this.$el.html(nunjucks.render('/assets/forms/photo_form.html'));
+        this.trigger('render');
+        return this;
+    },
+    afterRender: function () {
+        new App.Views.S3FormView().render();
+    }
+});
+
 App.Views.PhotoTextFormView = Backbone.View.extend({
-    el: '#photo-form-target',
+    el: '#photo-textform-target',
 
     initialize: function(){
         this.render()
@@ -401,7 +416,7 @@ App.Views.PhotoTextFormView = Backbone.View.extend({
 });
 
 App.Views.S3FormView = Backbone.View.extend({
-    el: '#s3-form',
+    el: '#photo-s3form-target',
     events: {
         'change #file-input': 'validateanddisplaysample'
     },
@@ -528,7 +543,8 @@ App.Views.S3FormView = Backbone.View.extend({
     },
 
     render: function() {
-        this.$el.html(this.template);
+        //this.$el.html(this.template);
+        this.$el.html(nunjucks.render('/assets/forms/photo_text_form.html', { "phototextform['csrf_token']": '12345' }));
         console.log('modal rendered');
         return this;
     }
