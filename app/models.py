@@ -4,8 +4,13 @@ import re
 from app import db
 from app import app
 from config import WHOOSH_ENABLED
-from flask import url_for, render_template, g
+from flask import url_for, render_template, g, json
 from flask.ext.login import UserMixin
+
+import json
+import datetime
+
+json.JSONEncoder.default = lambda self, obj: (obj.isoformat() if isinstance(obj, datetime.datetime) else None)
 
 import sys
 if sys.version_info >= (3, 0):
@@ -230,8 +235,8 @@ class Post(db.Model):
         return vote_status
 
     def json_view(self):
-        return {'id': self.id, 'author': self.user_id, 'header': self.header, 'body': self.body,
-                'post_widget': self.get_post_widget()}
+        return {'id': self.id, 'author': self.user_id, 'header': self.header, 'body': self.body, 'photo': self.photo,
+                'timestamp': json.dumps(self.timestamp)}
 
     def get_absolute_url(self):
         return url_for('post', kwargs={"slug": self.slug})

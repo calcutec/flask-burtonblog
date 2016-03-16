@@ -36,19 +36,19 @@ app.config['OAUTH_CREDENTIALS'] = {
 }
 
 
-class CustomJSONEncoder(JSONEncoder):
-    """This class adds support for lazy translation texts to Flask's
-    JSON encoder. This is necessary when flashing translated texts."""
-    def default(self, obj):
-        from speaklater import is_lazy_string
-        if is_lazy_string(obj):
-            try:
-                return unicode(obj)  # python 2
-            except NameError:
-                return str(obj)  # python 3
-        return super(CustomJSONEncoder, self).default(obj)
-
-app.json_encoder = CustomJSONEncoder
+# class CustomJSONEncoder(JSONEncoder):
+#     """This class adds support for lazy translation texts to Flask's
+#     JSON encoder. This is necessary when flashing translated texts."""
+#     def default(self, obj):
+#         from speaklater import is_lazy_string
+#         if is_lazy_string(obj):
+#             try:
+#                 return unicode(obj)  # python 2
+#             except NameError:
+#                 return str(obj)  # python 3
+#         return super(CustomJSONEncoder, self).default(obj)
+#
+# app.json_encoder = CustomJSONEncoder
 
 if not app.debug and MAIL_SERVER != '':
     import logging
@@ -83,9 +83,10 @@ if os.environ.get('HEROKU') is not None:
 
 app.jinja_env.globals['momentjs'] = momentjs
 
-app.config["S3_LOCATION"] = 'https://s3.amazonaws.com/netbardus/'
+app.config["S3_LOCATION"] = 'https://s3.amazonaws.com/aperturus/'
 app.config["S3_UPLOAD_DIRECTORY"] = 'user_imgs'
-app.config["S3_BUCKET"] = 'netbardus'
+app.config["S3_BUCKET"] = 'aperturus'
+app.config["S3_REGION"] = 'us-east-1'
 app.config["AWS_ACCESS_KEY_ID"] = os.environ['AWS_ACCESS_KEY_ID']
 app.config["AWS_SECRET_ACCESS_KEY"] = os.environ['AWS_SECRET_ACCESS_KEY']
 

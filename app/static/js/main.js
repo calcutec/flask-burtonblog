@@ -13,17 +13,29 @@ App.Router.MainRouter = Backbone.Router.extend({
         'edit/:id': 'edit' // http://netbard.com/photos/portfolio/#edit/7
     },
     start: function(){
-        var photolist = new App.Collections.PhotoList(initialdata); // loaded from data.js
+
         console.log('now in view' + Backbone.history.location.href);
         var page_mark = Backbone.history.location.pathname.split("/")[2];
-        if ( page_mark == "gallery") {
-            new App.Views.MainView({el: "#photoapp", collection: photolist, page_mark:page_mark});
-            new App.Views.PhotoFormView().render();
-        } else if (page_mark == "login") {
-            window.loginview = new App.Views.LoginFormView({el:'#body-form'}).render();
-        }  else if (page_mark == "home") {
-            new App.Views.MainView({el: "#photoapp", collection: photolist, page_mark:page_mark});
+        if (page_mark == "home") {
+            //window.photolist = new App.Collections.PhotoList(initialdata); // loaded from data.js
+            //new App.Views.MainView({collection: window.photolist, page_mark:page_mark});
+        } else if ( page_mark == "gallery") {
+            window.photolist = new App.Collections.PhotoList();
+            window.photolist.refreshFromServer({
+                success: function(freshData) {
+                    window.photolist.set(freshData['collection']);
+                    new App.Views.MainView({collection: window.photolist, page_mark:page_mark});
+                    new App.Views.PhotoFormView();
+                },
+                fail: function(error) {
+                    console.log(error);
+                }
+            });
         }
+
+
+
+
         //var pgurl = "#" + Backbone.history.location.pathname.split("/")[2];
         //$("#nav ul li a").each(function(){
         //    console.log($(this).attr("href"))
@@ -52,19 +64,19 @@ App.Views.LoginFormView = Backbone.View.extend({
 });
 
 App.Models.Photo = Backbone.Model.extend( {
+    url: "/photos/gallery",
     defaults: {
         author: '',
         header: '',
         body: '',
         photo: '',
-        entryPhotoName: '',
-        subject: '',
-        read: false,
-        star: false,
-        selected:false,
-        archived:false,
-        label: '',
-        static_url: 'https://s3.amazonaws.com/aperturus/'
+        timestamp: ''
+        //subject: '',
+        //read: false,
+        //star: false,
+        //selected:false,
+        //archived:false,
+        //label: ''
     },
 
     validate: function(attrs){
@@ -103,7 +115,7 @@ App.Views.PhotoMainView = Backbone.View.extend({
     },
 
     render: function() {
-        this.$el.html(nunjucks.render("main_entry.html", this.model.toJSON()));
+        this.$el.html(nunjucks.render("main_entry.html", {'photo': this.model.get('photo')}));
         return this;
     },
 
@@ -135,7 +147,7 @@ App.Views.PhotoListView = Backbone.View.extend({
                     return response;
                 }
                 if (response.savedsuccess == true){
-                    new App.Views.Post({model:model}).render();
+                    new App.Views.Photo({model:model}).render();
                     this.remove();
                     return response;
                 }
@@ -149,11 +161,11 @@ App.Views.PhotoListView = Backbone.View.extend({
     },
     editPost: function(e){
         e.preventDefault();
-        if (!App.Views.Post.editable) {
+        if (!App.Views.Photo.editable) {
             var $target = $(e.target);
             $target.closest("article").find(".edit-me").addClass('edit-selected');
             var editSelected = $('.edit-selected');
-            App.Views.Post.currentwysihtml5 = editSelected.wysihtml5({
+            App.Views.Photo.currentwysihtml5 = editSelected.wysihtml5({
                 toolbar: {
                     "style": true,
                     "font-styles": true,
@@ -169,7 +181,7 @@ App.Views.PhotoListView = Backbone.View.extend({
             $target.closest("article").find('.edit-button').html("Submit Changes").attr('class', 'submit-button').css({'color':'red', 'style':'bold'});
             editSelected.css({"border": "2px #2237ff dotted"});
             editSelected.attr('contenteditable', false);
-            App.Views.Post.editable = true;
+            App.Views.Photo.editable = true;
         }
     },
     updatePost: function(e){
@@ -212,9 +224,8 @@ App.Views.MainView = Backbone.View.extend({
         _.extend(this, _.pick(options, "page_mark"));
         //this.collection.bind('change', this.renderSideMenu, this);
         //this.renderSideMenu();
-        this.renderMainPhoto(this.collection.models[0]);
-        this.renderPhotoList(this.collection);
-        this.renderTitle();
+        this.render();
+        this.listenTo(this.collection, 'change', this.render, this);
     },
 
     events: {
@@ -267,7 +278,14 @@ App.Views.MainView = Backbone.View.extend({
         this.render(this.collection.inbox());
     },
 
+    render: function() {
+        this.renderMainPhoto(this.collection.models[0]);
+        this.renderPhotoList(this.collection);
+        this.renderTitle();
+    },
+
     renderTitle: function(){
+        $("#headline").html('')
         $("#headline").html(
             nunjucks.render('title.html', {'page_mark': this.page_mark})
         );
@@ -306,9 +324,14 @@ App.Views.MainView = Backbone.View.extend({
 });
 
 App.Collections.PhotoList = Backbone.Collection.extend({
+    url: "/photos/gallery",
     model: App.Models.Photo,
 
     localStorage: new Backbone.LocalStorage("photos"),
+
+    refreshFromServer : function(options) {
+        return Backbone.ajaxSync('read', this, options);
+    },
 
     parse: function(response){
         return response.myPhotos
@@ -354,24 +377,20 @@ App.Collections.PhotoList = Backbone.Collection.extend({
     },
 
     comparator: function(photo){
-        return -photo.get('timestamp');
+        return photo.get('timestamp');
     }
 });
 
 App.Views.PhotoFormView = Backbone.View.extend({
     el: '#body-form',
     initialize: function(){
-        this.on('render', this.afterRender);
         this.render();
+        new App.Views.S3FormView();
     },
     render: function() {
         this.$el.html('');
         this.$el.html(nunjucks.render('/assets/forms/photo_form.html'));
-        this.trigger('render');
         return this;
-    },
-    afterRender: function () {
-        new App.Views.S3FormView().render();
     }
 });
 
@@ -390,17 +409,16 @@ App.Views.PhotoTextFormView = Backbone.View.extend({
 
     postnewentry: function(e) {
         e.preventDefault();
-        var newPostModel = new App.Models.Post(this.$el.find('form').serializeObject());
+        var newPostModel = new App.Models.Photo(this.$el.find('form').serializeObject());
         if (currentFile === null){
             alert("file upload has failed")
         } else {
-            var entryPhotoName = currentFile.name.split(".")[0]+"-hexgenerator."+currentFile.type.split("/")[1];
-            newPostModel.set({'entryPhotoName': entryPhotoName});
+            var photo = window.uploadedfilename;
+            newPostModel.set({'photo': photo});
         }
         newPostModel.save(null, {
             success: function (model, response) {
-                alert('saved');
-                new App.Views.Post({model:model}).render();
+                window.photolist.add(model);
                 return response;
             },
             error: function () {
@@ -410,15 +428,83 @@ App.Views.PhotoTextFormView = Backbone.View.extend({
         });
     },
     render: function() {
-        this.$el.html(nunjucks.render('/assets/forms/photo_text_form.html', { "phototextform['csrf_token']": '12345' }));
+        var csrfToken = $('meta[name=csrf-token]').attr('content');
+        this.$el.html(nunjucks.render('/assets/forms/photo_text_form.html',
+            { "csrf_token": csrfToken }));
         return this;
     }
 });
 
+App.Models.S3Form = Backbone.Model.extend( {
+    url: "/photos/AjaxS3form",
+});
+
+
 App.Views.S3FormView = Backbone.View.extend({
     el: '#photo-s3form-target',
+    initialize: function() {
+        this.model = new App.Models.S3Form();
+        this.listenTo(this.model, 'sync', this.render);
+        this.listenTo(this.model, 'destroy', this.dispose);
+        this.model.fetch();
+    },
     events: {
-        'change #file-input': 'validateanddisplaysample'
+        'change #file-input': 'validateanddisplaysample',
+        'submit': 'capturesubmit'
+    },
+
+    dispose: function() {
+            // same as this.$el.remove();
+        this.remove();
+
+        // unbind events that are
+        // set on this view
+        this.off();
+
+        // remove all models bindings
+        // made by this view
+        this.model.off( null, null, this );
+
+    },
+
+    capturesubmit: function(e) {
+        e.preventDefault();
+        var fd = new FormData();
+        window.uploadedfilename = 'user-images/' + (new Date).getTime() + '-' + currentFile.name;
+        fd.append('key', window.uploadedfilename);
+        fd.append('acl', this.model.get('acl'));
+        fd.append('policy', this.model.get('policy'));
+        fd.append('success_action_status', this.model.get('success_action_status'));
+        fd.append('x-amz-algorithm', this.model.get('x-amz-algorithm'));
+        fd.append('x-amz-credential', this.model.get('x-amz-credential'));
+        fd.append('x-amz-date', this.model.get('x-amz-date'));
+        fd.append('x-amz-signature',this.model.get('x-amz-signature'));
+        if (typeof(serverBlob) !== "undefined") {
+            fd.append('file', serverBlob);
+        } else {
+            fd.append('file', currentFile);
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.upload.addEventListener('progress',function(e){
+            $( "#progress-bar").html(e.loaded+" of "+e.total+" bytes loaded");
+        }, false);
+
+        var self=this;
+        xhr.onreadystatechange = function(e){
+            if(xhr.readyState == 4){
+                if(xhr.status == 200){
+                    self.model.destroy();
+                    $('#exif').hide()
+                    new App.Views.PhotoTextFormView();
+                } else {
+                    console.log(xhr.statusText);
+                }
+
+            }
+        };
+        xhr.open('POST', 'https://aperturus.s3.amazonaws.com/', true);
+        xhr.send(fd);
     },
 
     validateanddisplaysample: function(e) {
@@ -543,15 +629,12 @@ App.Views.S3FormView = Backbone.View.extend({
     },
 
     render: function() {
-        //this.$el.html(this.template);
-        this.$el.html(nunjucks.render('/assets/forms/photo_text_form.html', { "phototextform['csrf_token']": '12345' }));
-        console.log('modal rendered');
+        this.$el.html(nunjucks.render('/assets/forms/S3_upload_form.html'));
         return this;
     }
 });
 
-$.fn.serializeObject = function()
-{
+$.fn.serializeObject = function() {
     var o = {};
     var a = this.serializeArray();
     $.each(a, function() {
@@ -565,23 +648,6 @@ $.fn.serializeObject = function()
         }
     });
     return o;
-};
-
-
-$.fn.submitData = function(e){
-    var data = new FormData(this);
-    var xhr = new XMLHttpRequest();
-    xhr.upload.addEventListener('progress',function(e){
-        console.log('now loading')
-    }, false);
-    xhr.onreadystatechange = function(e){
-        if(xhr.readyState == 4){
-          console.log(xhr.statusText) //complete! - check xhr.status
-        }
-    };
-    xhr.open('POST', 'https://aperturus.s3.amazonaws.com/', true);
-    xhr.send(data);
-    return false;
 };
 
 $(document).ready(function() {
@@ -622,38 +688,11 @@ $(document).ready(function() {
         })
     });
 
-    $( "#s3-form" ).submit(function( e ) {
-        e.preventDefault();
-        var data = new FormData(this);
-        if (typeof(serverBlob) !== "undefined") {
-            data.append('image', serverBlob);
-        }
-        var xhr = new XMLHttpRequest();
-        xhr.upload.addEventListener('progress',function(e){
-            $( "#progress-bar").html(e.loaded+" of "+e.total+" bytes loaded");
-        }, false);
-        xhr.onreadystatechange = function(e){
-            if(xhr.readyState == 4){
-                if(xhr.status == 200){
-                    window.s3formview.$el.hide();
-                    window.phototextformview = new App.Views.PhotoTextFormView();
-
-                } else {
-                    console.log(xhr.statusText)
-                }
-
-            }
-        };
-        xhr.open('POST', 'https://aperturus.s3.amazonaws.com/', true);
-        xhr.send(data);
-        return false;
-    });
-
     //App.Collections.Post.postCollection = new App.Collections.Post();
     //App.Collections.Post.postCollection.fetch({
     //    success: function() {
-    //        App.Views.Posts.poemListView = new App.Views.Posts({collection: App.Collections.Post.postCollection});
-    //        App.Views.Posts.poemListView.attachToView();
+    //        App.Views.Photos.poemListView = new App.Views.Photos({collection: App.Collections.Post.postCollection});
+    //        App.Views.Photos.poemListView.attachToView();
     //    }
     //});
 });

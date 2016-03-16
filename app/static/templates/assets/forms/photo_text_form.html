@@ -1,15 +1,15 @@
-<form id="photo-text-form" action="/photos/gallery/" method="post" enctype="multipart/form-data" name="post">
-    {{ phototextform.csrf_token }}
+<form id="photo-text-form" action="/photos/gallery/" method="post" enctype="form-data" name="post">
+    <input type="hidden" name="csrf_token"    value="{{ csrf_token }}">
     <div class="row">
     <div class="form-group">
         <label for="header">Title</label>
-        <input class="u-full-width" id="header" name="header" placeholder="Title" type="text" value="">
+        <input id="header" name="header" placeholder="Title" type="text" value="">
 
         <span id="error_header" class="help-inline" style="color:red"></span>
     </div>
     <div class="form-group">
         <label for="body">Body</label>
-        <textarea class="u-full-width" id="body-text" name="body" placeholder="Body"></textarea>
+        <textarea id="body-text" name="body" placeholder="Body"></textarea>
 
         <div id="editable"></div>
         <span id="error_header" class="help-inline" style="color:red"></span>

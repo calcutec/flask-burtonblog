@@ -1,4 +1,6 @@
-from flask import render_template, flash, redirect, session, url_for, g, abort, jsonify
+
+from flask import render_template, flash, redirect, session, url_for, g, abort, jsonify, make_response, request, \
+    current_app
 from werkzeug.utils import secure_filename
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from flask.ext.sqlalchemy import get_debug_queries
@@ -6,13 +8,12 @@ from datetime import datetime
 from app import app, db, lm
 from config import DATABASE_QUERY_TIMEOUT
 from slugify import slugify
-from .forms import SignupForm, LoginForm, EditForm, PostForm, SearchForm, CommentForm, PhotoForm
+from .forms import SignupForm, LoginForm, EditForm, PostForm, SearchForm, CommentForm
 from .models import User, Post, Comment
 from .emails import follower_notification
 from .utils import OAuthSignIn, pre_upload, ViewData, BasePage, allowed_file
 from PIL import Image
 from datetime import timedelta
-from flask import make_response, request, current_app
 from functools import update_wrapper
 import json
 from flask.views import MethodView
@@ -22,20 +23,23 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 @app.route('/', methods=['GET'])
 def index():
-    return redirect(url_for('photos', page_mark="home"))
+    if current_user.is_authenticated():
+        return redirect(url_for('photos', page_mark="gallery"))
+    else:
+        return redirect(url_for('photos', page_mark="home"))
 
 
 class PhotoAPI(MethodView):
     # @login_required
     def post(self, page_mark=None):
-        form = PhotoForm()
+        form = PostForm()
         if form.validate_on_submit():
-            photo_name = form.entryPhotoName.data
+            photo_name = form.photo.data
             thumbnail_name = "thumbnail" + photo_name
             slug = slugify(form.header.data)
             post = Post(body=form.body.data, timestamp=datetime.utcnow(),
                         author=g.user, photo=photo_name, thumbnail=thumbnail_name, header=form.header.data,
-                        writing_type=form.writing_type.data, slug=slug)
+                        writing_type="entry", slug=slug)
             db.session.add(post)
             db.session.commit()
             if request.is_xhr:
@@ -53,23 +57,25 @@ class PhotoAPI(MethodView):
                 return render_template("base.html", **context)
 
     def get(self, page_mark=None, post_id=None):
-        if current_user.is_authenticated() or page_mark == "login" or page_mark == "home":
+        if current_user.is_authenticated() or page_mark == "home":
             if post_id is None:    # Read all posts
+                assets = BasePage(page_mark=page_mark).assets
+                context = {'assets': assets}
                 if request.is_xhr:
-                    result = {'iserror': False, 'savedsuccess': True}
-                    return json.dumps(result)
-                    # posts = Post.query.all()
-                    # return jsonify(myPoems=[i.json_view() for i in posts])
-                    # formerly rendered client-side; change to return json and render client-side
+                    if page_mark == 'AjaxS3form':
+                        form = BasePage(page_mark=page_mark).assets['body_form']
+                        return json.dumps(form)
+                    elif page_mark == 'gallery':
+                        collection = BasePage(page_mark=page_mark).assets['collection']
+                        return json.dumps({"collection": collection})
                 else:
-                    # result = {'iserror': False, 'savedsuccess': True}
-                    # return json.dumps(result)
-                    return render_template("base.html")
+                    return render_template("base.html", **context)
             else:
                 pass  # Todo create logic for xhr request for a single post
         else:
-            # return current_app.login_manager.unauthorized()
-            return redirect(url_for('photos', page_mark="login"))
+            assets = BasePage(page_mark="login").assets
+            context = {'assets': assets}
+            return render_template("base.html", **context)
 
     # Update Post
     @login_required
@@ -99,10 +105,10 @@ class PhotoAPI(MethodView):
 # urls for Photo API
 photo_api_view = PhotoAPI.as_view('photos')
 # Read all posts for a given page, Create a new post
-app.add_url_rule('/photos/<any("gallery", "members", "profile", "home"):page_mark>/',
+app.add_url_rule('/photos/<any("gallery", "members", "profile", "home", AjaxS3form):page_mark>',
                  view_func=photo_api_view, methods=["GET", "POST"])
 # Update or Delete a single post
-app.add_url_rule('/photos/detail/<int:post_id>/', view_func=photo_api_view, methods=["GET", "PUT", "DELETE"])
+app.add_url_rule('/photos/detail/<int:post_id>', view_func=photo_api_view, methods=["GET", "PUT", "DELETE"])
 
 
 @app.route('/logout', methods=['GET'])
@@ -207,10 +213,10 @@ class LoginAPI(MethodView):
                 session.pop('remember_me', None)
             login_user(currentuser, remember=remember_me)
             # return redirect(request.args.get('next') or url_for('photos', page_mark="gallery"))
-            return redirect(url_for('photos', page_mark="home"))
+            return redirect(url_for('photos', page_mark="gallery"))
         else:   # LOGIN PAGE
             if g.user is not None and g.user.is_authenticated():
-                return redirect(url_for('members'))
+                return redirect(url_for('photos', page_mark="gallery"))
             login_data = ViewData("login")
             return render_template(login_data.template_name, **login_data.context)
 

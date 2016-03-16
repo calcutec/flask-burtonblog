@@ -14,7 +14,7 @@ class LoginForm(Form):
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)
 
-    def validate(self, extra_validators=None):
+    def validate(self):
         if not Form.validate(self):
             return False
 
@@ -38,7 +38,7 @@ class SignupForm(Form):
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)
 
-    def validate(self, extra_validators=None):
+    def validate(self):
         if not Form.validate(self):
             return False
 
@@ -76,20 +76,11 @@ class EditForm(Form):
 
 
 class PostForm(Form):
-    my_choices = [('poem', 'Poem'), ('op-ed', 'Op-ed'), ('featured', 'Featured')]
-    body = TextAreaField('Post', validators=[DataRequired()])
-    header = StringField('Header', validators=[DataRequired()])
-    writing_type = SelectField('Post Type', choices=my_choices, default='poem')
-    photo = FileField('Your photo', validators=[FileAllowed(['jpg', 'png'], 'Images only!')])
-    submit = SubmitField("Send")
-
-
-class PhotoForm(Form):
     my_choices = [('entry', 'Entry'), ('op-ed', 'Op-ed'), ('featured', 'Featured')]
     body = TextAreaField('Post', validators=[DataRequired()])
     header = StringField('Header', validators=[DataRequired()])
+    photo = StringField('Entry Photo Name', validators=[DataRequired()])
     writing_type = SelectField('Post Type', choices=my_choices, default='entry')
-    entryPhotoName = StringField('File Name')
     submit = SubmitField("Send")
 
 
