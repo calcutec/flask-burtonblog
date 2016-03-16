@@ -279,7 +279,7 @@ App.Views.MainView = Backbone.View.extend({
     },
 
     render: function() {
-        this.renderMainPhoto(this.collection.models[0]);
+        this.renderMainPhoto(this.collection.last());
         this.renderPhotoList(this.collection);
         this.renderTitle();
     },
