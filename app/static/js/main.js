@@ -7,46 +7,38 @@ window.App = {
 
 App.Router.MainRouter = Backbone.Router.extend({
     routes: { // sets the routes
-        '':         'start', // http://netbard.com/photos/portfolio/
-        '_=_':         'start', // http://netbard.com/photos/portfolio/#_=_    //Workaround for Facebook redirect
-        'create': 'create', // http://netbard.com/photos/portfolio/#create
-        'edit/:id': 'edit' // http://netbard.com/photos/portfolio/#edit/7
+        'home':     'home',
+        'photos':   'photos',
+        'create':   'create',
+        'edit/:id': 'edit', // http://netbard.com/edit/7
+        'people':   'people'
     },
-    start: function(){
-
+    home: function() {
         console.log('now in view' + Backbone.history.location.href);
-        var page_mark = Backbone.history.location.pathname.split("/")[2];
-        if (page_mark == "home") {
-            //window.photolist = new App.Collections.PhotoList(initialdata); // loaded from data.js
-            //new App.Views.MainView({collection: window.photolist, page_mark:page_mark});
-        } else if ( page_mark == "gallery") {
-            App.Collections.photolist = new App.Collections.PhotoList();
-            App.Collections.photolist.refreshFromServer({
-                success: function(freshData) {
-                    App.Collections.photolist.set(freshData['collection']);
-                    App.Views.mainView = new App.Views.MainView({collection: App.Collections.photolist});
-                    App.Views.mainView.attachToPhotoListView();
-                    App.Views.mainView.attachToPhotoMainView();
-                    App.Views.PhotoFormView.photoFormView = new App.Views.PhotoFormView();
-                },
-                fail: function(error) {
-                    console.log(error);
-                }
-            });
-        }
-        //var pgurl = "#" + Backbone.history.location.pathname.split("/")[2];
-        //$("#nav ul li a").each(function(){
-        //    console.log($(this).attr("href"))
-        //    if($(this).attr("href") == pgurl) {
-        //        $(this).addClass("active");
-        //    }
-        //})
+    },
+    photos: function() {
+        App.Collections.photolist = new App.Collections.PhotoList();
+        App.Collections.photolist.refreshFromServer({
+            success: function(freshData) {
+                App.Collections.photolist.set(freshData['collection']);
+                App.Views.mainView = new App.Views.MainView({collection: App.Collections.photolist});
+                App.Views.mainView.attachToPhotoListView();
+                App.Views.mainView.attachToPhotoMainView();
+                App.Views.PhotoFormView.photoFormView = new App.Views.PhotoFormView();
+            },
+            fail: function(error) {
+                console.log(error);
+            }
+        });
     },
     edit: function(id){
         console.log('edit route with id: ' + id);
     },
     create: function(){
-        console.log('View for creating photos rendered');
+        console.log('now in view' + Backbone.history.location.href);
+    },
+    people: function() {
+        console.log('now in view' + Backbone.history.location.href);
     }
 });
 
@@ -62,7 +54,7 @@ App.Views.LoginFormView = Backbone.View.extend({
 });
 
 App.Models.Photo = Backbone.Model.extend( {
-    url: "/photos/gallery",
+    url: "/photos",
     defaults: {
         photoid: '',
         author: '',
@@ -351,7 +343,7 @@ App.Views.MainView = Backbone.View.extend({
 });
 
 App.Collections.PhotoList = Backbone.Collection.extend({
-    url: "/photos/gallery",
+    url: "/photos",
     model: App.Models.Photo,
 
     localStorage: new Backbone.LocalStorage("photos"),
@@ -463,7 +455,7 @@ App.Views.PhotoTextFormView = Backbone.View.extend({
 });
 
 App.Models.S3Form = Backbone.Model.extend( {
-    url: "/photos/AjaxS3form",
+    url: "/AjaxS3form",
 });
 
 
@@ -681,8 +673,7 @@ $(document).ready(function() {
     var env = nunjucks.configure('/static/templates');
     env.addGlobal("static_url", 'https://s3.amazonaws.com/aperturus/');
     new App.Router.MainRouter();
-    Backbone.history.start();
-
+    Backbone.history.start({pushState: true});
     var csrftoken = $('meta[name=csrf-token]').attr('content');
     $(function(){
         $.ajaxSetup({

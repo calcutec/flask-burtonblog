@@ -33,9 +33,8 @@
 	<body>
         <div class="bodycontainer" id="photo-app">
             <nav class="navbar">
-                {% include 'slicknav.html' %}
+                {% include 'nav.html' %}
             </nav>
-{#                {{ assets.title|safe if assets.title != None }}#}
             <main>
                 {% if assets %}
                     <div id="photo-main">{{ assets.main_entry|safe if assets.main_entry != None }}</div>

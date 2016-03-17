@@ -24,7 +24,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 @app.route('/', methods=['GET'])
 def index():
     if current_user.is_authenticated():
-        return redirect(url_for('photos', page_mark="gallery"))
+        return redirect(url_for('photos', page_mark="photos"))
     else:
         return redirect(url_for('photos', page_mark="home"))
 
@@ -57,7 +57,7 @@ class PhotoAPI(MethodView):
                 return render_template("base.html", **context)
 
     def get(self, page_mark=None, post_id=None):
-        if current_user.is_authenticated() or page_mark == "home":
+        if current_user.is_authenticated() or page_mark != "upload" or page_mark != "profile":
             if post_id is None:    # Read all posts
                 assets = BasePage(page_mark=page_mark).assets
                 context = {'assets': assets}
@@ -213,10 +213,10 @@ class LoginAPI(MethodView):
                 session.pop('remember_me', None)
             login_user(currentuser, remember=remember_me)
             # return redirect(request.args.get('next') or url_for('photos', page_mark="gallery"))
-            return redirect(url_for('photos', page_mark="gallery"))
+            return redirect(url_for('photos', page_mark="photos"))
         else:   # LOGIN PAGE
             if g.user is not None and g.user.is_authenticated():
-                return redirect(url_for('photos', page_mark="gallery"))
+                return redirect(url_for('photos', page_mark="photos"))
             context = {'assets': BasePage(page_mark="login").assets}
             return render_template("base.html", **context)
 
@@ -347,8 +347,6 @@ member_api_view = MembersAPI.as_view('members')  # URLS for MEMBER API
 app.add_url_rule('/members/<nickname>', view_func=member_api_view, methods=["GET", "POST", "PUT", "DELETE"])
 # Read all members
 app.add_url_rule('/members/', view_func=member_api_view, methods=["GET"])
-app.add_url_rule('/phonegap/', view_func=member_api_view, methods=["GET"])
-app.add_url_rule('/piemail/', view_func=member_api_view, methods=["GET"])
 # Update a member when JS is turned off)
 app.add_url_rule('/members/<action>/<nickname>', view_func=member_api_view, methods=["GET"])
 
@@ -543,7 +541,6 @@ def before_request():
         g.user.last_seen = datetime.utcnow()
         db.session.add(g.user)
         db.session.commit()
-        g.search_form = SearchForm()
 
 
 @app.after_request
@@ -608,21 +605,3 @@ def crossdomain(origin=None, methods=None, headers=None,
         f.provide_automatic_options = False
         return update_wrapper(wrapped_function, f)
     return decorator
-
-
-@app.route('/employees', methods=['GET'])
-@crossdomain(origin='*')
-def employees():
-        employee_dict = User.query.all()
-        return jsonify(employees=[i.json_view() for i in employee_dict])
-
-
-# @app.template_filter('curly')  # Filter to create curly braces
-# def curly(value):
-#     # Handle value as string  {{'foo'|curly}}
-#     if isinstance(value,str):
-#         return_value = value
-#     # Handle value directly. {{foo|curly}}
-#     else:
-#         return_value = value._undefined_name
-#     return "{{" + return_value + "}}"
