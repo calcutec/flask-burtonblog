@@ -1,29 +1,25 @@
-<div id="mobileMenu"></div>
-<div id="nav">
-    <div class="container">
-        <ul id="main-menu">
-            <li>Gallery
-                <ul>
-                    <li><a href="/photos/gallery">My Photos</a></li>
-                    <li><<a href="#">Favorites</a></li>
-                    <li><<a href="#">Followed</a></li>
+<div class="fixed-nav">
+    <input class="burger-check" id="burger-check" type="checkbox"><label for="burger-check" class="burger"></label>
+    <div id="header">{{ assets.page_mark }}</div>
+    <nav id="navigation1" class="navigation">
+        <div id="nav">
+            <div class="container">
+                <ul id="main-menu">
+                    {% if not assets.page_mark == "photos"  %}
+                        <li class="button button-primary"><a href="#">Photos</a></li>
+                    {% endif %}
+                    {% if current_user.is_authenticated()  %}
+                        <li class="button button-primary"><a href="#">Submit</a></li>
+                        <li class="button button-primary"><a href="#">Profile</a></li>
+                        <li class="button button-primary"><a href="#">Logout</a></li>
+                    {% else %}
+                        <li class="button button-primary"><a href="#">Login</a></li>
+                    {% endif %}
+                    {% if not assets.page_mark == "people"  %}
+                        <li class="button button-primary"><a href="#">People</a></li>
+                    {% endif %}
                 </ul>
-            </li>
-            <li>Members
-                <ul>
-                    <li><a href="#">Followed</a></li>
-                    <li><<a href="#">Most Recent</a></li>
-                    <li><<a href="#">Most Appreciated</a></li>
-                </ul>
-            </li>
-            <li>Admin
-                <ul>
-                    <li><a href="/logout">Logout</a></li>
-                    <li><<a href="#">Update Profile</a></li>
-                    <li><<a href="#">Settings</a></li>
-                </ul>
-            </li>
-            <li><a href="/photos/create">Submit New Photo</a></li>
-        </ul>
-    </div>
+            </div>
+        </div>
+    </nav>
 </div>

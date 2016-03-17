@@ -22,22 +22,22 @@ import hashlib
 
 class BasePage(object):
     def __init__(self, page_mark):
-        self.page_mark = page_mark
-        self.assets = {}
+        self.assets = dict()
+        self.assets['page_mark'] = page_mark
         self.getassets()
 
     def getassets(self):
         self.assets['body_form'] = self.getform()
         posts = self.getposts()
         if request.is_xhr:
-            if not self.page_mark == "AjaxS3form":
-                self.assets['title'] = jsonify(page_mark=self.page_mark).data
+            if not self.assets['page_mark'] == "AjaxS3form":
+                self.assets['title'] = jsonify(page_mark=self.assets['page_mark']).data
                 self.assets['collection'] = [i.json_view() for i in posts[0:6]]
         else:
-            self.assets['title'] = render_template("title.html", page_mark=self.page_mark)
-            if self.page_mark == "home":
+            self.assets['title'] = render_template("title.html", page_mark=self.assets['page_mark'])
+            if self.assets['page_mark'] == "home":
                 self.assets['main_entry'] = render_template("main_entry.html", photo=posts[0].photo, id=posts[0].id)
-            elif self.page_mark == "login":
+            elif self.assets['page_mark'] == "login":
                 pass
             else:
                 self.assets['main_entry'] = render_template("main_entry.html", photo=posts[0].photo, id=posts[0].id)
@@ -45,61 +45,60 @@ class BasePage(object):
 
     def getposts(self):
         posts = None
-        if self.page_mark == 'home':
+        if self.assets['page_mark'] == 'home':
             posts = Post.query.filter_by(writing_type="op-ed").order_by(Post.timestamp.desc())
-        elif self.page_mark == 'gallery':
+        elif self.assets['page_mark'] == 'photos':
             posts = Post.query.filter_by(writing_type="entry").order_by(Post.timestamp.desc())
-        elif self.page_mark == 'profile':
+        elif self.assets['page_mark'] == 'profile':
             posts = Post.query.filter_by(author=g.user).order_by(Post.timestamp.desc())
-        elif self.page_mark == 'members':
+        elif self.assets['page_mark'] == 'members':
             posts = User.query.all()
-        elif self.page_mark == 'detail':
+        elif self.assets['page_mark'] == 'detail':
             posts = User.query.all()
         return posts
 
     def getform(self):
         formassets = None
-        if g.user.is_authenticated() is False and self.page_mark != "home":
+        if g.user.is_authenticated() is False and self.assets['page_mark'] != "home":
             if request.is_xhr:
                 pass
             else:
                 formassets = render_template("assets/forms/login_form.html")
         else:
-            if request.is_xhr and self.page_mark == "AjaxS3form":
+            if request.is_xhr and self.assets['page_mark'] == "AjaxS3form":
                 formassets = self.s3_upload_form(app.config['AWS_ACCESS_KEY_ID'], app.config['AWS_SECRET_ACCESS_KEY'],
                                             app.config['S3_REGION'], 'aperturus', prefix="user-images/")
             else:
-                if self.page_mark == 'signup':
+                if self.assets['page_mark'] == 'signup':
                     self.form = SignupForm()
                     formassets = render_template("assets/forms/signup_form.html", form=self.form)
-                elif self.page_mark == 'profile':
+                elif self.assets['page_mark'] == 'profile':
                     self.form = EditForm()
                     self.form.nickname.data = g.user.nickname
                     self.form.about_me.data = g.user.about_me
                     formassets = render_template("assets/forms/profile_form.html", form=self.form)
-                elif self.page_mark == 'portfolio':
+                elif self.assets['page_mark'] == 'portfolio':
                     self.form = PostForm()
                     formassets = render_template("assets/forms/poem_form.html", form=self.form)
-                elif self.page_mark == 'detail':
+                elif self.assets['page_mark'] == 'detail':
                     self.form = CommentForm()
                     formassets = render_template("assets/forms/comment_form.html", form=self.form)
-        return formassets
 
 
-        # else:
-        #     if self.page_mark == 'profile':
-        #         form = EditForm()
-        #         form.nickname.data = g.user.nickname
-        #         form.about_me.data = g.user.about_me
-        #         rendered_form = render_template("assets/forms/profile_form.html", form=EditForm)
-        #     elif self.page_mark == 'detail':
-        #         rendered_form = render_template("assets/forms/comment_form.html", form=CommentForm(),
-        #                                         post=self.getposts)
-            # No file upload for users without javascript since validation not possible
-            # if self.page_mark == 'gallery':
-            #     s3_form = self.create_s3_form()
-            #     photo_text_form = render_template("assets/forms/photo_text_form.html", phototextform=PostForm())
-            #     rendered_form = render_template("assets/forms/photo_form.html", S3form=s3_form)
+            # else:
+            #     if self.page_mark == 'profile':
+            #         form = EditForm()
+            #         form.nickname.data = g.user.nickname
+            #         form.about_me.data = g.user.about_me
+            #         rendered_form = render_template("assets/forms/profile_form.html", form=EditForm)
+            #     elif self.page_mark == 'detail':
+            #         rendered_form = render_template("assets/forms/comment_form.html", form=CommentForm(),
+            #                                         post=self.getposts)
+                # No file upload for users without javascript since validation not possible
+                # if self.page_mark == 'photos':
+                #     s3_form = self.create_s3_form()
+                #     photo_text_form = render_template("assets/forms/photo_text_form.html", phototextform=PostForm())
+                #     rendered_form = render_template("assets/forms/photo_form.html", S3form=s3_form)
         return formassets
 
     def hmac_sha256(self, key, msg):

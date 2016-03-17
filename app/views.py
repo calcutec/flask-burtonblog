@@ -65,7 +65,7 @@ class PhotoAPI(MethodView):
                     if page_mark == 'AjaxS3form':
                         form = BasePage(page_mark=page_mark).assets['body_form']
                         return json.dumps(form)
-                    elif page_mark == 'gallery':
+                    elif page_mark == 'photos':
                         collection = BasePage(page_mark=page_mark).assets['collection']
                         return json.dumps({"collection": collection})
                 else:
@@ -105,10 +105,10 @@ class PhotoAPI(MethodView):
 # urls for Photo API
 photo_api_view = PhotoAPI.as_view('photos')
 # Read all posts for a given page, Create a new post
-app.add_url_rule('/photos/<any("gallery", "members", "profile", "home", AjaxS3form):page_mark>',
+app.add_url_rule('/<any("photos", "people", "profile", "home", AjaxS3form):page_mark>',
                  view_func=photo_api_view, methods=["GET", "POST"])
 # Update or Delete a single post
-app.add_url_rule('/photos/detail/<int:post_id>', view_func=photo_api_view, methods=["GET", "PUT", "DELETE"])
+app.add_url_rule('/detail/<int:post_id>', view_func=photo_api_view, methods=["GET", "PUT", "DELETE"])
 
 
 @app.route('/logout', methods=['GET'])

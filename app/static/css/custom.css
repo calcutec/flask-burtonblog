@@ -15,7 +15,16 @@ body {
     max-width: 1280px;
     margin: 0 3.5vw 0 3.5vw;
 }
-
+#title section::first-letter {
+    text-transform: uppercase
+}
+.well {
+  box-shadow: 0 0 5px #888;
+  padding: 1rem;
+  border-radius: 5px;
+  margin-right: 0.5vw;
+  margin-bottom: 1rem;
+}
 /** Typography **/
 h1, h2, h3, h4, h5, h6 {
   margin-top: 0;
@@ -50,18 +59,6 @@ a:hover {
 table {
   table-layout: fixed;
   width: 100%
-}
-
-#title section::first-letter {
-    text-transform: uppercase
-}
-
-.well {
-  box-shadow: 0 0 5px #888;
-  padding: 1rem;
-  border-radius: 5px;
-  margin-right: 0.5vw;
-  margin-bottom: 1rem;
 }
 
 /* Buttons
@@ -278,82 +275,121 @@ span.rounded-icon svg {
     .bodycontainer { margin-left: calc((100vw - 1280px)/2); }
 }
 
-/** Slicknav styling **/
-#photo-main {
-    margin-top: 1.5rem;
+/** Navbar styling **/
+.fixed-nav {
+    position:fixed;
+    top:0;
+    padding: 8px 0 5px 0;
+    margin:auto;
+    z-index:100000;
+    width:92.5%;
+    background-color: #ffffff;
+    border-bottom: 3px solid #000000;
 }
-.slicknav_btn {
-  float: left;
-}
-
-.slicknav_brand {
-    float: right;
-}
-.slicknav_menu {
-    position: fixed;
-    top: 0px;
-    width: 92.5vw;
-    text-transform: uppercase;
-    font-weight: 600;
-    font-size: 1.125em;
-    padding: 1em .5em 0;
-    background: #fff;
-    z-index: 999;
-    border-bottom: 3px solid black;
-}
-ul.slicknav_nav {
-    border-top: 1px dotted black;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-}
-.slicknav_nav ul {
-    margin: 0 0 0 5rem;
-}
-.slicknav_nav a {
-    margin: 0px 5px;
-    line-height: .6;
-}
-.slicknav_brand {
-    padding: 4px 12px;
-}
-#branding {
+#header {
+    display: inline-block;
     font-size: 3.5rem;
     font-weight: 300;
     letter-spacing: -3.5px;
+    text-transform: uppercase;
+    padding-left: 4rem;
+}
+.burger {
+  display: inline-block;
+  border: 0;
+  background: none;
+  outline: 0;
+  padding: 0;
+  cursor: pointer;
+  border-bottom: 4px solid currentColor;
+  width: 28px;
+  transition: border-bottom 1s ease-in-out;
+  -webkit-transition: border-bottom 1s ease-in-out;
+}
+.burger::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+.burger:before {
+  content: "";
+  display: block;
+  border-bottom: 4px solid currentColor;
+  width: 100%;
+  margin-bottom: 5px;
+  transition: -webkit-transform 0.5s ease-in-out;
+  transition: transform 0.5s ease-in-out;
+  transition: transform 0.5s ease-in-out, -webkit-transform 0.5s ease-in-out;
+  -webkit-transition: -webkit-transform 0.5s ease-in-out;
+}
+.burger:after {
+  content: "";
+  display: block;
+  border-bottom: 4px solid currentColor;
+  width: 100%;
+  margin-bottom: 5px;
+  transition: -webkit-transform 0.5s ease-in-out;
+  transition: transform 0.5s ease-in-out;
+  transition: transform 0.5s ease-in-out, -webkit-transform 0.5s ease-in-out;
+  -webkit-transition: -webkit-transform 0.5s ease-in-out;
+}
+
+.burger-check {
+  display: none !important;
+}
+
+.burger-check:checked ~ .burger {
+  border-bottom: 4px solid transparent;
+  transition: border-bottom 0.8s ease-in-out;
+  -webkit-transition: border-bottom 0.8s ease-in-out;
+}
+.burger-check:checked ~ .burger:before {
+  transform: rotate(-405deg) translateY(1px) translateX(-3px);
+  -webkit-transform: rotate(-405deg) translateY(1px) translateX(-3px);
+  transition: -webkit-transform 0.5s ease-in-out;
+  transition: transform 0.5s ease-in-out;
+  transition: transform 0.5s ease-in-out, -webkit-transform 0.5s ease-in-out;
+  -webkit-transition: -webkit-transform 0.5s ease-in-out;
+}
+.burger-check:checked ~ .burger:after {
+  transform: rotate(405deg) translateY(-4px) translateX(-5px);
+  -webkit-transform: rotate(405deg) translateY(-4px) translateX(-5px);
+  transition: -webkit-transform 0.5s ease-in-out;
+  transition: transform 0.5s ease-in-out;
+  transition: transform 0.5s ease-in-out, -webkit-transform 0.5s ease-in-out;
+  -webkit-transition: -webkit-transform 0.5s ease-in-out;
+}
+
+.navigation {
+  overflow: hidden;
+  max-height: 0;
+  -webkit-transition: max-height 0.5s ease-in-out;
+  transition: max-height 0.5s ease-in-out;
+}
+
+.burger-check:checked ~ .navigation {
+  max-height: 500px;
+  -webkit-transition: max-height 0.5s ease-in-out;
+  transition: max-height 0.5s ease-in-out;
+}
+#photo-main {
+    margin-top: 1.5rem;
+}
+#nav {
+    border-top: 1px dotted darkblue;
 }
 #nav ul {
-    padding:0;
-    margin:0;
+    padding: 0;
+    margin: 0;
 }
 #nav li {
     display:inline-block;
-    padding:0.5em 0.5em;
+    padding: 0 .5em .5em .5em;
+    font-size: 1.2rem;
+    font-weight: 600;
 }
-
-.lt-ie8 {
-    display:inline;
-    zoom:1;
-}
-
 #nav a {
     color:#333333;
     text-decoration:none;
-}
-
-#nav a:hover {
-    border-bottom:4px solid #ea0b25;
-}
-.js #main-menu {
-    display:none;
-}
-.js #mobileMenu {
-    display:block;
-    position:fixed;
-    width:92.5%;
-    z-index:1000;
-}
-.js #nav{
-    text-align:center;
 }
 #nav {
     position: relative;
@@ -369,9 +405,6 @@ ul.slicknav_nav {
     text-align: center;
     font-size:0.6em;
     line-height: 1.5em;
-}
-#nav ul li {
-    padding:0.25em;
 }
 
 /* Login Forms Tab Menu */
@@ -434,7 +467,6 @@ ul.slicknav_nav {
     font-size: 18px;
   }
 }
-
 @media screen and (max-width: 400px) {
   #loginforms > label {
     padding: 15px;
