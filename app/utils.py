@@ -36,11 +36,11 @@ class BasePage(object):
         else:
             self.assets['title'] = render_template("title.html", page_mark=self.page_mark)
             if self.page_mark == "home":
-                self.assets['main_entry'] = render_template("main_entry.html", photo=posts[0].photo)
+                self.assets['main_entry'] = render_template("main_entry.html", photo=posts[0].photo, id=posts[0].id)
             elif self.page_mark == "login":
                 pass
             else:
-                self.assets['main_entry'] = render_template("main_entry.html", photo=posts[0].photo)
+                self.assets['main_entry'] = render_template("main_entry.html", photo=posts[0].photo, id=posts[0].id)
                 self.assets['archives'] = render_template("archives.html", posts=posts[1:6])
 
     def getposts(self):

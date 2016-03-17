@@ -20,22 +20,20 @@ App.Router.MainRouter = Backbone.Router.extend({
             //window.photolist = new App.Collections.PhotoList(initialdata); // loaded from data.js
             //new App.Views.MainView({collection: window.photolist, page_mark:page_mark});
         } else if ( page_mark == "gallery") {
-            window.photolist = new App.Collections.PhotoList();
-            window.photolist.refreshFromServer({
+            App.Collections.photolist = new App.Collections.PhotoList();
+            App.Collections.photolist.refreshFromServer({
                 success: function(freshData) {
-                    window.photolist.set(freshData['collection']);
-                    new App.Views.MainView({collection: window.photolist, page_mark:page_mark});
-                    new App.Views.PhotoFormView();
+                    App.Collections.photolist.set(freshData['collection']);
+                    App.Views.mainView = new App.Views.MainView({collection: App.Collections.photolist});
+                    App.Views.mainView.attachToPhotoListView();
+                    App.Views.mainView.attachToPhotoMainView();
+                    App.Views.PhotoFormView.photoFormView = new App.Views.PhotoFormView();
                 },
                 fail: function(error) {
                     console.log(error);
                 }
             });
         }
-
-
-
-
         //var pgurl = "#" + Backbone.history.location.pathname.split("/")[2];
         //$("#nav ul li a").each(function(){
         //    console.log($(this).attr("href"))
@@ -66,6 +64,7 @@ App.Views.LoginFormView = Backbone.View.extend({
 App.Models.Photo = Backbone.Model.extend( {
     url: "/photos/gallery",
     defaults: {
+        photoid: '',
         author: '',
         header: '',
         body: '',
@@ -134,10 +133,15 @@ App.Views.PhotoListView = Backbone.View.extend({
     },
 
     events: {
+        'click img':   'showImage',
         'click .edit':   'editPost',
         'click .edit-button':   'editPost',
         'click .submit-button':   'updatePost',
         'click .delete-button': 'deletePost',
+    },
+
+    showImage: function() {
+        alert('image clicked!');
     },
 
     savePost: function(){
@@ -178,7 +182,8 @@ App.Views.PhotoListView = Backbone.View.extend({
                     fa: true
                 }
             });
-            $target.closest("article").find('.edit-button').html("Submit Changes").attr('class', 'submit-button').css({'color':'red', 'style':'bold'});
+            $target.closest("article").find('.edit-button').html("Submit Changes").attr('class', 'submit-button')
+                .css({'color':'red', 'style':'bold'});
             editSelected.css({"border": "2px #2237ff dotted"});
             editSelected.attr('contenteditable', false);
             App.Views.Photo.editable = true;
@@ -217,15 +222,14 @@ App.Views.PhotoListView = Backbone.View.extend({
     }
 });
 
-
 App.Views.MainView = Backbone.View.extend({
 
     initialize: function(options){
         _.extend(this, _.pick(options, "page_mark"));
         //this.collection.bind('change', this.renderSideMenu, this);
         //this.renderSideMenu();
-        this.render();
-        this.listenTo(this.collection, 'change', this.render, this);
+        //this.render();
+        this.listenTo(this.collection, 'add', this.render, this);
     },
 
     events: {
@@ -310,6 +314,29 @@ App.Views.MainView = Backbone.View.extend({
     addOneToList: function (photo) {
         var photoView = new App.Views.PhotoListView({ model: photo});
         $('ul#img-list', this.el).append(photoView.render().el);
+    },
+
+    attachToPhotoListView: function(){
+        var self = this;
+        $("ul#img-list li").each(function(){
+            var photoEl = $(this);
+            var id = photoEl.data().id;
+            var photo = self.collection.get(id);
+            new App.Views.PhotoListView({
+                model: photo,
+                el: photoEl
+            });
+        });
+    },
+
+    attachToPhotoMainView: function(){
+        var mainPhotoEl = $("#photo-main");
+        var id = mainPhotoEl.find('img').data().id
+        var photo = this.collection.get(id);
+        App.Views.photoMainView = new App.Views.PhotoMainView({
+            model: photo,
+            el: mainPhotoEl
+        });
     }
 
 
@@ -687,12 +714,4 @@ $(document).ready(function() {
             }
         })
     });
-
-    //App.Collections.Post.postCollection = new App.Collections.Post();
-    //App.Collections.Post.postCollection.fetch({
-    //    success: function() {
-    //        App.Views.Photos.poemListView = new App.Views.Photos({collection: App.Collections.Post.postCollection});
-    //        App.Views.Photos.poemListView.attachToView();
-    //    }
-    //});
 });
