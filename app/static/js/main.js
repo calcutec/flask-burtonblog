@@ -683,7 +683,8 @@ $(document).ready(function() {
             prependTo:'#mobileMenu',
             closeOnClick: true,
             label: '',
-            brand: 'Gallery'
+            duplicate: false,
+            brand: 'Home'
         });
 
         $(document).on('click', "#main-menu .scroll, .slicknav_menu .scroll", function(e) {

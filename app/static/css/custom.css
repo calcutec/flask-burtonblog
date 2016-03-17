@@ -55,6 +55,7 @@ table {
 #title section::first-letter {
     text-transform: uppercase
 }
+
 .well {
   box-shadow: 0 0 5px #888;
   padding: 1rem;
@@ -279,32 +280,51 @@ span.rounded-icon svg {
 
 /** Slicknav styling **/
 #photo-main {
-    margin-top: 85px;
+    margin-top: 1.5rem;
 }
-#nav {
+.slicknav_btn {
+  float: left;
+}
+
+.slicknav_brand {
+    float: right;
+}
+.slicknav_menu {
     position: fixed;
     top: 0px;
     width: 92.5vw;
     text-transform: uppercase;
     font-weight: 600;
     font-size: 1.125em;
-    padding: 1.5em 0 1em 0;
+    padding: 1em .5em 0;
     background: #fff;
     z-index: 999;
     border-bottom: 3px solid black;
 }
-
+ul.slicknav_nav {
+    border-top: 1px dotted black;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+.slicknav_nav ul {
+    margin: 0 0 0 5rem;
+}
+.slicknav_nav a {
+    margin: 0px 5px;
+    line-height: .6;
+}
+.slicknav_brand {
+    padding: 4px 12px;
+}
+#branding {
+    font-size: 3.5rem;
+    font-weight: 300;
+    letter-spacing: -3.5px;
+}
 #nav ul {
     padding:0;
     margin:0;
 }
-
-ul.slicknav_nav {
-    /* padding-top: 0rem; */
-    border-top: 1px dotted black;
-    /* margin-top: 1rem; */
-}
-
 #nav li {
     display:inline-block;
     padding:0.5em 0.5em;
@@ -323,63 +343,35 @@ ul.slicknav_nav {
 #nav a:hover {
     border-bottom:4px solid #ea0b25;
 }
-
-#mobileMenu {
+.js #main-menu {
     display:none;
 }
-
-/* Slicknav Mobile Sizing */
-@media only screen and (max-width: 40em) {
-    #photo-main {
-        margin-top: 1.5rem;
-    }
-    .slicknav_menu {
-        position: fixed !important;
-        top: 0px !important;
-        width: 92.5vw !important;
-        text-transform: uppercase !important;
-        font-weight: 600 !important;
-        font-size: 1.125em !important;
-        padding: 1em .5em 0 !important;
-        background: #fff !important;
-        z-index: 999 !important;
-        border-bottom: 3px solid black !important;
-    }
-    #branding {
-        font-size: 4.5rem;
-        font-weight: 300;
-        letter-spacing: -3.5px;
-    }
-	.js #main-menu {
-		display:none;
-	}
-	.js #mobileMenu {
-		display:block;
-		position:fixed;
-		width:92.5%;
-		z-index:1000;
-	}
-	.js #nav{
-		text-align:center;
-	}
-	#nav {
-        position: relative;
-    }
-	#nav img {
-		display:block;
-		margin:0 auto;
-	}
-	#main {
-		padding:0;
-	}
-	#nav ul {
-		text-align: center;
-		font-size:0.6em;
-		line-height: 1.5em;
-	}
-	#nav ul li {
-		padding:0.25em;
-	}
+.js #mobileMenu {
+    display:block;
+    position:fixed;
+    width:92.5%;
+    z-index:1000;
+}
+.js #nav{
+    text-align:center;
+}
+#nav {
+    position: relative;
+}
+#nav img {
+    display:block;
+    margin:0 auto;
+}
+#main {
+    padding:0;
+}
+#nav ul {
+    text-align: center;
+    font-size:0.6em;
+    line-height: 1.5em;
+}
+#nav ul li {
+    padding:0.25em;
 }
 
 /* Login Forms Tab Menu */

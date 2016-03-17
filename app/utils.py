@@ -59,7 +59,7 @@ class BasePage(object):
 
     def getform(self):
         formassets = None
-        if g.user.is_authenticated() is False:
+        if g.user.is_authenticated() is False and self.page_mark != "home":
             if request.is_xhr:
                 pass
             else:
@@ -69,7 +69,21 @@ class BasePage(object):
                 formassets = self.s3_upload_form(app.config['AWS_ACCESS_KEY_ID'], app.config['AWS_SECRET_ACCESS_KEY'],
                                             app.config['S3_REGION'], 'aperturus', prefix="user-images/")
             else:
-                pass
+                if self.page_mark == 'signup':
+                    self.form = SignupForm()
+                    formassets = render_template("assets/forms/signup_form.html", form=self.form)
+                elif self.page_mark == 'profile':
+                    self.form = EditForm()
+                    self.form.nickname.data = g.user.nickname
+                    self.form.about_me.data = g.user.about_me
+                    formassets = render_template("assets/forms/profile_form.html", form=self.form)
+                elif self.page_mark == 'portfolio':
+                    self.form = PostForm()
+                    formassets = render_template("assets/forms/poem_form.html", form=self.form)
+                elif self.page_mark == 'detail':
+                    self.form = CommentForm()
+                    formassets = render_template("assets/forms/comment_form.html", form=self.form)
+        return formassets
 
 
         # else:

@@ -114,7 +114,7 @@ app.add_url_rule('/photos/detail/<int:post_id>', view_func=photo_api_view, metho
 @app.route('/logout', methods=['GET'])
 def logout():
         logout_user()
-        return redirect(url_for('photos', page_mark="login"))
+        return redirect(url_for('login'))
 
 
 class SignupAPI(MethodView):
@@ -217,8 +217,8 @@ class LoginAPI(MethodView):
         else:   # LOGIN PAGE
             if g.user is not None and g.user.is_authenticated():
                 return redirect(url_for('photos', page_mark="gallery"))
-            login_data = ViewData("login")
-            return render_template(login_data.template_name, **login_data.context)
+            context = {'assets': BasePage(page_mark="login").assets}
+            return render_template("base.html", **context)
 
     def login_returning_user(self, form):
         returninguser = User.query.filter_by(email=form.email.data).first()
