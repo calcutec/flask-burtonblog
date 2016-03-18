@@ -1,27 +1,30 @@
 <div class="fixed-nav">
-    <input class="burger-check" id="burger-check" type="checkbox"><label for="burger-check" class="burger"></label>
-    <div id="header">{{ assets.page_mark }}</div>
-    <nav id="navigation1" class="navigation">
-        <div id="nav">
-            <div class="container">
-                <ul id="main-menu">
-                    {% if not assets.page_mark == "photos"  %}
-                        <li class="button button-primary"><a href="/photos">Photos</a></li>
-                    {% endif %}
-                    {% if current_user.is_authenticated()  %}
-                        {% if not assets.page_mark == "upload"  %}<li class="button button-primary"><a href="#">Upload</a></li>{% endif %}
-                        {% if not assets.page_mark == "profile"  %}<li class="button button-primary"><a href="#">Profile</a></li>{% endif %}
-                        {% if not assets.page_mark == "logout"  %}<li class="button button-primary"><a href="/logout">Logout</a></li>{% endif %}
-                    {% else %}
-                        {% if not assets.page_mark == "login"  %}
-                            <li class="button button-primary"><a href="/login">Login</a></li>
-                        {% endif %}
-                    {% endif %}
-                    {% if not assets.page_mark == "people"  %}
-                        <li class="button button-primary"><a href="#">People</a></li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-    </nav>
+<input class="burger-check" id="burger-check" type="checkbox"><label for="burger-check" class="burger"></label>
+<div id="header">{{ assets.title }}</div>
+<nav id="navigation1" class="navigation">
+<div id="nav">
+<div class="container">
+<ul id="main-menu">
+{% if not assets.title == "home"  %}
+    <li class="button button-primary"><a href="/home">Home</a></li>
+{% endif %}
+{% if not assets.title == "photos"  %}
+    <li class="button button-primary"><a href="/photos">Photos</a></li>
+{% endif %}
+{% if not assets.title == "people"  %}
+    <li class="button button-primary"><a href="/people">People</a></li>
+{% endif %}
+{% if not current_user.is_authenticated()  %}
+    {% if not assets.title == "login"  %}
+        <li class="button button-primary"><a href="/login">Login</a></li>
+    {% endif %}
+{% else %}
+    {% if not assets.title == "upload"  %}<li class="button button-primary"><a href="/upload">Upload</a></li>{% endif %}
+    {% if not assets.title == "profile"  %}<li class="button button-primary"><a href="/profile">Profile</a></li>{% endif %}
+    {% if not assets.title == "logout"  %}<li class="button button-primary"><a href="/logout">Logout</a></li>{% endif %}
+{% endif %}
+</ul>
+</div>
+</div>
+</nav>
 </div>

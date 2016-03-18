@@ -24,7 +24,6 @@ App.Router.MainRouter = Backbone.Router.extend({
                 App.Views.mainView = new App.Views.MainView({collection: App.Collections.photolist});
                 App.Views.mainView.attachToPhotoListView();
                 App.Views.mainView.attachToPhotoMainView();
-                App.Views.PhotoFormView.photoFormView = new App.Views.PhotoFormView();
             },
             fail: function(error) {
                 console.log(error);
@@ -36,6 +35,7 @@ App.Router.MainRouter = Backbone.Router.extend({
     },
     create: function(){
         console.log('now in view' + Backbone.history.location.href);
+        App.Views.PhotoFormView.photoFormView = new App.Views.PhotoFormView();
     },
     people: function() {
         console.log('now in view' + Backbone.history.location.href);
@@ -62,12 +62,6 @@ App.Models.Photo = Backbone.Model.extend( {
         body: '',
         photo: '',
         timestamp: ''
-        //subject: '',
-        //read: false,
-        //star: false,
-        //selected:false,
-        //archived:false,
-        //label: ''
     },
 
     validate: function(attrs){
@@ -78,26 +72,6 @@ App.Models.Photo = Backbone.Model.extend( {
             alert('Your post must have a story');
         }
     },
-
-    markRead: function() {
-        this.save( {read: true } );
-    },
-
-    starMail: function() {
-        this.save( { star: !this.get("star")} );
-    },
-
-    archive: function(){
-        this.save( { archived: true, selected:false} );
-    },
-
-    selectMail: function() {
-        this.save( { selected: !this.get("selected")} );
-    },
-
-    setLabel: function(label){
-        this.save( { label: label } );
-    }
 });
 
 App.Views.PhotoMainView = Backbone.View.extend({
@@ -108,10 +82,6 @@ App.Views.PhotoMainView = Backbone.View.extend({
     render: function() {
         this.$el.html(nunjucks.render("main_entry.html", {'photo': this.model.get('photo')}));
         return this;
-    },
-
-    unrender: function(){
-        $(this.el).remove();
     }
 });
 
@@ -202,20 +172,13 @@ App.Views.PhotoListView = Backbone.View.extend({
         // remove all models bindings made by this view
         this.model.off( null, null, this );
     },
-
-
     render: function() {
         this.$el.html(nunjucks.render("archive_entry.html", this.model.toJSON()));
         return this;
-    },
-
-    unrender: function(){
-        $(this.el).remove();
     }
 });
 
 App.Views.MainView = Backbone.View.extend({
-
     initialize: function(options){
         _.extend(this, _.pick(options, "page_mark"));
         //this.collection.bind('change', this.renderSideMenu, this);
@@ -223,7 +186,6 @@ App.Views.MainView = Backbone.View.extend({
         //this.render();
         this.listenTo(this.collection, 'add', this.render, this);
     },
-
     events: {
         "change #labeler" : "applyLabel",
         "click #markallread" : "markallread",
@@ -233,66 +195,22 @@ App.Views.MainView = Backbone.View.extend({
         "click #starred": "starred",
         "keyup #search" : "search"
     },
-
-    search: function(){
-        this.render(this.collection.search($("#search").val()));
-    },
-    starred: function(){
-        this.render(this.collection.starred());
-    },
-
-    inbox: function(){
-        this.render(this.collection.inbox());
-    },
-
-    allmail: function(){
-        this.render(this.collection);
-    },
-
-    markallread : function(){
-        this.collection.each(function(item){
-          item.markRead();
-        }, this);
-    },
-
-    applyLabel: function(){
-
-        var label = $("#labeler").val();
-        this.collection.each(function(item){
-            if(item.get('selected') == true){
-              item.setLabel(label);
-            }
-        }, this);
-    },
-
-    archive: function(){
-        this.collection.each(function(item){
-            if(item.get('selected') == true){
-              item.archive();
-            }
-        }, this);
-        this.render(this.collection.inbox());
-    },
-
     render: function() {
         this.renderMainPhoto(this.collection.last());
         this.renderPhotoList(this.collection);
         this.renderTitle();
     },
-
     renderTitle: function(){
         $("#headline").html('')
         $("#headline").html(
             nunjucks.render('title.html', {'page_mark': this.page_mark})
         );
     },
-
     renderMainPhoto: function(latestrecord){
         $('div#photo-main', this.el).html('');
         var photoMainView = new App.Views.PhotoMainView({el:"#photo-main", model: latestrecord});
         $('div#photo-main', this.el).append(photoMainView.render().el);
     },
-
     renderPhotoList: function(collection){
         var target = $('ul#img-list', this.el);
         target.html('');
@@ -302,12 +220,10 @@ App.Views.MainView = Backbone.View.extend({
             self.addOneToList(model);
         }, this);
     },
-
     addOneToList: function (photo) {
         var photoView = new App.Views.PhotoListView({ model: photo});
         $('ul#img-list', this.el).append(photoView.render().el);
     },
-
     attachToPhotoListView: function(){
         var self = this;
         $("ul#img-list li").each(function(){
@@ -320,7 +236,6 @@ App.Views.MainView = Backbone.View.extend({
             });
         });
     },
-
     attachToPhotoMainView: function(){
         var mainPhotoEl = $("#photo-main");
         var id = mainPhotoEl.find('img').data().id
@@ -330,8 +245,6 @@ App.Views.MainView = Backbone.View.extend({
             el: mainPhotoEl
         });
     }
-
-
     //renderSideMenu: function(){
     //    $("#summary").html(
     //        nunjucks.render('summary_template.html', {
@@ -355,7 +268,6 @@ App.Collections.PhotoList = Backbone.Collection.extend({
     parse: function(response){
         return response.myPhotos
     },
-
     unread: function() {
         return _(this.filter( function(photo) { return !photo.get('read');} ) );
     },
@@ -419,13 +331,11 @@ App.Views.PhotoTextFormView = Backbone.View.extend({
     initialize: function(){
         this.render()
     },
-
     events: {
         'submit': 'postnewentry',
         'click .submit-button':   'updatePost',
         'click #test-button':   'testAlert'
     },
-
     postnewentry: function(e) {
         e.preventDefault();
         var newPostModel = new App.Models.Photo(this.$el.find('form').serializeObject());
@@ -455,7 +365,7 @@ App.Views.PhotoTextFormView = Backbone.View.extend({
 });
 
 App.Models.S3Form = Backbone.Model.extend( {
-    url: "/AjaxS3form",
+    url: "/upload",
 });
 
 
@@ -633,10 +543,10 @@ App.Views.S3FormView = Backbone.View.extend({
             prop;
         for (prop in tags) {
             if (tags.hasOwnProperty(prop)) {
-                if(prop in {'Make':'', 'Model':'', 'DateTime':'', 'ExposureTime':'', 'ShutterSpeedValue':'',
-                    'FNumber':'', 'ExposureProgram':'', 'MeteringMode':'', 'ExposureMode':'', 'WhiteBalance':'',
-                    'PhotographicSensitivity':'', 'FocalLength':'', 'FocalLengthIn35mmFilm':'', 'LensModel':'',
-                    'Sharpness':'', 'PixelXDimension':'', 'PixelYDimension':''}) {
+                if(prop in {'Make':'', 'Model':'', 'DateTime':'', 'ShutterSpeedValue':'', 'FNumber':'',
+                        'ExposureProgram':'', 'PhotographicSensitivity':'', 'FocalLength':'',
+                        'FocalLengthIn35mmFilm':'', 'LensModel':'', 'Sharpness':'', 'PixelXDimension':'',
+                        'PixelYDimension':''}) {
                         table.append(
                             row.clone()
                                 .append(cell.clone().text(prop))
@@ -644,6 +554,18 @@ App.Views.S3FormView = Backbone.View.extend({
                         );
                 }
             }
+            //if (tags.hasOwnProperty(prop)) {
+            //    if(prop in {'Make':'', 'Model':'', 'DateTime':'', 'ExposureTime':'', 'ShutterSpeedValue':'',
+            //        'FNumber':'', 'ExposureProgram':'', 'MeteringMode':'', 'ExposureMode':'', 'WhiteBalance':'',
+            //        'PhotographicSensitivity':'', 'FocalLength':'', 'FocalLengthIn35mmFilm':'', 'LensModel':'',
+            //        'Sharpness':'', 'PixelXDimension':'', 'PixelYDimension':''}) {
+            //            table.append(
+            //                row.clone()
+            //                    .append(cell.clone().text(prop))
+            //                    .append(cell.clone().text(tags[prop]))
+            //            );
+            //    }
+            //}
         }
     },
 

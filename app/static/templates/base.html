@@ -37,9 +37,9 @@
             </nav>
             <main>
                 {% if assets %}
-                    <div id="photo-main">{{ assets.main_entry|safe if assets.main_entry != None }}</div>
-                    <ul id="img-list">{{ assets.archives|safe if assets.archives != None }}</ul>
-                    <div id="body-form">{{ assets.body_form|safe if assets.body_form != None }}</div>
+                    <div id="photo-main">{{ assets.rendered_main_entry|safe if assets.rendered_main_entry != None }}</div>
+                    <ul id="img-list">{{ assets.rendered_archives|safe if assets.rendered_archives != None }}</ul>
+                    <div id="body-form">{{ assets.rendered_body_form|safe if assets.rendered_body_form != None }}</div>
                 {% endif %}
             </main>
         </div>

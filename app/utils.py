@@ -15,91 +15,104 @@ from functools import wraps
 from datetime import timedelta
 from datetime import datetime
 import hmac
-from uuid import uuid4
 from base64 import b64encode
 import hashlib
 
 
 class BasePage(object):
-    def __init__(self, page_mark):
+    def __init__(self, title):
+        self.title = title
+        self.posts = self.get_posts()
         self.assets = dict()
-        self.assets['page_mark'] = page_mark
-        self.getassets()
-
-    def getassets(self):
-        self.assets['body_form'] = self.getform()
-        posts = self.getposts()
-        if request.is_xhr:
-            if not self.assets['page_mark'] == "AjaxS3form":
-                self.assets['title'] = jsonify(page_mark=self.assets['page_mark']).data
-                self.assets['collection'] = [i.json_view() for i in posts[0:6]]
+        if not request.is_xhr:
+            self.assets['title'] = self.title
         else:
-            self.assets['title'] = render_template("title.html", page_mark=self.assets['page_mark'])
-            if self.assets['page_mark'] == "home":
-                self.assets['main_entry'] = render_template("main_entry.html", photo=posts[0].photo, id=posts[0].id)
-            elif self.assets['page_mark'] == "login":
-                pass
-            else:
-                self.assets['main_entry'] = render_template("main_entry.html", photo=posts[0].photo, id=posts[0].id)
-                self.assets['archives'] = render_template("archives.html", posts=posts[1:6])
+            self.assets['title'] = jsonify(title=self.assets['title']).data
 
-    def getposts(self):
+    def get_posts(self):
         posts = None
-        if self.assets['page_mark'] == 'home':
+        if self.title == 'login':
+            return posts
+        elif self.title == 'home':
             posts = Post.query.filter_by(writing_type="op-ed").order_by(Post.timestamp.desc())
-        elif self.assets['page_mark'] == 'photos':
+        elif self.title == 'photos':
             posts = Post.query.filter_by(writing_type="entry").order_by(Post.timestamp.desc())
-        elif self.assets['page_mark'] == 'profile':
+        elif self.title == 'profile':
             posts = Post.query.filter_by(author=g.user).order_by(Post.timestamp.desc())
-        elif self.assets['page_mark'] == 'members':
+        elif self.title == 'people':
             posts = User.query.all()
-        elif self.assets['page_mark'] == 'detail':
+        elif self.title == 'detail':
             posts = User.query.all()
         return posts
 
-    def getform(self):
-        formassets = None
-        if g.user.is_authenticated() is False and self.assets['page_mark'] != "home":
-            if request.is_xhr:
-                pass
-            else:
-                formassets = render_template("assets/forms/login_form.html")
+    def render(self):
+        context = {'assets': self.assets}
+        page = render_template("base.html", **context)
+        return page
+
+    def __str__(self):
+        return "%s has %s posts" % (self.title, self.posts.count())
+
+
+class PhotoPage(BasePage):
+    def __init__(self, *args, **kwargs):
+        super(PhotoPage, self).__init__(*args, **kwargs)
+        if not request.is_xhr:
+            self.get_non_xhr_assets()
         else:
-            if request.is_xhr and self.assets['page_mark'] == "AjaxS3form":
-                formassets = self.s3_upload_form(app.config['AWS_ACCESS_KEY_ID'], app.config['AWS_SECRET_ACCESS_KEY'],
-                                            app.config['S3_REGION'], 'aperturus', prefix="user-images/")
-            else:
-                if self.assets['page_mark'] == 'signup':
-                    self.form = SignupForm()
-                    formassets = render_template("assets/forms/signup_form.html", form=self.form)
-                elif self.assets['page_mark'] == 'profile':
-                    self.form = EditForm()
-                    self.form.nickname.data = g.user.nickname
-                    self.form.about_me.data = g.user.about_me
-                    formassets = render_template("assets/forms/profile_form.html", form=self.form)
-                elif self.assets['page_mark'] == 'portfolio':
-                    self.form = PostForm()
-                    formassets = render_template("assets/forms/poem_form.html", form=self.form)
-                elif self.assets['page_mark'] == 'detail':
-                    self.form = CommentForm()
-                    formassets = render_template("assets/forms/comment_form.html", form=self.form)
+            self.get_xhr_assets()
 
+    def get_non_xhr_assets(self):
+        if self.title == "photos":
+            # self.assets['rendered_form'] = self.get_rendered_form()  # Currently not doing forms client-side
+            self.assets['rendered_main_entry'] = render_template("main_entry.html", photo=self.posts[0].photo,
+                                                                 id=self.posts[0].id)
+            self.assets['rendered_archives'] = render_template("archives.html", posts=self.posts[1:6])
+        elif self.title == "home":
+            self.assets['rendered_main_entry'] = render_template("main_entry.html", photo=self.posts[0].photo,
+                                                                 id=self.posts[0].id)
+        elif self.title == "login":
+            self.assets['rendered_body_form'] = self.get_rendered_form()
+        elif self.title == "upload":
+            self.assets['rendered_body_form'] = self.get_rendered_form()
 
-            # else:
-            #     if self.page_mark == 'profile':
-            #         form = EditForm()
-            #         form.nickname.data = g.user.nickname
-            #         form.about_me.data = g.user.about_me
-            #         rendered_form = render_template("assets/forms/profile_form.html", form=EditForm)
-            #     elif self.page_mark == 'detail':
-            #         rendered_form = render_template("assets/forms/comment_form.html", form=CommentForm(),
-            #                                         post=self.getposts)
-                # No file upload for users without javascript since validation not possible
-                # if self.page_mark == 'photos':
-                #     s3_form = self.create_s3_form()
-                #     photo_text_form = render_template("assets/forms/photo_text_form.html", phototextform=PostForm())
-                #     rendered_form = render_template("assets/forms/photo_form.html", S3form=s3_form)
-        return formassets
+    def get_xhr_assets(self):
+        if self.title == "photos":
+            self.assets['collection'] = [i.json_view() for i in self.posts[0:6]]
+        elif self.title == "upload":
+            self.assets['form'] = self.s3_upload_form(app.config['AWS_ACCESS_KEY_ID'],
+                                                      app.config['AWS_SECRET_ACCESS_KEY'],
+                                                      app.config['S3_REGION'], 'aperturus', prefix="user-images/")
+
+    def get_rendered_form(self):
+        if self.title == "upload":
+            form = self.s3_upload_form(app.config['AWS_ACCESS_KEY_ID'],
+                                                      app.config['AWS_SECRET_ACCESS_KEY'],
+                                                      app.config['S3_REGION'], 'aperturus', prefix="user-images/")
+            form_template = self.title + "_form.html"
+            rendered_form = render_template(form_template, form=form)
+
+        else:
+            # form = self.get_form() # Not bothering with rendering wtform into template at this time
+            form_template = self.title + "_form.html"
+            rendered_form = render_template(form_template)
+        return rendered_form
+
+    def get_form(self):
+        form = None
+        if self.title == 'signup':
+            form = SignupForm()
+        elif self.title == 'login':
+            form = LoginForm()
+        elif self.title == 'profile':
+            form = EditForm()
+            form.nickname.data = g.user.nickname
+            form.about_me.data = g.user.about_me
+        elif self.title == 'upload':
+            form = PostForm()
+        elif self.title == 'detail':
+            form = CommentForm()
+        return form
 
     def hmac_sha256(self, key, msg):
         return hmac.new(key, msg.encode('utf-8'), hashlib.sha256).digest()
@@ -156,7 +169,49 @@ class BasePage(object):
         return form
 
     def __str__(self):
-        return "This is the %s page" % self.page_mark
+        return "This is the %s page" % self.title
+
+
+class MemberPage(BasePage):
+    def __init__(self, *args, **kwargs):
+        super(MemberPage, self).__init__(*args, **kwargs)
+        if not request.is_xhr:
+            self.get_non_xhr_assets()
+        else:
+            self.get_xhr_assets()
+
+    def get_non_xhr_assets(self):
+        if self.title == "people":
+            # self.assets['rendered_form'] = self.get_rendered_form()  # Currently not doing forms client-side
+            # self.assets['rendered_main_entry'] = render_template("main_entry.html", photo=self.posts[0].photo,
+            #                                                      id=self.posts[0].id)
+            self.assets['rendered_archives'] = render_template("members.html", posts=self.posts[0:12])
+
+    def get_xhr_assets(self):
+        if self.title == "members":
+            self.assets['collection'] = [i.json_view() for i in self.posts[0:6]]
+
+    def get_rendered_form(self):
+        rendered_form = None
+        if self.title == "members":
+            # form = self.get_form() # Not bothering with rendering wtform into template at this time
+            # rendered_form = render_template(form_template, form=form)
+            form_template = self.title + "_form.html"
+            rendered_form = render_template(form_template)
+        return rendered_form
+
+    def get_form(self):
+        form = None
+        if self.title == 'signup':
+            form = SignupForm()
+        elif self.title == 'profile':
+            form = EditForm()
+            form.nickname.data = g.user.nickname
+            form.about_me.data = g.user.about_me
+        return form
+
+    def __str__(self):
+        return "This is the %s page" % self.title
 
 
 class ViewData(object):
@@ -226,15 +281,6 @@ class ViewData(object):
             self.assets['header_text'] = "Login Page"
             if not self.form:
                 self.assets['body_form'] = self.get_form()
-
-        elif self.page_mark == 'phonegap':
-            self.posts = User.query.all()
-            self.assets['header_text'] = "PhoneGap Page"
-            self.template_name = "index.html"
-
-        elif self.page_mark == 'piemail':
-            self.assets['header_text'] = "PhoneGap Page"
-            self.template_name = "piemail.html"
 
     def get_form(self):
         rendered_form = None

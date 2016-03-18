@@ -1,4 +1,3 @@
-
 from flask import render_template, flash, redirect, session, url_for, g, abort, jsonify, make_response, request, \
     current_app
 from werkzeug.utils import secure_filename
@@ -8,10 +7,10 @@ from datetime import datetime
 from app import app, db, lm
 from config import DATABASE_QUERY_TIMEOUT
 from slugify import slugify
-from .forms import SignupForm, LoginForm, EditForm, PostForm, SearchForm, CommentForm
+from .forms import SignupForm, LoginForm, EditForm, PostForm, CommentForm
 from .models import User, Post, Comment
 from .emails import follower_notification
-from .utils import OAuthSignIn, pre_upload, ViewData, BasePage, allowed_file
+from .utils import OAuthSignIn, ViewData, pre_upload, allowed_file, PhotoPage, MemberPage
 from PIL import Image
 from datetime import timedelta
 from functools import update_wrapper
@@ -53,27 +52,26 @@ class PhotoAPI(MethodView):
                 form.errors['iserror'] = True
                 return json.dumps(form.errors)
             else:
-                context = {'assets': BasePage(page_mark=page_mark).assets}
+                context = {'assets': PhotoPage(title=page_mark).assets}
                 return render_template("base.html", **context)
 
     def get(self, page_mark=None, post_id=None):
-        if current_user.is_authenticated() or page_mark != "upload" or page_mark != "profile":
+        if current_user.is_authenticated() or page_mark != "upload":
             if post_id is None:    # Read all posts
-                assets = BasePage(page_mark=page_mark).assets
-                context = {'assets': assets}
                 if request.is_xhr:
-                    if page_mark == 'AjaxS3form':
-                        form = BasePage(page_mark=page_mark).assets['body_form']
+                    if page_mark == 'upload':
+                        form = PhotoPage(title=page_mark).assets['body_form']
                         return json.dumps(form)
                     elif page_mark == 'photos':
-                        collection = BasePage(page_mark=page_mark).assets['collection']
+                        collection = PhotoPage(title=page_mark).assets['collection']
                         return json.dumps({"collection": collection})
                 else:
-                    return render_template("base.html", **context)
+                    page = PhotoPage(title=page_mark).render()
+                    return page
             else:
                 pass  # Todo create logic for xhr request for a single post
         else:
-            assets = BasePage(page_mark="login").assets
+            assets = PhotoPage(title="login").assets
             context = {'assets': assets}
             return render_template("base.html", **context)
 
@@ -105,8 +103,7 @@ class PhotoAPI(MethodView):
 # urls for Photo API
 photo_api_view = PhotoAPI.as_view('photos')
 # Read all posts for a given page, Create a new post
-app.add_url_rule('/<any("photos", "people", "profile", "home", AjaxS3form):page_mark>',
-                 view_func=photo_api_view, methods=["GET", "POST"])
+app.add_url_rule('/<any("photos", "home", "upload"):page_mark>', view_func=photo_api_view, methods=["GET", "POST"])
 # Update or Delete a single post
 app.add_url_rule('/detail/<int:post_id>', view_func=photo_api_view, methods=["GET", "PUT", "DELETE"])
 
@@ -217,8 +214,8 @@ class LoginAPI(MethodView):
         else:   # LOGIN PAGE
             if g.user is not None and g.user.is_authenticated():
                 return redirect(url_for('photos', page_mark="photos"))
-            context = {'assets': BasePage(page_mark="login").assets}
-            return render_template("base.html", **context)
+            page = PhotoPage(title='login').render()
+            return page
 
     def login_returning_user(self, form):
         returninguser = User.query.filter_by(email=form.email.data).first()
@@ -285,19 +282,12 @@ class MembersAPI(MethodView):
             profile_data = ViewData("profile", nickname=nickname)
             return render_template(profile_data.template_name, **profile_data.context)
         elif nickname is None:  # Display all members
-            if request.url_rule.rule == '/phonegap/':
-                view_data = ViewData(page_mark='phonegap')
-                return render_template(view_data.template_name, **view_data.context)
-            if request.url_rule.rule == '/piemail/':
-                view_data = ViewData(page_mark='piemail')
-                return render_template(view_data.template_name, **view_data.context)
+            if request.is_xhr:
+                employee_dict = User.query.all()
+                return jsonify(employees=[i.json_view() for i in employee_dict])
             else:
-                if request.is_xhr:
-                    employee_dict = User.query.all()
-                    return jsonify(employees=[i.json_view() for i in employee_dict])
-                else:
-                    view_data = ViewData(page_mark='members')
-                    return render_template(view_data.template_name, **view_data.context)
+                page = MemberPage(title='people').render()
+                return page
         else:  # Display a single member
             profile_data = ViewData(page_mark="profile", nickname=nickname)
             return render_template(profile_data.template_name, **profile_data.context)
@@ -344,11 +334,11 @@ class MembersAPI(MethodView):
 
 member_api_view = MembersAPI.as_view('members')  # URLS for MEMBER API
 # Read, Update and Destroy a single member
-app.add_url_rule('/members/<nickname>', view_func=member_api_view, methods=["GET", "POST", "PUT", "DELETE"])
+app.add_url_rule('/people/<nickname>', view_func=member_api_view, methods=["GET", "POST", "PUT", "DELETE"])
 # Read all members
-app.add_url_rule('/members/', view_func=member_api_view, methods=["GET"])
+app.add_url_rule('/people/', view_func=member_api_view, methods=["GET"])
 # Update a member when JS is turned off)
-app.add_url_rule('/members/<action>/<nickname>', view_func=member_api_view, methods=["GET"])
+app.add_url_rule('/people/<action>/<nickname>', view_func=member_api_view, methods=["GET"])
 
 
 class PostAPI(MethodView):
