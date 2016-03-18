@@ -3,11 +3,11 @@ from PIL import Image
 from app import app
 from config import ALLOWED_EXTENSIONS
 from forms import SignupForm, EditForm, PostForm, CommentForm, LoginForm
-from rauth import OAuth2Service
+from rauth import OAuth2Service, OAuth1Service
 import json
 import urllib2
 import cStringIO
-from flask import request, redirect, url_for, render_template, g, flash, jsonify
+from flask import request, redirect, url_for, render_template, g, flash, jsonify, session
 from flask.views import View
 from flask.ext.login import login_required
 from models import User, Post
@@ -439,8 +439,9 @@ class OAuthSignIn(object):
         pass
 
     def get_callback_url(self):
-        return url_for('login', provider=self.provider_name,
-                       _external=True)
+        # next_url = request.args.get('next') or "/people"
+        # return url_for('login', provider=self.provider_name, next=next_url, _external=True) Redirect to original page
+        return url_for('login', provider=self.provider_name, _external=True)
 
     @classmethod
     def get_provider(cls, provider_name):
@@ -506,6 +507,42 @@ class GoogleSignIn(OAuthSignIn):
             response_type='code',
             redirect_uri=self.get_callback_url())
             )
+
+    def callback(self):
+        if 'code' not in request.args:
+            return None, None, None
+        oauth_session = self.service.get_auth_session(
+            data={'code': request.args['code'],
+                  'grant_type': 'authorization_code',
+                  'redirect_uri': self.get_callback_url()},
+            decoder=json.loads
+        )
+        me = oauth_session.get('').json()
+        nickname = me['name']
+        nickname = User.make_valid_nickname(nickname)
+        nickname = User.make_unique_nickname(nickname)
+        return nickname, me['email']
+
+
+class TwitterSignIn(OAuthSignIn):
+    def __init__(self):
+        super(TwitterSignIn, self).__init__('twitter')
+        self.service = OAuth1Service(
+            name='twitter',
+            consumer_key=self.consumer_id,
+            consumer_secret=self.consumer_secret,
+            request_token_url='https://api.twitter.com/oauth/request_token',
+            authorize_url='https://api.twitter.com/oauth/authorize',
+            access_token_url='https://api.twitter.com/oauth/access_token',
+            base_url='https://api.twitter.com/1.1/'
+        )
+
+    def authorize(self):
+        request_token = self.service.get_request_token(
+            params={'oauth_callback': self.get_callback_url()}
+        )
+        session['request_token'] = request_token
+        return redirect(self.service.get_authorize_url(request_token[0]))
 
     def callback(self):
         if 'code' not in request.args:

@@ -2,23 +2,13 @@ from hashlib import md5
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
 from app import db
-from app import app
-from config import WHOOSH_ENABLED
-from flask import url_for, render_template, g, json
+from flask import url_for, render_template, g
 from flask.ext.login import UserMixin
 
 import json
 import datetime
 
 json.JSONEncoder.default = lambda self, obj: (obj.isoformat() if isinstance(obj, datetime.datetime) else None)
-
-import sys
-if sys.version_info >= (3, 0):
-    enable_search = False
-else:
-    enable_search = WHOOSH_ENABLED
-    if enable_search:
-        import flask.ext.whooshalchemy as whooshalchemy
 
 
 followers = db.Table(
@@ -149,8 +139,7 @@ class User(UserMixin, db.Model):
 
 post_upvotes = db.Table('post_upvotes',
                         db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-                        db.Column('post_id', db.Integer, db.ForeignKey('post.id'))
-)
+                        db.Column('post_id', db.Integer, db.ForeignKey('post.id')))
 
 
 class Post(db.Model):
@@ -172,7 +161,7 @@ class Post(db.Model):
     def __init__(self, **kwargs):
         super(Post, self).__init__(**kwargs)
         if self.writing_type is None:
-            self.writing_type == "poem"
+            self.writing_type == "entry"
 
     def get_post_widget(self):
         post_widget = render_template('assets/posts/post_content.html', page_mark='portfolio', post=self, g=g)
@@ -255,6 +244,3 @@ class Comment(db.Model):
 
     def __repr__(self):  # pragma: no cover
         return '<Comment %r>' % self.body
-
-if enable_search:
-    whooshalchemy.whoosh_index(app, Post)

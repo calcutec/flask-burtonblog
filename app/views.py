@@ -194,10 +194,16 @@ class LoginAPI(MethodView):
             if not current_user.is_anonymous():
                 return redirect(url_for('home'))
             oauth = OAuthSignIn.get_provider(provider)
-            nickname, email = oauth.callback()
-            if email is None:
-                flash('Authentication failed.')
-                return redirect(url_for('home'))
+            if provider == "twitter":
+                social_id, username, email = oauth.callback()
+                if social_id is None:
+                    flash('Authentication failed.')
+                    return redirect("/photos")
+            else:
+                nickname, email = oauth.callback()
+                if email is None:
+                    flash('Authentication failed.')
+                    return redirect("/photos")
             currentuser = User.query.filter_by(email=email).first()
             if not currentuser:
                 currentuser = User(nickname=nickname, email=email)
@@ -209,8 +215,7 @@ class LoginAPI(MethodView):
                 remember_me = session['remember_me']
                 session.pop('remember_me', None)
             login_user(currentuser, remember=remember_me)
-            # return redirect(request.args.get('next') or url_for('photos', page_mark="gallery"))
-            return redirect(url_for('photos', page_mark="photos"))
+            return redirect(request.args.get('next') or url_for('photos'))
         else:   # LOGIN PAGE
             if g.user is not None and g.user.is_authenticated():
                 return redirect(url_for('photos', page_mark="photos"))
