@@ -189,16 +189,16 @@ class LoginAPI(MethodView):
             if not current_user.is_anonymous():
                 return redirect(url_for('home'))
             oauth = OAuthSignIn.get_provider(provider)
-            if provider == "twitter":
-                social_id, username, email = oauth.callback()
-                if social_id is None:
-                    flash('Authentication failed.')
-                    return redirect("/photos")
-            else:
-                nickname, email = oauth.callback()
-                if email is None:
-                    flash('Authentication failed.')
-                    return redirect("/photos")
+            # if provider == "twitter":
+            #     social_id, username, email = oauth.callback()
+            #     if social_id is None:
+            #         flash('Authentication failed.')
+            #         return redirect("/photos")
+            # else:
+            nickname, email = oauth.callback()
+            if email is None:
+                flash('Authentication failed.')
+                return redirect("/photos")
             currentuser = User.query.filter_by(email=email).first()
             if not currentuser:
                 currentuser = User(nickname=nickname, email=email)

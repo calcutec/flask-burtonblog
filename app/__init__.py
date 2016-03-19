@@ -32,11 +32,11 @@ app.config['OAUTH_CREDENTIALS'] = {
     'google': {
         'id': os.environ['GOOGLE_AUTH'],
         'secret': os.environ['GOOGLE_AUTH_SECRET']
-    },
-    'twitter': {
-        'id': os.environ['TWITTER_AUTH'],
-        'secret': os.environ['TWITTER_AUTH_SECRET']
     }
+    # 'twitter': {
+    #     'id': os.environ['TWITTER_AUTH'],
+    #     'secret': os.environ['TWITTER_AUTH_SECRET']
+    # }
 }
 
 if not app.debug and MAIL_SERVER != '':
