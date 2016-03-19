@@ -31,18 +31,16 @@
         <link rel="icon" type="image/png" href="{{ static_url }}img/aperturus/favicon.png">
     </head>
 	<body>
-        <div class="bodycontainer" id="photo-app">
-            <nav class="navbar">
+        <main>
+            <div class="bodycontainer">
                 {% include 'nav.html' %}
-            </nav>
-            <main>
                 {% if assets %}
                     <div id="photo-main">{{ assets.rendered_main_entry|safe if assets.rendered_main_entry != None }}</div>
                     <ul id="img-list">{{ assets.rendered_archives|safe if assets.rendered_archives != None }}</ul>
                     <div id="body-form">{{ assets.rendered_body_form|safe if assets.rendered_body_form != None }}</div>
                 {% endif %}
-            </main>
-        </div>
+            </div>
+        </main>
         {% block scripts %}
             <script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
 {#            {% assets "js_libs" %}#}

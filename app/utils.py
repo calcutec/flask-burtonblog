@@ -9,7 +9,7 @@ import urllib2
 import cStringIO
 from flask import request, redirect, url_for, render_template, g, flash, jsonify, session
 from flask.views import View
-from flask.ext.login import login_required
+from flask.ext.login import login_required, current_user
 from models import User, Post
 from functools import wraps
 from datetime import timedelta
@@ -20,10 +20,13 @@ import hashlib
 
 
 class BasePage(object):
-    def __init__(self, title):
-        self.title = title
-        self.posts = self.get_posts()
+    def __init__(self, title, nickname=None):
         self.assets = dict()
+        self.title = title
+        self.nickname = nickname
+        if self.nickname is not None:
+            self.assets['person'] = User.query.filter_by(nickname=self.nickname).first()
+        self.posts = self.get_posts()
         if not request.is_xhr:
             self.assets['title'] = self.title
         else:
@@ -37,8 +40,10 @@ class BasePage(object):
             posts = Post.query.filter_by(writing_type="op-ed").order_by(Post.timestamp.desc())
         elif self.title == 'photos':
             posts = Post.query.filter_by(writing_type="entry").order_by(Post.timestamp.desc())
-        elif self.title == 'profile':
+        elif self.title == 'people' and 'person' in self.assets and self.assets['person'] == g.user:
             posts = Post.query.filter_by(author=g.user).order_by(Post.timestamp.desc())
+        elif self.title == 'people' and 'person' in self.assets and self.assets['person'] != g.user:
+            posts = Post.query.filter_by(author=self.assets['person']).order_by(Post.timestamp.desc())
         elif self.title == 'people':
             posts = User.query.all()
         elif self.title == 'detail':
@@ -71,8 +76,6 @@ class PhotoPage(BasePage):
         elif self.title == "home":
             self.assets['rendered_main_entry'] = render_template("main_entry.html", photo=self.posts[0].photo,
                                                                  id=self.posts[0].id)
-        elif self.title == "login":
-            self.assets['rendered_body_form'] = self.get_rendered_form()
         elif self.title == "upload":
             self.assets['rendered_body_form'] = self.get_rendered_form()
 
@@ -100,15 +103,7 @@ class PhotoPage(BasePage):
 
     def get_form(self):
         form = None
-        if self.title == 'signup':
-            form = SignupForm()
-        elif self.title == 'login':
-            form = LoginForm()
-        elif self.title == 'profile':
-            form = EditForm()
-            form.nickname.data = g.user.nickname
-            form.about_me.data = g.user.about_me
-        elif self.title == 'upload':
+        if self.title == 'upload':
             form = PostForm()
         elif self.title == 'detail':
             form = CommentForm()
@@ -172,143 +167,50 @@ class PhotoPage(BasePage):
         return "This is the %s page" % self.title
 
 
-class MemberPage(BasePage):
+class PeoplePage(BasePage):
     def __init__(self, *args, **kwargs):
-        super(MemberPage, self).__init__(*args, **kwargs)
+        super(PeoplePage, self).__init__(*args, **kwargs)
         if not request.is_xhr:
             self.get_non_xhr_assets()
         else:
             self.get_xhr_assets()
 
     def get_non_xhr_assets(self):
-        if self.title == "people":
-            # self.assets['rendered_form'] = self.get_rendered_form()  # Currently not doing forms client-side
-            # self.assets['rendered_main_entry'] = render_template("main_entry.html", photo=self.posts[0].photo,
-            #                                                      id=self.posts[0].id)
-            self.assets['rendered_archives'] = render_template("members.html", posts=self.posts[0:12])
+        if self.title == "people" and "person" in self.assets and self.assets['person'] == current_user:  # This page is editable if the "nickname" is that of current user
+            self.assets['rendered_body_form'] = self.get_rendered_form()
+            self.assets['rendered_main_entry'] = render_template('person.html', profile_user=self.assets['person'])
+        elif self.title == "people":
+            self.assets['rendered_archives'] = render_template("people.html", posts=self.posts[0:12])
+        elif self.title == "login":
+            self.assets['rendered_body_form'] = self.get_rendered_form()
 
     def get_xhr_assets(self):
-        if self.title == "members":
+        if self.title == "people":
             self.assets['collection'] = [i.json_view() for i in self.posts[0:6]]
 
     def get_rendered_form(self):
-        rendered_form = None
-        if self.title == "members":
-            # form = self.get_form() # Not bothering with rendering wtform into template at this time
-            # rendered_form = render_template(form_template, form=form)
-            form_template = self.title + "_form.html"
+        form_template = self.title + "_form.html"
+        if self.title == "people" and self.nickname:
+            form = self.get_form()
+            rendered_form = render_template(form_template, form=form)
+            return rendered_form
+        else:
             rendered_form = render_template(form_template)
-        return rendered_form
+            return rendered_form
 
     def get_form(self):
         form = None
-        if self.title == 'signup':
-            form = SignupForm()
-        elif self.title == 'profile':
-            form = EditForm()
-            form.nickname.data = g.user.nickname
-            form.about_me.data = g.user.about_me
+        if self.title == 'login':
+            form = (LoginForm(), SignupForm)
+        elif self.title == "people" and self.nickname:
+            if self.nickname == g.user.nickname:
+                form = EditForm()
+                form.nickname.data = g.user.nickname
+                form.about_me.data = g.user.about_me
         return form
 
     def __str__(self):
         return "This is the %s page" % self.title
-
-
-class ViewData(object):
-    def __init__(self, page_mark, slug=None, nickname=None, page=1, form=None, render_form=None, posts_for_page=200):
-        self.posts_for_page = posts_for_page
-        self.slug = slug
-        self.nickname = nickname
-        self.page = page
-        self.page_mark = page_mark
-        self.template_name = "base_template.html"
-        self.title = page_mark.title()
-        self.page_logo = "img/icons/" + page_mark + ".svg"
-        self.form = form
-        self.render_form = render_form
-        self.profile_user = None
-        self.posts = None
-        self.post = None
-        self.assets = {}
-        self.context = None
-
-        self.get_items()
-        self.get_context()
-
-    def get_items(self):
-        if self.page_mark == 'profile':
-            self.profile_user = User.query.filter_by(nickname=self.nickname).first()
-            self.posts = Post.query.filter_by(author=self.profile_user)\
-                .order_by(Post.timestamp.desc()).paginate(self.page, self.posts_for_page, False)
-            if not self.form:
-                self.assets['header_form'] = self.get_form()
-
-        elif self.page_mark == 'home':
-            self.assets['header_text'] = "Home Page"
-
-        elif self.page_mark == 'members':
-            self.posts = User.query.all()
-            self.assets['header_text'] = "Members on this site"
-
-        elif self.page_mark == 'poetry':
-            self.posts = Post.query.filter_by(writing_type="featured")\
-                .order_by(Post.timestamp.desc()).paginate(self.page, self.posts_for_page, False)
-            self.assets['header_text'] = "Poetry Page"
-
-        elif self.page_mark == 'workshop':
-            self.posts = Post.query.filter_by(writing_type="poem")\
-                .order_by(Post.timestamp.desc()).paginate(self.page, self.posts_for_page, False)
-            self.assets['header_text'] = "Workshop Page"
-
-        elif self.page_mark == 'portfolio':
-            self.posts = g.user.posts\
-                .order_by(Post.timestamp.desc()).paginate(self.page, self.posts_for_page, False)
-            if not self.form:
-                self.assets['header_form'] = self.get_form()
-
-        elif self.page_mark == 'detail':
-            self.post = Post.query.filter(Post.slug == self.slug).first()
-            self.assets['header_text'] = "Poem Details"
-            if not self.form:
-                self.assets['body_form'] = self.get_form()
-
-        elif self.page_mark == 'signup':
-            self.assets['header_text'] = "Signup Page"
-            if not self.form:
-                self.assets['body_form'] = self.get_form()
-
-        elif self.page_mark == 'login':
-            self.assets['header_text'] = "Login Page"
-            if not self.form:
-                self.assets['body_form'] = self.get_form()
-
-    def get_form(self):
-        rendered_form = None
-        if self.page_mark == 'signup':
-            self.form = SignupForm()
-            rendered_form = render_template("assets/forms/signup_form.html", form=self.form)
-        elif self.page_mark == 'login':
-            self.form = LoginForm()
-            rendered_form = render_template("assets/forms/login_form.html", form=self.form)
-        elif self.page_mark == 'profile':
-            self.form = EditForm()
-            self.form.nickname.data = g.user.nickname
-            self.form.about_me.data = g.user.about_me
-            if self.render_form:  # Only render profile form on request, using button to show on noJS profile page
-                rendered_form = render_template("assets/forms/profile_form.html", form=self.form)
-        elif self.page_mark == 'portfolio':
-            self.form = PostForm()
-            if self.render_form:  # Only render post form on request, using button to show on noJS portfolio page
-                rendered_form = render_template("assets/forms/poem_form.html", form=self.form)
-        elif self.page_mark == 'detail':
-            self.form = CommentForm()
-            rendered_form = render_template("assets/forms/comment_form.html", form=self.form)
-        return rendered_form
-
-    def get_context(self):
-        self.context = {'post': self.post, 'posts': self.posts, 'title': self.title, 'profile_user': self.profile_user,
-                        'page_logo': self.page_logo, 'page_mark': self.page_mark, 'form': self.form,
-                        'assets': self.assets}
 
 
 def check_expired(func):

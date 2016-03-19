@@ -20,6 +20,7 @@
     <section id="content2">
         <h3>Email Login</h3>
         <form action="/login/" id="login-form" method="post" accept-charset="utf-8">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             <div class="form-group">
                 <label for="email">Email</label>
                 <input id="email" name="email" placeholder="Email" type="email" value="">
@@ -39,6 +40,7 @@
     <section id="content3">
         <h3>Signup</h3>
         <form action="/signup/" id="signup-form" method="post" accept-charset="utf-8">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             <div class="form-group">
                 <label for="firstname">First Name</label>
                 <input class="u-full-width" id="firstname" name="firstname" placeholder="First Name" type="text" value="">
