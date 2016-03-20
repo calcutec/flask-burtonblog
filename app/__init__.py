@@ -1,4 +1,5 @@
 import os
+from .momentjs import momentjs
 from flask import Flask
 from jinja2 import FileSystemLoader
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -6,13 +7,13 @@ from flask.ext.login import LoginManager
 from flask.ext.mail import Mail
 from config import ADMINS, MAIL_SERVER, MAIL_PORT, MAIL_USERNAME, \
     MAIL_PASSWORD, SQLALCHEMY_DATABASE_URI
-from .momentjs import momentjs
 from flask.json import JSONEncoder
 from flask_wtf.csrf import CsrfProtect
 
 app = Flask(__name__)
 base_dir = os.path.dirname(os.path.realpath(__file__))
 app.jinja_loader = FileSystemLoader(os.path.join(base_dir, 'static', 'templates'))
+app.jinja_env.globals['momentjs'] = momentjs
 app.config.from_object('config')
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 db = SQLAlchemy(app)
@@ -69,8 +70,6 @@ if os.environ.get('HEROKU') is not None:
     app.logger.addHandler(stream_handler)
     app.logger.setLevel(logging.INFO)
     app.logger.info('burtonblog startup')
-
-app.jinja_env.globals['momentjs'] = momentjs
 
 app.config["S3_LOCATION"] = 'https://s3.amazonaws.com/aperturus/'
 app.config["S3_UPLOAD_DIRECTORY"] = 'user_imgs'

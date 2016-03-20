@@ -1,5 +1,5 @@
 <input class="burger-check" id="burger-check" type="checkbox"><label for="burger-check" class="burger"></label>
-{% if assets %}<div id="header">{{ assets.title }}</div>{% endif %}
+{% if assets %}<div id="title">{{ assets.title }}</div>{% endif %}
 <nav id="nav" class="navigation">
     <ul id="main-menu">
     {% if assets %}
@@ -14,7 +14,7 @@
             <li class="button button-primary"><a href="/login">Login</a></li>
         {% endif %}
     {% else %}
-        {% if not assets.title == "people"  %}<li class="button button-primary"><a href="/people">People</a></li>{% endif %}
+        <li class="button button-primary"><a href="/people">People</a></li>
         {% if not assets.title == "upload"  %}<li class="button button-primary"><a href="/upload">Upload</a></li>{% endif %}
         {% if not assets.title == "profile"  %}<li class="button button-primary"><a href="/people/{{ g.user.nickname }}">Profile</a></li>{% endif %}
         {% if not assets.title == "logout"  %}<li class="button button-primary"><a href="/logout">Logout</a></li>{% endif %}

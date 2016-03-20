@@ -1,6 +1,5 @@
 from flask import render_template, flash, redirect, session, url_for, g, abort, jsonify, make_response, request, \
     current_app
-from werkzeug.utils import secure_filename
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from flask.ext.sqlalchemy import get_debug_queries
 from datetime import datetime
@@ -10,8 +9,7 @@ from slugify import slugify
 from .forms import SignupForm, LoginForm, EditForm, PostForm, CommentForm
 from .models import User, Post, Comment
 from .emails import follower_notification
-from .utils import OAuthSignIn, pre_upload, allowed_file, PhotoPage, PeoplePage
-from PIL import Image
+from .utils import OAuthSignIn, PhotoPage, PeoplePage
 from datetime import timedelta
 from functools import update_wrapper
 import json
@@ -46,7 +44,8 @@ class PhotoAPI(MethodView):
                 response['savedsuccess'] = True
                 return json.dumps(response)
             else:
-                return redirect("/photos/"+page_mark)
+                page = PhotoPage(title=page_mark).render()
+                return page
         else:
             if request.is_xhr:
                 form.errors['iserror'] = True
@@ -106,6 +105,8 @@ photo_api_view = PhotoAPI.as_view('photos')
 app.add_url_rule('/<any("photos", "home", "upload"):page_mark>', view_func=photo_api_view, methods=["GET", "POST"])
 # Update or Delete a single post
 app.add_url_rule('/detail/<int:post_id>', view_func=photo_api_view, methods=["GET", "PUT", "DELETE"])
+# Update or Delete a single post
+app.add_url_rule('/amazonS3', view_func=photo_api_view, methods=["GET"])
 
 
 @app.route('/logout', methods=['GET'])
@@ -137,7 +138,8 @@ class SignupAPI(MethodView):
                 page = PeoplePage(title='people', nickname=newuser.nickname).render()
                 return page
             else:
-                signup_data = ViewData("signup", form=form)
+                # signup_data = ViewData("signup", form=form)
+                signup_data = "stump"
                 return render_template(signup_data.template_name, **signup_data.context)
 
     def save_user(self, form):
@@ -176,7 +178,8 @@ class LoginAPI(MethodView):
                 returninguser = self.login_returning_user(form)
                 return redirect(url_for('members', nickname=returninguser.nickname))
             else:
-                login_data = ViewData("login", form=form)
+                # login_data = ViewData("login", form=form)
+                login_data = "stump"
                 return render_template(login_data.template_name, **login_data.context)
 
     def get(self, get_provider=None, provider=None):
@@ -244,7 +247,8 @@ class PeopleAPI(MethodView):
     @login_required
     def get(self, nickname=None, action=None):
         if action == 'update':
-            profile_data = ViewData(page_mark="profile", render_form=True, nickname=nickname)
+            # profile_data = ViewData(page_mark="profile", render_form=True, nickname=nickname)
+            profile_data = "stump"
             return render_template(profile_data.template_name, **profile_data.context)
         elif action == 'follow':
             user = User.query.filter_by(nickname=nickname).first()
@@ -262,7 +266,8 @@ class PeopleAPI(MethodView):
             db.session.commit()
             flash('You are now following %s.' % nickname)
             follower_notification(user, g.user)
-            profile_data = ViewData("profile", nickname=nickname)
+            # profile_data = ViewData("profile", nickname=nickname)
+            profile_data = "stump"
             return render_template(profile_data.template_name, **profile_data.context)
         elif action == 'unfollow':
             user = User.query.filter_by(nickname=nickname).first()
@@ -279,7 +284,8 @@ class PeopleAPI(MethodView):
             db.session.add(u)
             db.session.commit()
             flash('You have stopped following %s.' % nickname)
-            profile_data = ViewData("profile", nickname=nickname)
+            # profile_data = ViewData("profile", nickname=nickname)
+            profile_data = "stump"
             return render_template(profile_data.template_name, **profile_data.context)
         elif nickname is None:  # Display all members
             if request.is_xhr:
@@ -305,40 +311,41 @@ class PeopleAPI(MethodView):
             form.errors['iserror'] = True
             return json.dumps(form.errors)
         else:  # Once form is valid, original form is called and processed
-            if form.validate():
-                profile_photo = request.files['profile_photo']
-                if profile_photo and allowed_file(profile_photo.filename):
-                    filename = secure_filename(profile_photo.filename)
-                    img_obj = dict(filename=filename, img=Image.open(profile_photo.stream), box=(400, 300),
-                                   photo_type="thumb", crop=True,
-                                   extension=form['profile_photo'].data.mimetype.split('/')[1].upper())
-                    profile_photo_name = pre_upload(img_obj)
+            pass
+            # if form.validate():
+            #     profile_photo = request.files['profile_photo']
+            #     if profile_photo and allowed_file(profile_photo.filename):
+            #         filename = secure_filename(profile_photo.filename)
+            #         img_obj = dict(filename=filename, img=Image.open(profile_photo.stream), box=(400, 300),
+            #                        photo_type="thumb", crop=True,
+            #                        extension=form['profile_photo'].data.mimetype.split('/')[1].upper())
+            #         profile_photo_name = "stump"
+            #
+            #         thumbnail_obj = dict(filename=filename, img=Image.open(profile_photo.stream), box=(160, 160),
+            #                              photo_type="thumbnail", crop=True,
+            #                              extension=form['profile_photo'].data.mimetype.split('/')[1].upper())
+            #         thumbnail_name = "stump"
+            #
+            #         g.user.profile_photo = profile_photo_name
+            #         g.user.thumbnail = thumbnail_name
+            #
+            #     g.user.nickname = form.nickname.data
+            #     g.user.about_me = form.about_me.data
+            #     db.session.add(g.user)
+            #     db.session.commit()
+            #     profile_data = ViewData(page_mark="profile", nickname=g.user.nickname, form=form)
+            #     return render_template(profile_data.template_name, **profile_data.context)
+            # profile_data = ViewData(page_mark="profile", nickname=g.user.nickname, form=form)
+            # return render_template(profile_data.template_name, **profile_data.context)
 
-                    thumbnail_obj = dict(filename=filename, img=Image.open(profile_photo.stream), box=(160, 160),
-                                         photo_type="thumbnail", crop=True,
-                                         extension=form['profile_photo'].data.mimetype.split('/')[1].upper())
-                    thumbnail_name = pre_upload(thumbnail_obj)
 
-                    g.user.profile_photo = profile_photo_name
-                    g.user.thumbnail = thumbnail_name
-
-                g.user.nickname = form.nickname.data
-                g.user.about_me = form.about_me.data
-                db.session.add(g.user)
-                db.session.commit()
-                profile_data = ViewData(page_mark="profile", nickname=g.user.nickname, form=form)
-                return render_template(profile_data.template_name, **profile_data.context)
-            profile_data = ViewData(page_mark="profile", nickname=g.user.nickname, form=form)
-            return render_template(profile_data.template_name, **profile_data.context)
-
-
-member_api_view = PeopleAPI.as_view('people')  # URLS for MEMBER API
+people_api_view = PeopleAPI.as_view('people')  # URLS for MEMBER API
 # Read, Update and Destroy a single member
-app.add_url_rule('/people/<nickname>', view_func=member_api_view, methods=["GET", "POST", "PUT", "DELETE"])
+app.add_url_rule('/people/<nickname>', view_func=people_api_view, methods=["GET", "POST", "PUT", "DELETE"])
 # Read all members
-app.add_url_rule('/people/', view_func=member_api_view, methods=["GET"])
+app.add_url_rule('/people/', view_func=people_api_view, methods=["GET"])
 # Update a member when JS is turned off)
-app.add_url_rule('/people/<action>/<nickname>', view_func=member_api_view, methods=["GET"])
+app.add_url_rule('/people/<action>/<nickname>', view_func=people_api_view, methods=["GET"])
 
 
 class ActionsAPI(MethodView):

@@ -24,8 +24,11 @@
 {#            <link rel="stylesheet" href="{{ static_url }}gen/app.css">#}
 {#        {% endassets %}#}
         <link rel="stylesheet" href="{{ static_url }}css/fix.css">
-        <link rel="stylesheet" href="{{ static_url }}css/custom.css">
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="{{ local_static_url }}css/custom.css">
+{#        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">#}
+
+        <script src="{{ local_static_url }}js/_libs/moment.min.js"></script>
+
         <!-- Favicon
         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
         <link rel="icon" type="image/png" href="{{ static_url }}img/aperturus/favicon.png">
@@ -35,14 +38,14 @@
             <div class="bodycontainer">
                 {% include 'nav.html' %}
                 {% if assets %}
-                    <div id="photo-main">{{ assets.rendered_main_entry|safe if assets.rendered_main_entry != None }}</div>
-                    <ul id="img-list">{{ assets.rendered_archives|safe if assets.rendered_archives != None }}</ul>
-                    <div id="body-form">{{ assets.rendered_body_form|safe if assets.rendered_body_form != None }}</div>
+                    <div id="photo-main">{{ assets.main_entry|safe if assets.main_entry != None }}</div>
+                    <ul id="img-list">{{ assets.archives|safe if assets.archives != None }}</ul>
+                    <div id="body-form">{{ assets.body_form|safe if assets.body_form != None }}</div>
                 {% endif %}
             </div>
         </main>
         {% block scripts %}
-            <script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+{#            <script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>#}
 {#            {% assets "js_libs" %}#}
 {#                <script type="text/javascript" src="{{ static_url }}gen/libs.js"></script>#}
 {#            {% endassets %}#}

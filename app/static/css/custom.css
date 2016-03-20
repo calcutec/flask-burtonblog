@@ -21,6 +21,9 @@ body {
 #title section::first-letter {
     text-transform: uppercase
 }
+.hide {
+  display: none;
+}
 .well {
   box-shadow: 0 0 5px #888;
   padding: 1rem;
@@ -304,7 +307,7 @@ span.rounded-icon svg {
     position: absolute;
 }
 /** Navbar styling **/
-#header {
+#title {
     display: inline-block;
     font-size: 3.5rem;
     font-weight: 300;

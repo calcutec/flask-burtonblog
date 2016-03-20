@@ -1,0 +1,4 @@
+You don’t seem to be able to use success_action_redirect at the moment – the 303 response from S3 doesn’t have any CORS headers which seems to confuse browsers. If you need to access the key under which the file was saved then if you set success_action_status to 201 then S3 will respond with an XML document that has the key and bucket under which the file was saved. You can then access this using a similar approach to the error message:
+
+$('Key', xhr.responseXML).text()
+This is a bit inconvient if you want a single form that falls back to a traditional form submission. However you can get around this by setting up both success_action_status and success_action_redirect in your policy, with a condition of 'starts-with' => ''. Then in your pre submit javascript clear the value of success_action_redirect if you are about to go down the HTML5 route or the value of success_action_status otherwise.

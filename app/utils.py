@@ -1,19 +1,15 @@
-import boto
-from PIL import Image
 from app import app
 from config import ALLOWED_EXTENSIONS
 from forms import SignupForm, EditForm, PostForm, CommentForm, LoginForm
-from rauth import OAuth2Service, OAuth1Service
+from rauth import OAuth2Service
 import json
 import urllib2
-import cStringIO
 from flask import request, redirect, url_for, render_template, g, flash, jsonify, session
-from flask.views import View
 from flask.ext.login import login_required, current_user
 from models import User, Post
-from functools import wraps
 from datetime import timedelta
 from datetime import datetime
+from uuid import uuid4
 import hmac
 from base64 import b64encode
 import hashlib
@@ -27,6 +23,13 @@ class BasePage(object):
         if self.nickname is not None:
             self.assets['person'] = User.query.filter_by(nickname=self.nickname).first()
         self.posts = self.get_posts()
+        self.get_title_asset()
+        if self.title in ["login", "photo", "profile", "upload", "signup"]:
+            self.assets['body_form'] = Form(self.title).form_asset
+        if self.title == "people" and self.nickname is not None and self.nickname == g.user.nickname:
+            self.assets['body_form'] = Form(self.title, nickname=self.nickname).form_asset
+
+    def get_title_asset(self):
         if not request.is_xhr:
             self.assets['title'] = self.title
         else:
@@ -50,6 +53,17 @@ class BasePage(object):
             posts = User.query.all()
         return posts
 
+    def get_asset(self, template=None, context=None):
+        asset = None
+        if request.is_xhr:
+            asset = jsonify(context)
+        else:
+            if template is None:
+                asset = render_template(self.title + ".html", **context)
+            else:
+                asset = render_template(template, **context)
+        return asset
+
     def render(self):
         context = {'assets': self.assets}
         page = render_template("base.html", **context)
@@ -62,63 +76,107 @@ class BasePage(object):
 class PhotoPage(BasePage):
     def __init__(self, *args, **kwargs):
         super(PhotoPage, self).__init__(*args, **kwargs)
-        if not request.is_xhr:
-            self.get_non_xhr_assets()
-        else:
-            self.get_xhr_assets()
+        self.get_page_assets()
 
-    def get_non_xhr_assets(self):
-        if self.title == "photos":
-            # self.assets['rendered_form'] = self.get_rendered_form()  # Currently not doing forms client-side
-            self.assets['rendered_main_entry'] = render_template("main_entry.html", photo=self.posts[0].photo,
-                                                                 id=self.posts[0].id)
-            self.assets['rendered_archives'] = render_template("archives.html", posts=self.posts[1:6])
-        elif self.title == "home":
-            self.assets['rendered_main_entry'] = render_template("main_entry.html", photo=self.posts[0].photo,
-                                                                 id=self.posts[0].id)
-        elif self.title == "upload":
-            self.assets['rendered_body_form'] = self.get_rendered_form()
+    def get_page_assets(self):
+        if self.title == "home":
+            if request.is_xhr:
+                pass
+            else:
+                home_context = {'photo': self.posts[0].photo, 'id': self.posts[0].id}
+                self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=home_context)
+        elif self.title == "photos":
+            if request.is_xhr:
+                self.assets['collection'] = self.get_asset(context=[i.json_view() for i in self.posts[0:6]])
+            else:
+                main_photo_context = {'photo': self.posts[0].photo, 'id': self.posts[0].id}
+                archive_photos_context = {'posts': self.posts[1:6]}
+                self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=main_photo_context)
+                self.assets['archives'] = self.get_asset(template="archives.html", context=archive_photos_context)
 
-    def get_xhr_assets(self):
-        if self.title == "photos":
-            self.assets['collection'] = [i.json_view() for i in self.posts[0:6]]
-        elif self.title == "upload":
-            self.assets['form'] = self.s3_upload_form(app.config['AWS_ACCESS_KEY_ID'],
-                                                      app.config['AWS_SECRET_ACCESS_KEY'],
-                                                      app.config['S3_REGION'], 'aperturus', prefix="user-images/")
+    def __str__(self):
+        return "This is the %s page" % self.title
 
-    def get_rendered_form(self):
-        if self.title == "upload":
-            form = self.s3_upload_form(app.config['AWS_ACCESS_KEY_ID'],
-                                                      app.config['AWS_SECRET_ACCESS_KEY'],
-                                                      app.config['S3_REGION'], 'aperturus', prefix="user-images/")
-            form_template = self.title + "_form.html"
-            rendered_form = render_template(form_template, form=form)
 
-        else:
-            # form = self.get_form() # Not bothering with rendering wtform into template at this time
-            form_template = self.title + "_form.html"
-            rendered_form = render_template(form_template)
-        return rendered_form
+class PeoplePage(BasePage):
+    def __init__(self, *args, **kwargs):
+        super(PeoplePage, self).__init__(*args, **kwargs)
+        self.get_page_assets()
+
+    def get_page_assets(self):
+        if self.title == "people" and "person" in self.assets:
+            if request.is_xhr:
+                pass
+            else:
+                user_context = {'profile_user': self.assets['person']}
+                self.assets['main_entry'] = self.get_asset(template='person.html', context=user_context)
+                archive_photos_context = {'posts': self.posts[0:6]}
+                self.assets['archives'] = self.get_asset(template="archives.html", context=archive_photos_context)
+        elif self.title == "people":
+            if request.is_xhr:
+                self.assets['collection'] = [i.json_view() for i in self.posts[0:6]]
+            else:
+                people_context = {'posts': self.posts[0:12]}
+                self.assets['archives'] = self.get_asset(template="people.html", context=people_context)
+
+    def __str__(self):
+        return "This is the %s page" % self.title
+
+
+class Form(object):
+    def __init__(self, title, template=None, nickname=None, key=None):
+        self.nickname = nickname
+        self.page_title = title
+        self.key = key
+        self.template = template
+        self.form = self.get_form()
+        self.form_template = self.get_form_template()
+        self.form_asset = self.prepare_form()
 
     def get_form(self):
         form = None
-        if self.title == 'upload':
-            form = PostForm()
-        elif self.title == 'detail':
+        if self.page_title == 'photos':
+            form = PostForm
+        if self.page_title == 'login':
+            form = (LoginForm(), SignupForm)
+        elif self.page_title == "people" and self.nickname and self.nickname == g.user.nickname:
+            form = EditForm()
+            form.nickname.data = g.user.nickname
+            form.about_me.data = g.user.about_me
+        elif self.page_title == 'upload':
+            if 'key' in request.args:
+                form = PostForm()
+                form.photo.data = request.args['key']
+                self.template = "post_form.html"
+            else:
+                key = "user-images/" + str(uuid4()) + ".jpeg"
+                # form = self.s3_upload_form(app.config['AWS_ACCESS_KEY_ID'], app.config['AWS_SECRET_ACCESS_KEY'],
+                #                            app.config['S3_REGION'], 'aperturus', prefix="user-images/")
+                form = self.s3_upload_form(app.config['AWS_ACCESS_KEY_ID'], app.config['AWS_SECRET_ACCESS_KEY'],
+                               app.config['S3_REGION'], 'aperturus', key=key)
+        elif self.page_title == 'detail':
             form = CommentForm()
         return form
 
-    def hmac_sha256(self, key, msg):
-        return hmac.new(key, msg.encode('utf-8'), hashlib.sha256).digest()
+    def get_form_template(self):
+        form_template = None
+        if request.is_xhr:
+            pass
+        else:
+            if self.template:
+                form_template = "/assets/forms/" + self.template
+            else:
+                form_template = "/assets/forms/" + self.page_title + "_form.html"
 
-    def sign(self, key, date, region, service, msg):
-        date = date.strftime('%Y%m%d')
-        hash1 = self.hmac_sha256('AWS4'+key, date)
-        hash2 = self.hmac_sha256(hash1, region)
-        hash3 = self.hmac_sha256(hash2, service)
-        key = self.hmac_sha256(hash3, 'aws4_request')
-        return hmac.new(key, msg.encode('utf-8'), hashlib.sha256).hexdigest()
+        return form_template
+
+    def prepare_form(self):
+        form_asset = None
+        if self.form:
+            form_asset = render_template(self.form_template, form=self.form)
+        else:
+            form_asset = render_template(self.form_template)
+        return form_asset
 
     def s3_upload_form(self, access_key, secret_key, region, bucket, key=None, prefix=None):
         assert (key is not None) or (prefix is not None)
@@ -128,6 +186,7 @@ class PhotoPage(BasePage):
         form = {
             'acl': 'private',
             'success_action_status': '200',
+            'success_action_redirect': "http://localhost:8000/upload",
             'x-amz-algorithm': 'AWS4-HMAC-SHA256',
             'x-amz-credential': '{}/{}/{}/s3/aws4_request'.format(access_key, now.strftime('%Y%m%d'), region),
             'x-amz-date': now.strftime('%Y%m%dT000000Z'),
@@ -140,6 +199,7 @@ class PhotoPage(BasePage):
             {'acl': 'private'},
             ['content-length-range', 32, 10485760],
             {'success_action_status': form['success_action_status']},
+            {'success_action_redirect': form['success_action_redirect']},
             {'x-amz-algorithm':       form['x-amz-algorithm']},
             {'x-amz-credential':      form['x-amz-credential']},
             {'x-amz-date':            form['x-amz-date']},
@@ -163,166 +223,21 @@ class PhotoPage(BasePage):
         form['x-amz-signature'] = self.sign(secret_key, now, region, 's3', form['policy'])
         return form
 
-    def __str__(self):
-        return "This is the %s page" % self.title
+    def hmac_sha256(self, key, msg):
+        return hmac.new(key, msg.encode('utf-8'), hashlib.sha256).digest()
 
-
-class PeoplePage(BasePage):
-    def __init__(self, *args, **kwargs):
-        super(PeoplePage, self).__init__(*args, **kwargs)
-        if not request.is_xhr:
-            self.get_non_xhr_assets()
-        else:
-            self.get_xhr_assets()
-
-    def get_non_xhr_assets(self):
-        if self.title == "people" and "person" in self.assets and self.assets['person'] == current_user:  # This page is editable if the "nickname" is that of current user
-            self.assets['rendered_body_form'] = self.get_rendered_form()
-            self.assets['rendered_main_entry'] = render_template('person.html', profile_user=self.assets['person'])
-        elif self.title == "people":
-            self.assets['rendered_archives'] = render_template("people.html", posts=self.posts[0:12])
-        elif self.title == "login":
-            self.assets['rendered_body_form'] = self.get_rendered_form()
-
-    def get_xhr_assets(self):
-        if self.title == "people":
-            self.assets['collection'] = [i.json_view() for i in self.posts[0:6]]
-
-    def get_rendered_form(self):
-        form_template = self.title + "_form.html"
-        if self.title == "people" and self.nickname:
-            form = self.get_form()
-            rendered_form = render_template(form_template, form=form)
-            return rendered_form
-        else:
-            rendered_form = render_template(form_template)
-            return rendered_form
-
-    def get_form(self):
-        form = None
-        if self.title == 'login':
-            form = (LoginForm(), SignupForm)
-        elif self.title == "people" and self.nickname:
-            if self.nickname == g.user.nickname:
-                form = EditForm()
-                form.nickname.data = g.user.nickname
-                form.about_me.data = g.user.about_me
-        return form
-
-    def __str__(self):
-        return "This is the %s page" % self.title
-
-
-def check_expired(func):
-    @wraps(func)
-    def decorated_function(page_mark=None, slug=None, post_id=None):
-        if page_mark and page_mark not in ['poetry', 'portfolio', 'workshop', 'create']:
-            flash("That page does not exist.")
-            return redirect(url_for('home'))
-        return func(page_mark, slug, post_id)
-
-    return decorated_function
+    def sign(self, key, date, region, service, msg):
+        date = date.strftime('%Y%m%d')
+        hash1 = self.hmac_sha256('AWS4'+key, date)
+        hash2 = self.hmac_sha256(hash1, region)
+        hash3 = self.hmac_sha256(hash2, service)
+        key = self.hmac_sha256(hash3, 'aws4_request')
+        return hmac.new(key, msg.encode('utf-8'), hashlib.sha256).hexdigest()
 
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
-
-
-def pre_upload(img_obj):
-    thumbnail_name, thumbnail_file, upload_directory = generate_thumbnail(**img_obj)
-    s3_file_name = s3_upload(thumbnail_name, thumbnail_file, upload_directory)
-    return s3_file_name
-
-
-def s3_upload(filename, source_file, upload_directory, acl='public-read'):
-    """ Uploads WTForm File Object to Amazon S3
-
-        Expects following app.config attributes to be set:
-            S3_KEY              :   S3 API Key
-            S3_SECRET           :   S3 Secret Key
-            S3_BUCKET           :   What bucket to upload to
-            S3_UPLOAD_DIRECTORY :   Which S3 Directory.
-
-        The default sets the access rights on the uploaded file to
-        public-read.  Optionally, can generate a unique filename via
-        the uuid4 function combined with the file extension from
-        the source file(to avoid filename collision for user uploads.
-    """
-
-    # Connect to S3 and upload file.
-    conn = boto.connect_s3(app.config["AWS_ACCESS_KEY_ID"], app.config["AWS_SECRET_ACCESS_KEY"])
-    b = conn.get_bucket(app.config["S3_BUCKET"])
-
-    sml = b.new_key("/".join([upload_directory, filename]))
-    sml.set_contents_from_file(source_file, rewind=True)
-    sml.set_acl(acl)
-
-    return filename
-
-
-def generate_thumbnail(filename, img, box, photo_type, crop, extension):
-    """Downsample the image.
-    @param box: tuple(x, y) - the bounding box of the result image
-    """
-    # preresize image with factor 2, 4, 8 and fast algorithm
-    factor = 1
-    while img.size[0]/factor > 2*box[0] and img.size[1]*2/factor > 2*box[1]:
-        factor *= 2
-    if factor > 1:
-        img.thumbnail((img.size[0]/factor, img.size[1]/factor), Image.NEAREST)
-
-    # calculate the cropping box and get the cropped part
-    if crop:
-        x1 = y1 = 0
-        x2, y2 = img.size
-        wratio = 1.0 * x2/box[0]
-        hratio = 1.0 * y2/box[1]
-        if hratio > wratio:
-            y1 = int(y2/2-box[1]*wratio/2)
-            y2 = int(y2/2+box[1]*wratio/2)
-        else:
-            x1 = int(x2/2-box[0]*hratio/2)
-            x2 = int(x2/2+box[0]*hratio/2)
-        img = img.crop((x1, y1, x2, y2))
-
-    # Resize the image with best quality algorithm ANTI-ALIAS
-    img.thumbnail(box, Image.ANTIALIAS)
-
-    # save it into a file-like object
-    thumbnail_name = photo_type + "_" + filename
-    if photo_type == 'thumbnail':
-        upload_directory = "cordova/www/pics"
-    else:
-        upload_directory = "user_imgs"
-    image_stream = cStringIO.StringIO()
-    img.save(image_stream, extension, quality=75)
-    image_stream.seek(0)
-    thumbnail_file = image_stream
-    return thumbnail_name, thumbnail_file, upload_directory
-
-
-class GenericListView(View):
-    def __init__(self, view_data):
-        self.view_data = view_data
-
-    def get_template_name(self):
-        return self.view_data.template_name
-
-    def get_context(self):
-        context = self.view_data.context
-        return context
-
-    def dispatch_request(self):
-        context = self.get_context()
-        return self.render_template(context)
-
-    def render_template(self, context):
-        return render_template(self.get_template_name(), **context)
-
-
-class LoginRequiredListView(GenericListView):
-    decorators = [login_required]
 
 
 class OAuthSignIn(object):
@@ -424,39 +339,3 @@ class GoogleSignIn(OAuthSignIn):
         nickname = User.make_valid_nickname(nickname)
         nickname = User.make_unique_nickname(nickname)
         return nickname, me['email']
-
-
-# class TwitterSignIn(OAuthSignIn):
-#     def __init__(self):
-#         super(TwitterSignIn, self).__init__('twitter')
-#         self.service = OAuth1Service(
-#             name='twitter',
-#             consumer_key=self.consumer_id,
-#             consumer_secret=self.consumer_secret,
-#             request_token_url='https://api.twitter.com/oauth/request_token',
-#             authorize_url='https://api.twitter.com/oauth/authorize',
-#             access_token_url='https://api.twitter.com/oauth/access_token',
-#             base_url='https://api.twitter.com/1.1/'
-#         )
-#
-#     def authorize(self):
-#         request_token = self.service.get_request_token(
-#             params={'oauth_callback': self.get_callback_url()}
-#         )
-#         session['request_token'] = request_token
-#         return redirect(self.service.get_authorize_url(request_token[0]))
-#
-#     def callback(self):
-#         if 'code' not in request.args:
-#             return None, None, None
-#         oauth_session = self.service.get_auth_session(
-#             data={'code': request.args['code'],
-#                   'grant_type': 'authorization_code',
-#                   'redirect_uri': self.get_callback_url()},
-#             decoder=json.loads
-#         )
-#         me = oauth_session.get('').json()
-#         nickname = me['name']
-#         nickname = User.make_valid_nickname(nickname)
-#         nickname = User.make_unique_nickname(nickname)
-#         return nickname, me['email']
