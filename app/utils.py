@@ -24,10 +24,17 @@ class BasePage(object):
             self.assets['person'] = User.query.filter_by(nickname=self.nickname).first()
         self.posts = self.get_posts()
         self.get_title_asset()
-        if self.title in ["login", "photo", "profile", "upload", "signup"]:
-            self.assets['body_form'] = Form(self.title).form_asset
-        if self.title == "people" and self.nickname is not None and self.nickname == g.user.nickname:
-            self.assets['body_form'] = Form(self.title, nickname=self.nickname).form_asset
+        if self.title in ["login", "photo", "profile", "signup"]:
+            self.assets['body_form'] = \
+                Form(self.title).form_asset
+        elif self.title == "upload":
+            self.assets['body_form'] = \
+                Form(self.title, target_url=request.base_url).form_asset
+        elif self.title == "people" and self.nickname is not None and self.nickname == g.user.nickname:
+            self.assets['body_form'] = \
+                Form(self.title, nickname=self.nickname).form_asset
+            self.assets['profile_photo_form'] = \
+                Form(self.title, nickname=self.nickname, target_url=request.base_url, template="upload_form.html").form_asset
 
     def get_title_asset(self):
         if not request.is_xhr:
@@ -108,7 +115,8 @@ class PeoplePage(BasePage):
             if request.is_xhr:
                 pass
             else:
-                user_context = {'profile_user': self.assets['person']}
+                user_context = {'profile_user': self.assets['person'],
+                                'profile_photo_form': self.assets['profile_photo_form']}
                 self.assets['main_entry'] = self.get_asset(template='person.html', context=user_context)
                 archive_photos_context = {'posts': self.posts[0:6]}
                 self.assets['archives'] = self.get_asset(template="archives.html", context=archive_photos_context)
@@ -124,11 +132,12 @@ class PeoplePage(BasePage):
 
 
 class Form(object):
-    def __init__(self, title, template=None, nickname=None, key=None):
+    def __init__(self, title, template=None, nickname=None, key=None, target_url=None):
         self.nickname = nickname
         self.page_title = title
         self.key = key
         self.template = template
+        self.target_url = target_url
         self.form = self.get_form()
         self.form_template = self.get_form_template()
         self.form_asset = self.prepare_form()
@@ -137,8 +146,12 @@ class Form(object):
         form = None
         if self.page_title == 'photos':
             form = PostForm
-        if self.page_title == 'login':
+        elif self.page_title == 'login':
             form = (LoginForm(), SignupForm)
+        elif self.page_title == "people" and self.nickname and self.nickname == g.user.nickname and self.target_url:
+            key = "user-images/profile_image/" + str(uuid4()) + ".jpeg"
+            form = self.s3_upload_form(app.config['AWS_ACCESS_KEY_ID'], app.config['AWS_SECRET_ACCESS_KEY'],
+                           app.config['S3_REGION'], 'aperturus', key=key, target_url=self.target_url)
         elif self.page_title == "people" and self.nickname and self.nickname == g.user.nickname:
             form = EditForm()
             form.nickname.data = g.user.nickname
@@ -153,7 +166,7 @@ class Form(object):
                 # form = self.s3_upload_form(app.config['AWS_ACCESS_KEY_ID'], app.config['AWS_SECRET_ACCESS_KEY'],
                 #                            app.config['S3_REGION'], 'aperturus', prefix="user-images/")
                 form = self.s3_upload_form(app.config['AWS_ACCESS_KEY_ID'], app.config['AWS_SECRET_ACCESS_KEY'],
-                               app.config['S3_REGION'], 'aperturus', key=key)
+                               app.config['S3_REGION'], 'aperturus', key=key, target_url=self.target_url)
         elif self.page_title == 'detail':
             form = CommentForm()
         return form
@@ -178,7 +191,7 @@ class Form(object):
             form_asset = render_template(self.form_template)
         return form_asset
 
-    def s3_upload_form(self, access_key, secret_key, region, bucket, key=None, prefix=None):
+    def s3_upload_form(self, access_key, secret_key, region, bucket, key=None, prefix=None, target_url=None):
         assert (key is not None) or (prefix is not None)
         if (key is not None) and (prefix is not None):
             assert key.startswith(prefix)
@@ -186,7 +199,7 @@ class Form(object):
         form = {
             'acl': 'private',
             'success_action_status': '200',
-            'success_action_redirect': "http://localhost:8000/upload",
+            'success_action_redirect': target_url,
             'x-amz-algorithm': 'AWS4-HMAC-SHA256',
             'x-amz-credential': '{}/{}/{}/s3/aws4_request'.format(access_key, now.strftime('%Y%m%d'), region),
             'x-amz-date': now.strftime('%Y%m%dT000000Z'),

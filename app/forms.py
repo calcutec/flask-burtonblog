@@ -53,7 +53,6 @@ class SignupForm(Form):
 class EditForm(Form):
     nickname = StringField('nickname', validators=[DataRequired()])
     about_me = TextAreaField('about_me', validators=[Length(min=0, max=140)])
-    profile_photo = FileField('Your photo', validators=[FileAllowed(['jpg', 'png'], 'Images only!')])
 
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)

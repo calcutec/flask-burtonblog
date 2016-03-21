@@ -1,3 +1,4 @@
+from werkzeug.utils import secure_filename
 from flask import render_template, flash, redirect, session, url_for, g, abort, jsonify, make_response, request, \
     current_app
 from flask.ext.login import login_user, logout_user, current_user, login_required
@@ -9,12 +10,11 @@ from slugify import slugify
 from .forms import SignupForm, LoginForm, EditForm, PostForm, CommentForm
 from .models import User, Post, Comment
 from .emails import follower_notification
-from .utils import OAuthSignIn, PhotoPage, PeoplePage
+from .utils import OAuthSignIn, PhotoPage, PeoplePage, allowed_file
 from datetime import timedelta
 from functools import update_wrapper
-import json
 from flask.views import MethodView
-import os
+import os, json
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -192,12 +192,6 @@ class LoginAPI(MethodView):
             if not current_user.is_anonymous():
                 return redirect(url_for('home'))
             oauth = OAuthSignIn.get_provider(provider)
-            # if provider == "twitter":
-            #     social_id, username, email = oauth.callback()
-            #     if social_id is None:
-            #         flash('Authentication failed.')
-            #         return redirect("/photos")
-            # else:
             nickname, email = oauth.callback()
             if email is None:
                 flash('Authentication failed.')
@@ -239,10 +233,27 @@ app.add_url_rule('/callback/<provider>', view_func=login_api_view, methods=["GET
 
 
 class PeopleAPI(MethodView):
-    def post(self):
+    def post(self, nickname=None):
         form = EditForm()  # Update Member Data
-        response = self.update_user(form)
-        return response
+        if request.is_xhr:  # First validate form using an async request
+            if form.validate(current_user=current_user):
+                result = {'iserror': False, 'savedsuccess': True}
+                return json.dumps(result)
+            form.errors['iserror'] = True
+            return json.dumps(form.errors)
+        else:  # Once form is valid, original form is called and processed
+            if form.validate(current_user=current_user):
+                if hasattr(form, "photo") and allowed_file(form.photo.data):
+                    g.user.profile_photo = secure_filename(form.photo.data)
+                g.user.nickname = form.nickname.data
+                g.user.about_me = form.about_me.data
+                db.session.add(g.user)
+                db.session.commit()
+                page = PeoplePage(title='people', nickname=nickname).render()
+                return page
+            else: # Return errors
+                page = PeoplePage(title='people', nickname=nickname).render()
+                return page
 
     @login_required
     def get(self, nickname=None, action=None):
@@ -294,7 +305,11 @@ class PeopleAPI(MethodView):
             else:
                 page = PeoplePage(title='people').render()
                 return page
-        else:  # Display a single member
+        else: # Display a single member
+            if "key" in request.args:
+                g.user.profile_photo = request.args['key']
+                db.session.add(g.user)
+                db.session.commit()
             page = PeoplePage(title='people', nickname=nickname).render()
             return page
 
@@ -302,41 +317,7 @@ class PeopleAPI(MethodView):
     def delete(self, nickname):
         pass
 
-    @login_required
-    def update_user(self, form):
-        if request.is_xhr:  # First validate form using an async request
-            if form.validate():
-                result = {'iserror': False, 'savedsuccess': True}
-                return json.dumps(result)
-            form.errors['iserror'] = True
-            return json.dumps(form.errors)
-        else:  # Once form is valid, original form is called and processed
-            pass
-            # if form.validate():
-            #     profile_photo = request.files['profile_photo']
-            #     if profile_photo and allowed_file(profile_photo.filename):
-            #         filename = secure_filename(profile_photo.filename)
-            #         img_obj = dict(filename=filename, img=Image.open(profile_photo.stream), box=(400, 300),
-            #                        photo_type="thumb", crop=True,
-            #                        extension=form['profile_photo'].data.mimetype.split('/')[1].upper())
-            #         profile_photo_name = "stump"
-            #
-            #         thumbnail_obj = dict(filename=filename, img=Image.open(profile_photo.stream), box=(160, 160),
-            #                              photo_type="thumbnail", crop=True,
-            #                              extension=form['profile_photo'].data.mimetype.split('/')[1].upper())
-            #         thumbnail_name = "stump"
-            #
-            #         g.user.profile_photo = profile_photo_name
-            #         g.user.thumbnail = thumbnail_name
-            #
-            #     g.user.nickname = form.nickname.data
-            #     g.user.about_me = form.about_me.data
-            #     db.session.add(g.user)
-            #     db.session.commit()
-            #     profile_data = ViewData(page_mark="profile", nickname=g.user.nickname, form=form)
-            #     return render_template(profile_data.template_name, **profile_data.context)
-            # profile_data = ViewData(page_mark="profile", nickname=g.user.nickname, form=form)
-            # return render_template(profile_data.template_name, **profile_data.context)
+
 
 
 people_api_view = PeopleAPI.as_view('people')  # URLS for MEMBER API
