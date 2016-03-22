@@ -8,19 +8,40 @@
     {% endif %}
 </span>
 <nav id="nav" class="navigation">
-    <ul id="main-menu">
+    <ul>
     {% if assets %}
-    {% if not assets.title == "home"  %}
-        <li class="button button-primary"><a href="/home">Home</a></li>
-    {% endif %}
-    {% if not assets.title == "photos"  %}
-        <li class="button button-primary"><a href="/photos">Photos</a></li>
-    {% endif %}
+    <li><a class="{% if assets.title == "home"  %}current {% endif %}button button-primary" href="/home">Home</a></li>
+    <li><a class="{% if assets.title == "photos"  %}current {% endif %}button button-primary"href="/photos">Photos</a></li>
     {% if current_user.is_authenticated()  %}
-        {% if not assets.members_page %}<li class="button button-primary"><a href="/people">People</a></li>{% endif %}
-        {% if not assets.title == "upload"  %}<li class="button button-primary"><a href="/upload">Upload</a></li>{% endif %}
-        {% if not assets.profile_page %}<li class="button button-primary"><a href="/people/{{ g.user.nickname }}">Profile</a></li>{% endif %}
+        <li><a class="{% if assets.members_page %}current {% endif %}button button-primary" href="/people">Members</a></li>
+        <li><a class="{% if assets.profile_page %}current {% endif %}button button-primary" href="/people/{{ g.user.nickname }}">Portfolio</a></li>
     {% endif %}
     {% endif %}
     </ul>
+    {% if current_user.is_authenticated() and assets.title in ["photos", "people", "portfolio"]  %}
+    <ul>
+    {% if assets.title == "photos"  -%}
+        <li><a class="button button-primary" href="/photos">Recent</a></li>
+        <li><a class="button button-primary" href="/photos/starred">Starred</a></li>
+        <li><a class="button button-primary" href="/photos/theme">Theme</a></li>
+        <li><a class="button button-primary" href="/photos/popular">Popular</a></li>
+    {% endif %}
+    {% if assets.title == "people"  %}
+        <li><a class="button button-primary" href="/people/recent">Recent</a></li>
+        <li><a class="button button-primary" href="/people/starred">Starred</a></li>
+        <li><a class="button button-primary" href="/people/popular">Popular</a></li>
+        <li><a class="button button-primary" href="/people/followed">Followed</a></li>
+        <li><a class="button button-primary" href="/people/followers">Followers</a></li>
+    {% endif %}
+    {% if assets.title == "portfolio" %}
+        <li><a class="button button-primary" href="/portfolio/{{ current_user.nickname }}">Recent</a></li>
+        <li><a class="button button-primary" href="/portfolio/{{ current_user.nickname }}/starred">Starred</a></li>
+        <li><a class="button button-primary" href="/portfolio/{{ current_user.nickname }}/<theme>">Theme</a></li>
+        <li><a class="button button-primary" href="/portfolio/{{ current_user.nickname }}/popular">Popular</a></li>
+        <li><a class="button button-primary" href="/portfolio/{{ current_user.nickname }}/published">Published</a></li>
+        <li><a class="button button-primary" href="/portfolio/{{ current_user.nickname }}/unpublished">Unpublished</a></li>
+        <li><a class="button button-primary" href="/portfolio/upload">Upload</a></li>
+    {% endif %}
+    </ul>
+    {% endif %}
 </nav>

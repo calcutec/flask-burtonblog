@@ -103,6 +103,8 @@ class PhotoAPI(MethodView):
 photo_api_view = PhotoAPI.as_view('photos')
 # Read all posts for a given page, Create a new post
 app.add_url_rule('/<any("photos", "home", "upload"):page_mark>', view_func=photo_api_view, methods=["GET", "POST"])
+# Get photos of a given category
+app.add_url_rule('/photos/<category>', view_func=photo_api_view, methods=["GET", "POST"])
 # Update or Delete a single post
 app.add_url_rule('/detail/<int:post_id>', view_func=photo_api_view, methods=["GET", "PUT", "DELETE"])
 # Update or Delete a single post
@@ -318,15 +320,17 @@ class PeopleAPI(MethodView):
         pass
 
 
-
-
 people_api_view = PeopleAPI.as_view('people')  # URLS for MEMBER API
 # Read, Update and Destroy a single member
-app.add_url_rule('/people/<nickname>', view_func=people_api_view, methods=["GET", "POST", "PUT", "DELETE"])
+app.add_url_rule('/portfolio/<nickname>', view_func=people_api_view, methods=["GET", "POST", "PUT", "DELETE"])
 # Read all members
-app.add_url_rule('/people/', view_func=people_api_view, methods=["GET"])
+app.add_url_rule('/members/', view_func=people_api_view, methods=["GET"])
+# Get members of a given category
+app.add_url_rule('/members/<category>', view_func=people_api_view, methods=["GET"])
+# Get photos of a given category for a given member
+app.add_url_rule('/portfolio/<nickname>/<category>', view_func=people_api_view, methods=["GET"])
 # Update a member when JS is turned off)
-app.add_url_rule('/people/<action>/<nickname>', view_func=people_api_view, methods=["GET"])
+# app.add_url_rule('/people/<action>/<nickname>', view_func=people_api_view, methods=["GET"])
 
 
 class ActionsAPI(MethodView):

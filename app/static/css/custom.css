@@ -172,6 +172,16 @@ table {
         border-color: #157b9b;
 }
 
+.button.button-primary.current,
+    button.button-primary:active,
+    input[type="submit"].button-primary:active,
+    input[type="reset"].button-primary:active,
+    input[type="button"].button-primary:active {
+        color: #FFF;
+        background-color: #157b9b;
+        border-color: #157b9b;
+}
+
 /* Forms */
 input[type="email"],
     input[type="number"],
@@ -401,18 +411,18 @@ nav {
     width: 92.52vw;
 }
 #nav ul {
-    padding: .5rem 0 .5rem 0;
     margin: 0;
     border-top: 1px dotted darkblue;
+    padding-bottom: .5rem;
 }
 #nav li {
     display: inline-block;
-    padding: 0 .5em 0 .5em;
-    font-size: 1.2rem;
-    font-weight: 600;
+    margin-top: .5rem;
 }
 #nav li a{
     color: #FFFFFF;
+    font-size: 1.2rem;
+    padding: 0 .5rem 0 .5rem;
 }
 #nav li > :last-child {
     margin-right: 0 !important;
