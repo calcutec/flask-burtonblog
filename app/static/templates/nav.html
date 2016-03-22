@@ -4,7 +4,7 @@
     {% if g.user.is_authenticated() %}
         <a href="/logout"><i class="fa fa-sign-out fa-2x"></i></a>
     {% else %}
-        <a href="/login"><i class="fa fa-sign-in fa-2x"></i></a>
+        {% if not assets.title == "login"  %}<a href="/login"><i class="fa fa-sign-in fa-2x"></i></a>{% endif %}
     {% endif %}
 </span>
 <nav id="nav" class="navigation">
