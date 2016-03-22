@@ -115,6 +115,7 @@ class PeoplePage(BasePage):
             if request.is_xhr:
                 pass
             else:
+                self.assets['profile_page'] = True
                 user_context = {'profile_user': self.assets['person'],
                                 'profile_photo_form': self.assets['profile_photo_form']}
                 self.assets['main_entry'] = self.get_asset(template='person.html', context=user_context)
@@ -124,6 +125,7 @@ class PeoplePage(BasePage):
             if request.is_xhr:
                 self.assets['collection'] = [i.json_view() for i in self.posts[0:6]]
             else:
+                self.assets['members_page'] = True
                 people_context = {'posts': self.posts[0:12]}
                 self.assets['archives'] = self.get_asset(template="people.html", context=people_context)
 

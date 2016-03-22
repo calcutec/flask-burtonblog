@@ -1,5 +1,12 @@
 <input class="burger-check" id="burger-check" type="checkbox"><label for="burger-check" class="burger"></label>
 {% if assets %}<div id="title">{{ assets.title }}</div>{% endif %}
+<span class="loginlogout">
+    {% if g.user.is_authenticated() %}
+        <a href="/logout"><i class="fa fa-sign-out fa-2x"></i></a>
+    {% else %}
+        <a href="/login"><i class="fa fa-sign-in fa-2x"></i></a>
+    {% endif %}
+</span>
 <nav id="nav" class="navigation">
     <ul id="main-menu">
     {% if assets %}
@@ -9,15 +16,10 @@
     {% if not assets.title == "photos"  %}
         <li class="button button-primary"><a href="/photos">Photos</a></li>
     {% endif %}
-    {% if not current_user.is_authenticated()  %}
-        {% if not assets.title == "login"  %}
-            <li class="button button-primary"><a href="/login">Login</a></li>
-        {% endif %}
-    {% else %}
-        <li class="button button-primary"><a href="/people">People</a></li>
+    {% if current_user.is_authenticated()  %}
+        {% if not assets.members_page %}<li class="button button-primary"><a href="/people">People</a></li>{% endif %}
         {% if not assets.title == "upload"  %}<li class="button button-primary"><a href="/upload">Upload</a></li>{% endif %}
-        {% if not assets.title == "profile"  %}<li class="button button-primary"><a href="/people/{{ g.user.nickname }}">Profile</a></li>{% endif %}
-        {% if not assets.title == "logout"  %}<li class="button button-primary"><a href="/logout">Logout</a></li>{% endif %}
+        {% if not assets.profile_page %}<li class="button button-primary"><a href="/people/{{ g.user.nickname }}">Profile</a></li>{% endif %}
     {% endif %}
     {% endif %}
     </ul>

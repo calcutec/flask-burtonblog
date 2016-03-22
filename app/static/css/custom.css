@@ -23,6 +23,11 @@ body {
 .hide {
     display: none;
 }
+.loginlogout {
+    float: right;
+    display: inline-block;
+    /*margin-right: 1rem;*/
+}
 .well {
     box-shadow: 0 0 5px #888;
     padding: 1rem;
