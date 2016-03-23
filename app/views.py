@@ -1,4 +1,5 @@
 from werkzeug.utils import secure_filename
+from werkzeug.routing import BaseConverter
 from flask import render_template, flash, redirect, session, url_for, g, abort, jsonify, make_response, request, \
     current_app
 from flask.ext.login import login_user, logout_user, current_user, login_required
@@ -18,17 +19,35 @@ import os, json
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
+class RegexConverter(BaseConverter):
+    def __init__(self, url_map, *items):
+        super(RegexConverter, self).__init__(url_map)
+        self.regex = items[0]
+
+app.url_map.converters['regex'] = RegexConverter
+
+
+# this URL should return with 200: http://localhost:8000/abc0/foo/
+# this URL should will return with 404: http://localhost:8000/abcd/foo/
+@app.route('/<regex("[abcABC0-9]{4,6}"):uid>/<slug>/')
+def example(uid, slug):
+    return "uid: %s, slug: %s" % (uid, slug)
+
+
 @app.route('/', methods=['GET'])
+@app.route('/photos/', methods=['GET'])
+@app.route('/home/', methods=['GET'])
 def index():
     if current_user.is_authenticated():
-        return redirect(url_for('photos', page_mark="photos"))
+        return redirect(url_for('photos', category='recent'))
     else:
-        return redirect(url_for('photos', page_mark="home"))
+        context = {'assets': PhotoPage(title="home").assets}
+        return render_template("base.html", **context)
 
 
 class PhotoAPI(MethodView):
     # @login_required
-    def post(self, page_mark=None):
+    def post(self):
         form = PostForm()
         if form.validate_on_submit():
             photo_name = form.photo.data
@@ -44,31 +63,36 @@ class PhotoAPI(MethodView):
                 response['savedsuccess'] = True
                 return json.dumps(response)
             else:
-                page = PhotoPage(title=page_mark).render()
+                page = PhotoPage(title='photos').render()
                 return page
         else:
             if request.is_xhr:
                 form.errors['iserror'] = True
                 return json.dumps(form.errors)
             else:
-                context = {'assets': PhotoPage(title=page_mark).assets}
+                context = {'assets': PhotoPage(title=request.endpoint).assets}
                 return render_template("base.html", **context)
 
-    def get(self, page_mark=None, post_id=None):
-        if current_user.is_authenticated() or page_mark in ["home", "photos"]:
+    def get(self, post_id=None, category=None):
+        if current_user.is_authenticated():
             if post_id is None:    # Read all posts
                 if request.is_xhr:
-                    if page_mark == 'upload':
-                        form = PhotoPage(title=page_mark).assets['body_form']
-                        return json.dumps(form)
-                    elif page_mark == 'photos':
-                        collection = PhotoPage(title=page_mark).assets['collection']
-                        return json.dumps({"collection": collection})
+                    pass
+                    # if page_mark == 'upload':
+                    #     form = PhotoPage(title=page_mark).assets['body_form']
+                    #     return json.dumps(form)
+                    # elif page_mark == 'photos':
+                    #     collection = PhotoPage(title=page_mark).assets['collection']
+                    #     return json.dumps({"collection": collection})
                 else:
-                    page = PhotoPage(title=page_mark).render()
+                    page = PhotoPage(title="photos", category=category).render()
                     return page
             else:
-                pass  # Todo create logic for xhr request for a single post
+                if request.is_xhr:
+                    pass
+                else:
+                    page = PhotoPage(title="photos", post_id=post_id).render()
+                    return page
         else:
             assets = PhotoPage(title="login").assets
             context = {'assets': assets}
@@ -102,13 +126,13 @@ class PhotoAPI(MethodView):
 # urls for Photo API
 photo_api_view = PhotoAPI.as_view('photos')
 # Read all posts for a given page, Create a new post
-app.add_url_rule('/<any("photos", "home", "upload"):page_mark>', view_func=photo_api_view, methods=["GET", "POST"])
+app.add_url_rule('/photos/', view_func=photo_api_view, methods=["GET", "POST"])
 # Get photos of a given category
-app.add_url_rule('/photos/<category>', view_func=photo_api_view, methods=["GET", "POST"])
+app.add_url_rule('/photos/<any("recent", "favorite", "starred"):category>/', view_func=photo_api_view, methods=["GET", "POST"])
 # Update or Delete a single post
-app.add_url_rule('/detail/<int:post_id>', view_func=photo_api_view, methods=["GET", "PUT", "DELETE"])
+app.add_url_rule('/photos/<int:post_id>/', view_func=photo_api_view, methods=["GET", "PUT", "DELETE"])
 # Update or Delete a single post
-app.add_url_rule('/amazonS3', view_func=photo_api_view, methods=["GET"])
+app.add_url_rule('/photos/upload/', view_func=photo_api_view, methods=["GET", "POST"])
 
 
 @app.route('/logout', methods=['GET'])
@@ -251,10 +275,10 @@ class PeopleAPI(MethodView):
                 g.user.about_me = form.about_me.data
                 db.session.add(g.user)
                 db.session.commit()
-                page = PeoplePage(title='people', nickname=nickname).render()
+                page = PeoplePage(title='members', nickname=nickname).render()
                 return page
             else: # Return errors
-                page = PeoplePage(title='people', nickname=nickname).render()
+                page = PeoplePage(title='members', nickname=nickname).render()
                 return page
 
     @login_required
@@ -305,14 +329,14 @@ class PeopleAPI(MethodView):
                 employee_dict = User.query.all()
                 return jsonify(employees=[i.json_view() for i in employee_dict])
             else:
-                page = PeoplePage(title='people').render()
+                page = PeoplePage(title='members').render()
                 return page
         else: # Display a single member
             if "key" in request.args:
                 g.user.profile_photo = request.args['key']
                 db.session.add(g.user)
                 db.session.commit()
-            page = PeoplePage(title='people', nickname=nickname).render()
+            page = PeoplePage(title='portfolio', nickname=nickname).render()
             return page
 
     @login_required
@@ -321,12 +345,12 @@ class PeopleAPI(MethodView):
 
 
 people_api_view = PeopleAPI.as_view('people')  # URLS for MEMBER API
-# Read, Update and Destroy a single member
-app.add_url_rule('/portfolio/<nickname>', view_func=people_api_view, methods=["GET", "POST", "PUT", "DELETE"])
 # Read all members
 app.add_url_rule('/members/', view_func=people_api_view, methods=["GET"])
 # Get members of a given category
 app.add_url_rule('/members/<category>', view_func=people_api_view, methods=["GET"])
+# Read, Update and Destroy a single member
+app.add_url_rule('/portfolio/<nickname>', view_func=people_api_view, methods=["GET", "POST", "PUT", "DELETE"])
 # Get photos of a given category for a given member
 app.add_url_rule('/portfolio/<nickname>/<category>', view_func=people_api_view, methods=["GET"])
 # Update a member when JS is turned off)
