@@ -11,10 +11,8 @@ body {
     margin: 0;
 }
 .bodycontainer {
-    position:relative;
-    padding-top: 8px;
     max-width: 1280px;
-    margin: 0 3.5vw 0 3.5vw;
+    margin: 4.5rem 3.5vw 0 3.5vw;
     width: 93vw;
 }
 #title section::first-letter {
@@ -321,6 +319,13 @@ span.rounded-icon svg {
     position: absolute;
 }
 /** Navbar styling **/
+#fixed-nav {
+    position: fixed;
+    padding-top: 5px;
+    background-color: #FFFFFF;
+    top: 0;
+    z-index:9999;
+}
 #title {
     display: inline-block;
     font-size: 3.5rem;
@@ -406,7 +411,6 @@ span.rounded-icon svg {
     margin-top: .5rem;
 }
 nav {
-    margin-bottom: .5rem;
     border-bottom: 1px solid #000000;
     width: 92.52vw;
 }
