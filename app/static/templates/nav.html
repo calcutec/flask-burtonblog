@@ -7,15 +7,14 @@
         {% if not assets.title == "login"  %}<a href="/login"><i class="fa fa-sign-in fa-2x"></i></a>{% endif %}
     {% endif %}
 </span>
+{% if assets %}
 <nav id="nav" class="navigation">
     <ul>
-    {% if assets %}
     <li><a class="{% if assets.title == "home"  %}current {% endif %}button button-primary" href="/home">Home</a></li>
     <li><a class="{% if assets.title == "photos"  %}current {% endif %}button button-primary"href="/photos/recent">Photos</a></li>
     {% if current_user.is_authenticated()  %}
         <li><a class="{% if assets.title == "members" %}current {% endif %}button button-primary" href="/members">Members</a></li>
         <li><a class="{% if assets.title == "portfolio" %}current {% endif %}button button-primary" href="/portfolio/{{ g.user.nickname }}">Portfolio</a></li>
-    {% endif %}
     {% endif %}
     </ul>
     {% if current_user.is_authenticated() and assets.title in ["photos", "members", "portfolio"]  %}
@@ -45,3 +44,4 @@
     </ul>
     {% endif %}
 </nav>
+{% endif %}
