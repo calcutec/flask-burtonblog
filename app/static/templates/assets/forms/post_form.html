@@ -1,12 +1,12 @@
 <form id="poem-form" class="form-horizontal" action="/photos" method="post" enctype="multipart/form-data" name="post">
     {{ form.csrf_token }}
-    <div class="form-group{% if form.header.errors %} error{% endif %}">
-        <label>Title</label>
-        {{ form.header(type="text") }}
-        <span id="error_header" class="help-inline"></span><br>
-    </div>
+{#    <div class="form-group{% if form.header.errors %} error{% endif %}">#}
+{#        <label>Title</label>#}
+{#        {{ form.header(type="text") }}#}
+{#        <span id="error_header" class="help-inline"></span><br>#}
+{#    </div>#}
     <div class="form-group{% if form.body.errors %} error{% endif %}">
-        <label>Text</label>
+        <label>What makes this picture great?</label>
         {{ form.body(type="text") }}
         <span id="error_post" class="help-inline"></span><br>
     </div>

@@ -1,4 +1,4 @@
-from app import app
+from app import app, db
 from config import ALLOWED_EXTENSIONS
 from forms import SignupForm, EditForm, PostForm, CommentForm, LoginForm
 from rauth import OAuth2Service
@@ -16,9 +16,10 @@ import hashlib
 
 
 class BasePage(object):
-    def __init__(self, title, nickname=None, category=None, post_id=None):
+    def __init__(self, title, nickname=None, category=None, post_id=None, form=None):
         self.assets = dict()
         self.title = title
+        self.form = form
         self.nickname = nickname
         self.category = category
         self.post_id = post_id
@@ -26,17 +27,20 @@ class BasePage(object):
             self.assets['person'] = User.query.filter_by(nickname=self.nickname).first()
         self.posts = self.get_posts()
         self.get_title_asset()
-        if self.title in ["login", "photo", "signup"]:
-            self.assets['body_form'] = \
-                Form(self.title).form_asset
-        elif self.title == "upload":
-            self.assets['body_form'] = \
-                Form(self.title, target_url=request.base_url).form_asset
-        elif self.title == "portfolio" and self.nickname is not None and self.nickname == g.user.nickname:
-            self.assets['body_form'] = \
-                Form(self.title, nickname=self.nickname).form_asset
-            self.assets['profile_photo_form'] = \
-                Form(self.title, nickname=self.nickname, target_url=request.base_url, template="upload_form.html").form_asset
+
+        if self.form:
+            self.assets['body_form'] = self.form
+        else:
+            if self.category == "upload":
+                self.assets['body_form'] = Form("upload", target_url=request.base_url).form_asset
+            elif self.title in ["login", "photo", "signup"]:
+                self.assets['body_form'] = Form(self.title).form_asset
+            elif self.title == "portfolio" and self.nickname is not None and self.nickname == g.user.nickname:
+                self.assets['body_form'] = Form(self.title, nickname=self.nickname).form_asset
+                self.assets['profile_photo_form'] = Form(self.title,
+                                                         nickname=self.nickname,
+                                                         target_url=request.base_url,
+                                                         template="upload_form.html").form_asset
 
     def get_title_asset(self):
         if not request.is_xhr:
@@ -48,21 +52,21 @@ class BasePage(object):
         posts = None
         if self.title == 'login':
             return posts
-        elif self.title == 'home':
-            posts = Post.query.filter_by(writing_type="op-ed").order_by(Post.timestamp.desc())
-        elif self.title == 'photos':
+        elif self.title == 'photos' and self.category != "upload":
             if self.post_id:
                 posts = Post.query.filter_by(id=self.post_id)
             else:
-                if self.category == 'recent':
+                if not self.category:
                     posts = Post.query.filter_by(writing_type="entry").order_by(Post.timestamp.desc())
+                elif self.category == 'home':
+                    posts = Post.query.filter_by(writing_type="op-ed").order_by(Post.timestamp.desc())[0]
+                elif self.category == 'recent':
+                    posts = Post.query.filter_by(writing_type="entry").order_by(Post.timestamp.desc())[0:6]
         elif self.title == 'portfolio' and 'person' in self.assets and self.assets['person'] == g.user:
             posts = Post.query.filter_by(author=g.user).order_by(Post.timestamp.desc())
         elif self.title == 'portfolio' and 'person' in self.assets and self.assets['person'] != g.user:
             posts = Post.query.filter_by(author=self.assets['person']).order_by(Post.timestamp.desc())
         elif self.title == 'members':
-            posts = User.query.all()
-        elif self.title == 'detail':
             posts = User.query.all()
         return posts
 
@@ -92,13 +96,7 @@ class PhotoPage(BasePage):
         self.get_page_assets()
 
     def get_page_assets(self):
-        if self.title == "home":
-            if request.is_xhr:
-                pass
-            else:
-                home_context = {'photo': self.posts[0].photo, 'id': self.posts[0].id}
-                self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=home_context)
-        elif self.title == "photos":
+        if self.title == "photos" and not self.category == "upload":
             if self.post_id:
                 main_photo_context = {'photo': self.posts[0].photo, 'id': self.posts[0].id, 'body': self.posts[0].body}
                 self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=main_photo_context)
@@ -107,7 +105,7 @@ class PhotoPage(BasePage):
                     self.assets['collection'] = self.get_asset(context=[i.json_view() for i in self.posts[0:6]])
                 else:
                     main_photo_context = {'photo': self.posts[0].photo, 'id': self.posts[0].id}
-                    archive_photos_context = {'posts': self.posts[1:6]}
+                    archive_photos_context = {'posts': self.posts[1:]}
                     self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=main_photo_context)
                     self.assets['archives'] = self.get_asset(template="archives.html", context=archive_photos_context)
 
@@ -144,15 +142,45 @@ class PeoplePage(BasePage):
 
 
 class Form(object):
-    def __init__(self, title, template=None, nickname=None, key=None, target_url=None):
+    def __init__(self, title=None, template=None, nickname=None, key=None, target_url=None, form=None):
         self.nickname = nickname
         self.page_title = title
         self.key = key
         self.template = template
+
         self.target_url = target_url
-        self.form = self.get_form()
-        self.form_template = self.get_form_template()
-        self.form_asset = self.prepare_form()
+        if not form:
+            self.form = self.get_form()
+            self.form_template = self.get_form_template()
+            self.form_asset = self.prepare_form()
+        else:
+            self.form = form
+            self.process_form()
+
+    def process_form(self):
+        processedform = None
+        if self.page_title == 'photos':
+            if self.form.validate_on_submit():
+                photo_name = self.form.photo.data
+                post = Post(body=self.form.body.data, timestamp=datetime.utcnow(),
+                            author=g.user, photo=photo_name, writing_type="entry")
+                db.session.add(post)
+                db.session.commit()
+                if request.is_xhr:
+                    response = post.json_view()
+                    response['savedsuccess'] = True
+                    return json.dumps(response)
+                else:
+                    page = PhotoPage(title='photos').render()
+                    return page
+            else:
+                if request.is_xhr:
+                    self.form.errors['iserror'] = True
+                    return json.dumps(self.form.errors)
+                else:
+                    context = {'assets': PhotoPage(title=request.endpoint, form=self.form).assets}
+                    return render_template("base.html", **context)
+        return processedform
 
     def get_form(self):
         form = None

@@ -11,7 +11,7 @@ from slugify import slugify
 from .forms import SignupForm, LoginForm, EditForm, PostForm, CommentForm
 from .models import User, Post, Comment
 from .emails import follower_notification
-from .utils import OAuthSignIn, PhotoPage, PeoplePage, allowed_file
+from .utils import OAuthSignIn, PhotoPage, PeoplePage, allowed_file, Form
 from datetime import timedelta
 from functools import update_wrapper
 from flask.views import MethodView
@@ -40,58 +40,23 @@ def index():
     if current_user.is_authenticated():
         return redirect(url_for('photos', category='recent'))
     else:
-        context = {'assets': PhotoPage(title="home").assets}
-        return render_template("base.html", **context)
+        return redirect(url_for('photos', category='home'))
 
 
 class PhotoAPI(MethodView):
-    # @login_required
+    @login_required
     def post(self):
-        form = PostForm()
-        if form.validate_on_submit():
-            photo_name = form.photo.data
-            thumbnail_name = "thumbnail" + photo_name
-            slug = slugify(form.header.data)
-            post = Post(body=form.body.data, timestamp=datetime.utcnow(),
-                        author=g.user, photo=photo_name, thumbnail=thumbnail_name, header=form.header.data,
-                        writing_type="entry", slug=slug)
-            db.session.add(post)
-            db.session.commit()
-            if request.is_xhr:
-                response = post.json_view()
-                response['savedsuccess'] = True
-                return json.dumps(response)
-            else:
-                page = PhotoPage(title='photos').render()
-                return page
-        else:
-            if request.is_xhr:
-                form.errors['iserror'] = True
-                return json.dumps(form.errors)
-            else:
-                context = {'assets': PhotoPage(title=request.endpoint).assets}
-                return render_template("base.html", **context)
+        page = PhotoPage(title=request.endpoint, form=PostForm()).render()
+        return page
 
     def get(self, post_id=None, category=None):
-        if current_user.is_authenticated() or request.path.split("/")[1] != "update":
+        if current_user.is_authenticated() or category != "upload":
             if post_id is None:    # Read all posts
-                if request.is_xhr:
-                    pass
-                    # if page_mark == 'upload':
-                    #     form = PhotoPage(title=page_mark).assets['body_form']
-                    #     return json.dumps(form)
-                    # elif page_mark == 'photos':
-                    #     collection = PhotoPage(title=page_mark).assets['collection']
-                    #     return json.dumps({"collection": collection})
-                else:
-                    page = PhotoPage(title="photos", category=category).render()
-                    return page
+                page = PhotoPage(title="photos", category=category).render()
+                return page
             else:
-                if request.is_xhr:
-                    pass
-                else:
-                    page = PhotoPage(title="photos", post_id=post_id).render()
-                    return page
+                page = PhotoPage(title="photos", post_id=post_id).render()
+                return page
         else:
             assets = PhotoPage(title="login").assets
             context = {'assets': assets}
@@ -125,13 +90,11 @@ class PhotoAPI(MethodView):
 # urls for Photo API
 photo_api_view = PhotoAPI.as_view('photos')
 # Read all posts for a given page, Create a new post
-app.add_url_rule('/photos/', view_func=photo_api_view, methods=["GET", "POST"])
+app.add_url_rule('/photos', view_func=photo_api_view, methods=["GET", "POST"])
 # Get photos of a given category
-app.add_url_rule('/photos/<any("recent", "favorite", "starred"):category>/', view_func=photo_api_view, methods=["GET", "POST"])
+app.add_url_rule('/photos/<any("recent", "favorite", "starred", "upload", "home):category>/', view_func=photo_api_view, methods=["GET", "POST"])
 # Update or Delete a single post
 app.add_url_rule('/photos/<int:post_id>/', view_func=photo_api_view, methods=["GET", "PUT", "DELETE"])
-# Update or Delete a single post
-app.add_url_rule('/photos/upload/', view_func=photo_api_view, methods=["GET", "POST"])
 
 
 @app.route('/logout', methods=['GET'])

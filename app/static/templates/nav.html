@@ -10,11 +10,12 @@
 {% if assets %}
 <nav id="nav" class="navigation">
     <ul>
-    <li><a class="{% if assets.title == "home"  %}current {% endif %}button button-primary" href="/home">Home</a></li>
+    {% if not current_user.is_authenticated() %}<li><a class="{% if assets.title == "home"  %}current {% endif %}button button-primary" href="/home">Home</a></li>{% endif %}
     <li><a class="{% if assets.title == "photos"  %}current {% endif %}button button-primary"href="/photos/recent">Photos</a></li>
     {% if current_user.is_authenticated()  %}
         <li><a class="{% if assets.title == "members" %}current {% endif %}button button-primary" href="/members">Members</a></li>
         <li><a class="{% if assets.title == "portfolio" %}current {% endif %}button button-primary" href="/portfolio/{{ g.user.nickname }}">Portfolio</a></li>
+        <li><a class="button button-primary" href="/photos/upload">Upload</a></li>
     {% endif %}
     </ul>
     {% if current_user.is_authenticated() and assets.title in ["photos", "members", "portfolio"]  %}
@@ -39,7 +40,6 @@
         <li><a class="button button-primary" href="/portfolio/{{ current_user.nickname }}/popular">Popular</a></li>
         <li><a class="button button-primary" href="/portfolio/{{ current_user.nickname }}/published">Published</a></li>
         <li><a class="button button-primary" href="/portfolio/{{ current_user.nickname }}/unpublished">Unpublished</a></li>
-        <li><a class="button button-primary" href="/portfolio/upload">Upload</a></li>
     {% endif %}
     </ul>
     {% endif %}
