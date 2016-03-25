@@ -59,7 +59,7 @@ class BasePage(object):
                 if not self.category:
                     posts = Post.query.filter_by(writing_type="entry").order_by(Post.timestamp.desc())
                 elif self.category == 'home':
-                    posts = Post.query.filter_by(writing_type="op-ed").order_by(Post.timestamp.desc())[0]
+                    posts = Post.query.filter_by(writing_type="op-ed").order_by(Post.timestamp.desc())
                 elif self.category == 'recent':
                     posts = Post.query.filter_by(writing_type="entry").order_by(Post.timestamp.desc())[0:6]
         elif self.title == 'portfolio' and 'person' in self.assets and self.assets['person'] == g.user:
@@ -100,6 +100,12 @@ class PhotoPage(BasePage):
             if self.post_id:
                 main_photo_context = {'photo': self.posts[0].photo, 'id': self.posts[0].id, 'body': self.posts[0].body}
                 self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=main_photo_context)
+            elif self.category == "home":
+                if request.is_xhr:
+                    pass
+                else:
+                    home_context = {'photo': self.posts[0].photo, 'id': self.posts[0].id}
+                    self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=home_context)
             else:
                 if request.is_xhr:
                     self.assets['collection'] = self.get_asset(context=[i.json_view() for i in self.posts[0:6]])
