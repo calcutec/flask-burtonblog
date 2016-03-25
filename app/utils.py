@@ -26,25 +26,29 @@ class BasePage(object):
         if self.nickname is not None:
             self.assets['person'] = User.query.filter_by(nickname=self.nickname).first()
         self.posts = self.get_posts()
-        self.get_title_asset()
+        self.get_header_assets()
 
         if self.form:
-            self.assets['body_form'] = self.form
+            self.assets['body_form'] = Form("upload", target_url=request.base_url, form=self.form).form_asset
         else:
             if self.category == "upload":
                 self.assets['body_form'] = Form("upload", target_url=request.base_url).form_asset
             elif self.title in ["login", "photo", "signup"]:
                 self.assets['body_form'] = Form(self.title).form_asset
-            elif self.title == "portfolio" and self.nickname is not None and self.nickname == g.user.nickname:
+            elif self.title == "members" and self.nickname is not None and self.nickname == g.user.nickname:
                 self.assets['body_form'] = Form(self.title, nickname=self.nickname).form_asset
                 self.assets['profile_photo_form'] = Form(self.title,
                                                          nickname=self.nickname,
                                                          target_url=request.base_url,
                                                          template="upload_form.html").form_asset
 
-    def get_title_asset(self):
+    def get_header_assets(self):
         if not request.is_xhr:
             self.assets['title'] = self.title
+            if request.endpoint == "members" and self.nickname:
+                self.assets['category'] = "portfolio"
+            else:
+                self.assets['category'] = self.category
         else:
             self.assets['title'] = jsonify(title=self.assets['title']).data
 
@@ -56,18 +60,22 @@ class BasePage(object):
             if self.post_id:
                 posts = Post.query.filter_by(id=self.post_id)
             else:
-                if not self.category:
+                if self.category == 'all':
                     posts = Post.query.filter_by(writing_type="entry").order_by(Post.timestamp.desc())
                 elif self.category == 'home':
                     posts = Post.query.filter_by(writing_type="op-ed").order_by(Post.timestamp.desc())
-                elif self.category == 'recent':
+                elif self.category == 'latest':
                     posts = Post.query.filter_by(writing_type="entry").order_by(Post.timestamp.desc())[0:6]
-        elif self.title == 'portfolio' and 'person' in self.assets and self.assets['person'] == g.user:
+        elif self.title == 'members' and 'person' in self.assets and self.assets['person'] == g.user:
             posts = Post.query.filter_by(author=g.user).order_by(Post.timestamp.desc())
-        elif self.title == 'portfolio' and 'person' in self.assets and self.assets['person'] != g.user:
+        elif self.title == 'members' and 'person' in self.assets and self.assets['person'] != g.user:
             posts = Post.query.filter_by(author=self.assets['person']).order_by(Post.timestamp.desc())
         elif self.title == 'members':
-            posts = User.query.all()
+            if self.category == 'all':
+                posts = User.query.all()
+            elif self.category == 'latest':
+                posts = User.query.all()[0:6]
+
         return posts
 
     def get_asset(self, template=None, context=None):
@@ -119,29 +127,44 @@ class PhotoPage(BasePage):
         return "This is the %s page" % self.title
 
 
-class PeoplePage(BasePage):
+class MembersPage(BasePage):
     def __init__(self, *args, **kwargs):
-        super(PeoplePage, self).__init__(*args, **kwargs)
+        super(MembersPage, self).__init__(*args, **kwargs)
         self.get_page_assets()
 
     def get_page_assets(self):
-        if self.title == "portfolio" and "person" in self.assets:
+        if "person" in self.assets:
             if request.is_xhr:
                 pass
             else:
                 self.assets['profile_page'] = True
-                user_context = {'profile_user': self.assets['person'],
-                                'profile_photo_form': self.assets['profile_photo_form']}
+                if "profile_photo_form" in self.assets:
+                    user_context = {'profile_user': self.assets['person'],
+                                    'profile_photo_form': self.assets['profile_photo_form']}
+                else:
+                    user_context = {'profile_user': self.assets['person']}
                 self.assets['main_entry'] = self.get_asset(template='person.html', context=user_context)
                 archive_photos_context = {'posts': self.posts[0:6]}
                 self.assets['archives'] = self.get_asset(template="archives.html", context=archive_photos_context)
-        elif self.title == "members":
+        else:
             if request.is_xhr:
                 self.assets['collection'] = [i.json_view() for i in self.posts[0:6]]
             else:
                 self.assets['members_page'] = True
                 members_context = {'posts': self.posts[0:12]}
                 self.assets['archives'] = self.get_asset(template="members.html", context=members_context)
+
+    def __str__(self):
+        return "This is the %s page" % self.title
+
+
+class SignupPage(BasePage):
+    def __init__(self, *args, **kwargs):
+        super(SignupPage, self).__init__(*args, **kwargs)
+        self.get_page_assets()
+
+    def get_page_assets(self):
+        pass
 
     def __str__(self):
         return "This is the %s page" % self.title
@@ -184,8 +207,8 @@ class Form(object):
                     self.form.errors['iserror'] = True
                     return json.dumps(self.form.errors)
                 else:
-                    context = {'assets': PhotoPage(title=request.endpoint, form=self.form).assets}
-                    return render_template("base.html", **context)
+                    self.form_template = self.get_form_template()
+                    self.form_asset = self.prepare_form()
         return processedform
 
     def get_form(self):
@@ -194,11 +217,11 @@ class Form(object):
             form = PostForm
         elif self.page_title == 'login':
             form = (LoginForm(), SignupForm)
-        elif self.page_title == "portfolio" and self.nickname and self.nickname == g.user.nickname and self.target_url:
+        elif self.page_title == "members" and self.nickname and self.nickname == g.user.nickname and self.target_url:
             key = "user-images/profile_image/" + str(uuid4()) + ".jpeg"
             form = self.s3_upload_form(app.config['AWS_ACCESS_KEY_ID'], app.config['AWS_SECRET_ACCESS_KEY'],
                            app.config['S3_REGION'], 'aperturus', key=key, target_url=self.target_url)
-        elif self.page_title == "portfolio" and self.nickname and self.nickname == g.user.nickname:
+        elif self.page_title == "members" and self.nickname and self.nickname == g.user.nickname:
             form = EditForm()
             form.nickname.data = g.user.nickname
             form.about_me.data = g.user.about_me

@@ -1,5 +1,9 @@
 <input class="burger-check" id="burger-check" type="checkbox"><label for="burger-check" class="burger"></label>
-{% if assets %}<div id="title">{{ assets.title }}</div>{% endif %}
+    {%  if request.endpoint == "members" and assets.person %}
+        <div id="title"><span id="title-text">{{ request.endpoint }} - {{ assets.person.nickname }}</span></div>
+    {% else %}
+        <div id="title"><span id="title-text">{{ request.endpoint }} - {{ assets.category }}</span></div>
+    {% endif %}
 <span class="loginlogout">
     {% if g.user.is_authenticated() %}
         <a href="/logout"><i class="fa fa-sign-out fa-2x"></i></a>
@@ -7,34 +11,35 @@
         {% if not request.endpoint == "login"  %}<a href="/login"><i class="fa fa-sign-in fa-2x"></i></a>{% endif %}
     {% endif %}
 </span>
-{% if assets %}
 <nav id="nav" class="navigation">
     <ul>
     {% if not current_user.is_authenticated() %}<li><a class="{% if assets.title == "home"  %}current {% endif %}button button-primary" href="/home">Home</a></li>{% endif %}
-    <li><a class="{% if assets.title == "photos"  %}current {% endif %}button button-primary"href="/photos/recent">Photos</a></li>
+    <li><a class="{% if request.endpoint == "photos"  %}current {% endif %}button button-primary"href="/photos/latest">Photos</a></li>
     {% if current_user.is_authenticated()  %}
-        <li><a class="{% if assets.title == "members" %}current {% endif %}button button-primary" href="/members">Members</a></li>
+        <li><a class="{% if assets.title == "members" %}current {% endif %}button button-primary" href="/members/latest">Members</a></li>
         <li><a class="{% if assets.title == "portfolio" %}current {% endif %}button button-primary" href="/portfolio/{{ g.user.nickname }}">Portfolio</a></li>
         <li><a class="button button-primary" href="/photos/upload">Upload</a></li>
     {% endif %}
     </ul>
     {% if current_user.is_authenticated() and assets.title in ["photos", "members", "portfolio"]  %}
     <ul>
-    {% if assets.title == "photos" %}
-        <li><a class="{% if request.endpoint == "photos"  %}current {% endif %}button button-primary" href="/photos/recent">Recent</a></li>
+    {% if request.endpoint == "photos" %}
+        <li><a class="{% if request.endpoint == "photos" and assets.category == "all"  %}current {% endif %}button button-primary" href="/photos/all">All</a></li>
+        <li><a class="{% if request.endpoint == "photos" and assets.category == "latest"  %}current {% endif %}button button-primary" href="/photos/latest">Latest</a></li>
         <li><a class="button button-primary" href="/photos/starred">Starred</a></li>
         <li><a class="button button-primary" href="/photos/themed">Theme</a></li>
         <li><a class="button button-primary" href="/photos/popular">Popular</a></li>
     {% endif %}
-    {% if assets.title == "members"  %}
-        <li><a class="{% if assets.title == "members"  %}current {% endif %}button button-primary" href="/members/">Recent</a></li>
+    {% if request.endpoint == "members" and not assets.person %}
+        <li><a class="{% if request.endpoint == "members" and assets.category == "all" %}current {% endif %}button button-primary" href="/members/all">All</a></li>
+        <li><a class="{% if request.endpoint == "members" and assets.category == "latest" %}current {% endif %}button button-primary" href="/members/latest">Latest</a></li>
         <li><a class="button button-primary" href="/members/starred">Starred</a></li>
         <li><a class="button button-primary" href="/members/popular">Popular</a></li>
         <li><a class="button button-primary" href="/members/followed">Followed</a></li>
         <li><a class="button button-primary" href="/members/followers">Followers</a></li>
     {% endif %}
-    {% if assets.title == "portfolio" %}
-        <li><a class="{% if request.url_rule.rule  == '/portfolio/<nickname>'  %}current {% endif %}button button-primary" href="/portfolio/{{ current_user.nickname }}">Recent</a></li>
+    {% if request.endpoint == "members" and assets.person %}
+        <li><a class="{% if not assets.category  %}current {% endif %}button button-primary" href="/portfolio/{{ current_user.nickname }}">Latest</a></li>
         <li><a class="button button-primary" href="/portfolio/{{ current_user.nickname }}/starred">Starred</a></li>
         <li><a class="button button-primary" href="/portfolio/{{ current_user.nickname }}/<theme>">Theme</a></li>
         <li><a class="button button-primary" href="/portfolio/{{ current_user.nickname }}/popular">Popular</a></li>
@@ -44,4 +49,3 @@
     </ul>
     {% endif %}
 </nav>
-{% endif %}

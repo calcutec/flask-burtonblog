@@ -7,15 +7,15 @@ from flask.ext.sqlalchemy import get_debug_queries
 from datetime import datetime
 from app import app, db, lm
 from config import DATABASE_QUERY_TIMEOUT
-from slugify import slugify
-from .forms import SignupForm, LoginForm, EditForm, PostForm, CommentForm
-from .models import User, Post, Comment
+from .forms import SignupForm, LoginForm, EditForm, PostForm
+from .models import User, Post
 from .emails import follower_notification
-from .utils import OAuthSignIn, PhotoPage, PeoplePage, allowed_file, Form
+from .utils import OAuthSignIn, PhotoPage, MembersPage, SignupPage, allowed_file
 from datetime import timedelta
 from functools import update_wrapper
 from flask.views import MethodView
-import os, json
+import os
+import json
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -51,11 +51,14 @@ class PhotoAPI(MethodView):
 
     def get(self, post_id=None, category=None):
         if current_user.is_authenticated() or category != "upload":
-            if post_id is None:    # Read all posts
-                page = PhotoPage(title="photos", category=category).render()
+            if post_id is None:
+                if category:
+                    page = PhotoPage(title=request.endpoint, category=category).render()
+                else:
+                    page = PhotoPage(title=request.endpoint, category="all").render()
                 return page
             else:
-                page = PhotoPage(title="photos", post_id=post_id).render()
+                page = PhotoPage(title=request.endpoint, post_id=post_id).render()
                 return page
         else:
             assets = PhotoPage(title="login").assets
@@ -90,9 +93,10 @@ class PhotoAPI(MethodView):
 # urls for Photo API
 photo_api_view = PhotoAPI.as_view('photos')
 # Read all posts for a given page, Create a new post
-app.add_url_rule('/photos', view_func=photo_api_view, methods=["GET", "POST"])
+app.add_url_rule('/photos/', view_func=photo_api_view, methods=["GET", "POST"])
 # Get photos of a given category
-app.add_url_rule('/photos/<any("recent", "favorite", "starred", "upload", "home):category>/', view_func=photo_api_view, methods=["GET", "POST"])
+app.add_url_rule('/photos/<any("latest", "favorite", "starred", "upload", "home):category>/',
+                 view_func=photo_api_view, methods=["GET", "POST"])
 # Update or Delete a single post
 app.add_url_rule('/photos/<int:post_id>/', view_func=photo_api_view, methods=["GET", "PUT", "DELETE"])
 
@@ -123,12 +127,11 @@ class SignupAPI(MethodView):
         else:
             if form.validate_on_submit():
                 newuser = self.save_user(form)
-                page = PeoplePage(title='people', nickname=newuser.nickname).render()
+                page = MembersPage(title='members', nickname=newuser.nickname).render()
                 return page
             else:
-                # signup_data = ViewData("signup", form=form)
-                signup_data = "stump"
-                return render_template(signup_data.template_name, **signup_data.context)
+                page = SignupPage(title=request.endpoint, form=form).render()
+                return page
 
     def save_user(self, form):
         newuser = User(form.firstname.data, form.email.data, firstname=form.firstname.data,
@@ -199,7 +202,7 @@ class LoginAPI(MethodView):
         else:   # LOGIN PAGE
             if g.user is not None and g.user.is_authenticated():
                 return redirect(url_for('photos', category="recent"))
-            page = PeoplePage(title='login').render()
+            page = MembersPage(title='login').render()
             return page
 
     def login_returning_user(self, form):
@@ -220,7 +223,7 @@ app.add_url_rule('/login/<get_provider>', view_func=login_api_view, methods=["GE
 app.add_url_rule('/callback/<provider>', view_func=login_api_view, methods=["GET", ])
 
 
-class PeopleAPI(MethodView):
+class MembersAPI(MethodView):
     def post(self, nickname=None):
         form = EditForm()  # Update Member Data
         if request.is_xhr:  # First validate form using an async request
@@ -237,68 +240,33 @@ class PeopleAPI(MethodView):
                 g.user.about_me = form.about_me.data
                 db.session.add(g.user)
                 db.session.commit()
-                page = PeoplePage(title='members', nickname=nickname).render()
+                page = MembersPage(title='members', nickname=nickname).render()
                 return page
             else: # Return errors
-                page = PeoplePage(title='members', nickname=nickname).render()
+                page = MembersPage(title='members', nickname=nickname).render()
                 return page
 
     @login_required
-    def get(self, nickname=None, action=None):
-        if action == 'update':
-            # profile_data = ViewData(page_mark="profile", render_form=True, nickname=nickname)
-            profile_data = "stump"
-            return render_template(profile_data.template_name, **profile_data.context)
-        elif action == 'follow':
-            user = User.query.filter_by(nickname=nickname).first()
-            if user is None:
-                flash('User %s not found.' % nickname)
-                return redirect(url_for('home'))
-            if user == g.user:
-                flash('You can\'t follow yourself!')
-                return redirect(redirect_url())
-            u = g.user.follow(user)
-            if u is None:
-                flash('Cannot follow %s.' % nickname)
-                return redirect(redirect_url())
-            db.session.add(u)
-            db.session.commit()
-            flash('You are now following %s.' % nickname)
-            follower_notification(user, g.user)
-            # profile_data = ViewData("profile", nickname=nickname)
-            profile_data = "stump"
-            return render_template(profile_data.template_name, **profile_data.context)
-        elif action == 'unfollow':
-            user = User.query.filter_by(nickname=nickname).first()
-            if user is None:
-                flash('User %s not found.' % nickname)
-                return redirect(redirect_url())
-            if user == g.user:
-                flash('You can\'t unfollow yourself!')
-                return redirect(redirect_url())
-            u = g.user.unfollow(user)
-            if u is None:
-                flash('Cannot unfollow %s.' % nickname)
-                return redirect(redirect_url())
-            db.session.add(u)
-            db.session.commit()
-            flash('You have stopped following %s.' % nickname)
-            # profile_data = ViewData("profile", nickname=nickname)
-            profile_data = "stump"
-            return render_template(profile_data.template_name, **profile_data.context)
-        elif nickname is None:  # Display all members
+    def get(self, nickname=None, action=None, category=None):
+        if nickname is None:  # Display all members
             if request.is_xhr:
                 employee_dict = User.query.all()
                 return jsonify(employees=[i.json_view() for i in employee_dict])
             else:
-                page = PeoplePage(title='members').render()
+                if category:
+                    page = MembersPage(title=request.endpoint, category=category).render()
+                else:
+                    page = MembersPage(title=request.endpoint, category="all").render()
                 return page
         else: # Display a single member
             if "key" in request.args:
                 g.user.profile_photo = request.args['key']
                 db.session.add(g.user)
                 db.session.commit()
-            page = PeoplePage(title='portfolio', nickname=nickname).render()
+            if category:
+                page = MembersPage(title=request.endpoint, nickname=nickname, category=category).render()
+            else:
+                page = MembersPage(title=request.endpoint, nickname=nickname, category="all").render()
             return page
 
     @login_required
@@ -306,15 +274,15 @@ class PeopleAPI(MethodView):
         pass
 
 
-people_api_view = PeopleAPI.as_view('people')  # URLS for MEMBER API
+members_api_view = MembersAPI.as_view('members')  # URLS for MEMBER API
 # Read all members
-app.add_url_rule('/members/', view_func=people_api_view, methods=["GET"])
+app.add_url_rule('/members/', view_func=members_api_view, methods=["GET"])
 # Get members of a given category
-app.add_url_rule('/members/<category>', view_func=people_api_view, methods=["GET"])
+app.add_url_rule('/members/<any("all", "latest", "favorite", "starred", "followed", "followers"):category>', view_func=members_api_view, methods=["GET"])
 # Read, Update and Destroy a single member
-app.add_url_rule('/portfolio/<nickname>', view_func=people_api_view, methods=["GET", "POST", "PUT", "DELETE"])
+app.add_url_rule('/members/<nickname>/', view_func=members_api_view, methods=["GET", "POST", "PUT", "DELETE"])
 # Get photos of a given category for a given member
-app.add_url_rule('/portfolio/<nickname>/<category>', view_func=people_api_view, methods=["GET"])
+app.add_url_rule('/members/<nickname>/<category>/', view_func=members_api_view, methods=["GET"])
 # Update a member when JS is turned off)
 # app.add_url_rule('/people/<action>/<nickname>', view_func=people_api_view, methods=["GET"])
 
@@ -330,8 +298,49 @@ class ActionsAPI(MethodView):
                 vote_status = post.vote(user_id=user_id)
                 return jsonify(new_votes=post.votes, vote_status=vote_status)
 
-        def get(self, action=None, post_id=None):
-            if action == 'vote':   # Vote on post
+        def get(self, action=None, post_id=None, nickname=None):
+            if action == 'update':
+                # profile_data = ViewData(page_mark="profile", render_form=True, nickname=nickname)
+                profile_data = "stump"
+                return render_template(profile_data.template_name, **profile_data.context)
+            elif action == 'follow':
+                user = User.query.filter_by(nickname=nickname).first()
+                if user is None:
+                    flash('User %s not found.' % nickname)
+                    return redirect(url_for('home'))
+                if user == g.user:
+                    flash('You can\'t follow yourself!')
+                    return redirect(redirect_url())
+                u = g.user.follow(user)
+                if u is None:
+                    flash('Cannot follow %s.' % nickname)
+                    return redirect(redirect_url())
+                db.session.add(u)
+                db.session.commit()
+                flash('You are now following %s.' % nickname)
+                follower_notification(user, g.user)
+                # profile_data = ViewData("profile", nickname=nickname)
+                profile_data = "stump"
+                return render_template(profile_data.template_name, **profile_data.context)
+            elif action == 'unfollow':
+                user = User.query.filter_by(nickname=nickname).first()
+                if user is None:
+                    flash('User %s not found.' % nickname)
+                    return redirect(redirect_url())
+                if user == g.user:
+                    flash('You can\'t unfollow yourself!')
+                    return redirect(redirect_url())
+                u = g.user.unfollow(user)
+                if u is None:
+                    flash('Cannot unfollow %s.' % nickname)
+                    return redirect(redirect_url())
+                db.session.add(u)
+                db.session.commit()
+                flash('You have stopped following %s.' % nickname)
+                # profile_data = ViewData("profile", nickname=nickname)
+                profile_data = "stump"
+                return render_template(profile_data.template_name, **profile_data.context)
+            elif action == 'vote':   # Vote on post
                 post_id = post_id
                 user_id = g.user.id
                 if not post_id:

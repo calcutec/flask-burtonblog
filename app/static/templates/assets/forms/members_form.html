@@ -1,4 +1,4 @@
-<form id="profile-form" class="form-horizontal" action="{{ url_for('people', nickname=g.user.nickname) }}" method="post" enctype="multipart/form-data" name="edit">
+<form id="profile-form" class="form-horizontal" action="{{ url_for('members', nickname=g.user.nickname) }}" method="post" enctype="multipart/form-data" name="edit">
     {{ form.csrf_token }}
     <div class="control-group{% if form.nickname.errors %} error{% endif %}">
         <label class="control-label" for="nickname">Your nickname:</label>
