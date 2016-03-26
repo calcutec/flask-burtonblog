@@ -198,11 +198,11 @@ class LoginAPI(MethodView):
                 remember_me = session['remember_me']
                 session.pop('remember_me', None)
             login_user(currentuser, remember=remember_me)
-            return redirect(request.args.get('next') or '/photos/recent')
+            return redirect(request.args.get('next') or '/photos/latest')
         else:   # LOGIN PAGE
             if g.user is not None and g.user.is_authenticated():
                 return redirect(url_for('photos', category="recent"))
-            page = MembersPage(title='login').render()
+            page = MembersPage(title=request.endpoint, category=request.endpoint).render()
             return page
 
     def login_returning_user(self, form):

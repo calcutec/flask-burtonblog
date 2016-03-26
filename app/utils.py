@@ -137,11 +137,12 @@ class MembersPage(BasePage):
         self.get_page_assets()
 
     def get_page_assets(self):
-        if "person" in self.assets:
+        if self.category == "login":
+            pass
+        elif "person" in self.assets:
             if request.is_xhr:
                 pass
             else:
-                self.assets['profile_page'] = True
                 if "profile_photo_form" in self.assets:
                     user_context = {'profile_user': self.assets['person'],
                                     'profile_photo_form': self.assets['profile_photo_form']}
@@ -154,7 +155,6 @@ class MembersPage(BasePage):
             if request.is_xhr:
                 self.assets['collection'] = [i.json_view() for i in self.posts[0:6]]
             else:
-                self.assets['members_page'] = True
                 members_context = {'posts': self.posts[0:12]}
                 self.assets['archives'] = self.get_asset(template="members.html", context=members_context)
 
