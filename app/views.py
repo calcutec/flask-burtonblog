@@ -38,7 +38,7 @@ def example(uid, slug):
 @app.route('/home/', methods=['GET'])
 def index():
     if current_user.is_authenticated():
-        return redirect(url_for('photos', category='recent'))
+        return redirect(url_for('photos', category='latest'))
     else:
         return redirect(url_for('photos', category='home'))
 
@@ -46,7 +46,7 @@ def index():
 class PhotoAPI(MethodView):
     @login_required
     def post(self):
-        page = PhotoPage(title=request.endpoint, form=PostForm()).render()
+        page = PhotoPage(title=request.endpoint, category="upload", form=PostForm()).render()
         return page
 
     def get(self, post_id=None, category=None):
@@ -95,7 +95,7 @@ photo_api_view = PhotoAPI.as_view('photos')
 # Read all posts for a given page, Create a new post
 app.add_url_rule('/photos/', view_func=photo_api_view, methods=["GET", "POST"])
 # Get photos of a given category
-app.add_url_rule('/photos/<any("latest", "favorite", "starred", "upload", "home):category>/',
+app.add_url_rule('/photos/<any("all", "latest", "favorite", "starred", "upload", "home):category>/',
                  view_func=photo_api_view, methods=["GET", "POST"])
 # Update or Delete a single post
 app.add_url_rule('/photos/<int:post_id>/', view_func=photo_api_view, methods=["GET", "PUT", "DELETE"])

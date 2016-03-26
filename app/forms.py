@@ -77,7 +77,6 @@ class EditForm(Form):
 class PostForm(Form):
     my_choices = [('entry', 'Entry'), ('op-ed', 'Op-ed'), ('featured', 'Featured')]
     body = TextAreaField('Post', validators=[DataRequired()])
-    header = StringField('Title', validators=[DataRequired()])
     photo = StringField('Photo', validators=[DataRequired()])
     writing_type = SelectField('Type', choices=my_choices, default='entry')
     submit = SubmitField("Send")

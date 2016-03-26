@@ -4,8 +4,7 @@ from forms import SignupForm, EditForm, PostForm, CommentForm, LoginForm
 from rauth import OAuth2Service
 import json
 import urllib2
-from flask import request, redirect, url_for, render_template, g, flash, jsonify, session
-from flask.ext.login import login_required, current_user
+from flask import request, redirect, url_for, render_template, g, jsonify
 from models import User, Post
 from datetime import timedelta
 from datetime import datetime
@@ -25,11 +24,19 @@ class BasePage(object):
         self.post_id = post_id
         if self.nickname is not None:
             self.assets['person'] = User.query.filter_by(nickname=self.nickname).first()
-        self.posts = self.get_posts()
         self.get_header_assets()
+        self.get_form_assets()
+        self.posts = self.get_posts()
 
-        if self.form:
+    def get_form_assets(self):
+        if self.form:  # Handles instantiated forms
             self.assets['body_form'] = Form("upload", target_url=request.base_url, form=self.form).form_asset
+            if not self.assets['body_form']:  # self.assets['body_form'] is only returned if there are form errors
+                self.title = "photos"
+                self.category = "latest"
+                self.form = None
+                self.get_header_assets()
+                self.get_form_assets()  # This function is run again to get a new form
         else:
             if self.category == "upload":
                 self.assets['body_form'] = Form("upload", target_url=request.base_url).form_asset
@@ -45,10 +52,7 @@ class BasePage(object):
     def get_header_assets(self):
         if not request.is_xhr:
             self.assets['title'] = self.title
-            if request.endpoint == "members" and self.nickname:
-                self.assets['category'] = "portfolio"
-            else:
-                self.assets['category'] = self.category
+            self.assets['category'] = self.category
         else:
             self.assets['title'] = jsonify(title=self.assets['title']).data
 
@@ -176,19 +180,19 @@ class Form(object):
         self.page_title = title
         self.key = key
         self.template = template
-
+        self.form_errors = False
         self.target_url = target_url
+
         if not form:
             self.form = self.get_form()
             self.form_template = self.get_form_template()
             self.form_asset = self.prepare_form()
         else:
             self.form = form
-            self.process_form()
+            self.form = self.process_form()
 
     def process_form(self):
-        processedform = None
-        if self.page_title == 'photos':
+        if self.page_title == 'upload':
             if self.form.validate_on_submit():
                 photo_name = self.form.photo.data
                 post = Post(body=self.form.body.data, timestamp=datetime.utcnow(),
@@ -200,16 +204,19 @@ class Form(object):
                     response['savedsuccess'] = True
                     return json.dumps(response)
                 else:
-                    page = PhotoPage(title='photos').render()
-                    return page
+                    # PhotoPage(title='photos').render()
+                    self.form = None
+                    self.form_asset = None
+                    self.form_errors = False
             else:
                 if request.is_xhr:
                     self.form.errors['iserror'] = True
                     return json.dumps(self.form.errors)
                 else:
+                    self.template = "post_form.html"
                     self.form_template = self.get_form_template()
                     self.form_asset = self.prepare_form()
-        return processedform
+                    self.form_errors = True
 
     def get_form(self):
         form = None
