@@ -83,7 +83,6 @@ class BasePage(object):
         return posts
 
     def get_asset(self, template=None, context=None):
-        asset = None
         if request.is_xhr:
             asset = jsonify(context)
         else:
@@ -227,7 +226,7 @@ class Form(object):
         elif self.page_title == "members" and self.nickname and self.nickname == g.user.nickname and self.target_url:
             key = "user-images/profile_image/" + str(uuid4()) + ".jpeg"
             form = self.s3_upload_form(app.config['AWS_ACCESS_KEY_ID'], app.config['AWS_SECRET_ACCESS_KEY'],
-                           app.config['S3_REGION'], 'aperturus', key=key, target_url=self.target_url)
+                                       app.config['S3_REGION'], 'aperturus', key=key, target_url=self.target_url)
         elif self.page_title == "members" and self.nickname and self.nickname == g.user.nickname:
             form = EditForm()
             form.nickname.data = g.user.nickname
@@ -242,7 +241,7 @@ class Form(object):
                 # form = self.s3_upload_form(app.config['AWS_ACCESS_KEY_ID'], app.config['AWS_SECRET_ACCESS_KEY'],
                 #                            app.config['S3_REGION'], 'aperturus', prefix="user-images/")
                 form = self.s3_upload_form(app.config['AWS_ACCESS_KEY_ID'], app.config['AWS_SECRET_ACCESS_KEY'],
-                               app.config['S3_REGION'], 'aperturus', key=key, target_url=self.target_url)
+                                           app.config['S3_REGION'], 'aperturus', key=key, target_url=self.target_url)
         elif self.page_title == 'detail':
             form = CommentForm()
         return form
@@ -260,7 +259,6 @@ class Form(object):
         return form_template
 
     def prepare_form(self):
-        form_asset = None
         if self.form:
             form_asset = render_template(self.form_template, form=self.form)
         else:
