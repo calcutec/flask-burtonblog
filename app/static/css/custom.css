@@ -257,7 +257,17 @@ label > .label-body {
     display: block;
     float: left;
 }
+.profile-img {
+    width: 92.5vw;
+    max-width: 1280px;
+    margin-bottom: .5vw;
+    display: block;
+    float: left;
+}
 ul#img-list li:hover span.text-content {
+    opacity: 1;
+}
+ul#img-list li:hover span.profile-content {
     opacity: 1;
 }
 ul#img-list li:hover span.rounded-icon {
@@ -289,8 +299,24 @@ span.text-content {
 }
 span.text-content span {
     display: table-cell;
-    text-align: center;
-    vertical-align: middle;
+}
+span.profile-content {
+    position: absolute;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    cursor: pointer;
+    display: table;
+    height: 92.5vw;
+    left: 0;
+    bottom: 0;
+    width: 92.5vw;
+    margin-bottom: .5vw;
+    opacity: 0;
+    transition: opacity 500ms;
+}
+span.profile-content span {
+    display: table-cell;
+    padding: 1rem;
 }
 span.rounded-icon {
     display: table;

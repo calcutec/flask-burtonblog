@@ -1,7 +1,5 @@
 from werkzeug.utils import secure_filename
-from werkzeug.routing import BaseConverter
-from flask import render_template, flash, redirect, session, url_for, g, abort, jsonify, make_response, request, \
-    current_app
+from flask import render_template, flash, redirect, session, url_for, g, jsonify, request
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from flask.ext.sqlalchemy import get_debug_queries
 from datetime import datetime
@@ -9,29 +7,11 @@ from app import app, db, lm
 from config import DATABASE_QUERY_TIMEOUT
 from .forms import SignupForm, LoginForm, EditForm, PostForm
 from .models import User, Post
-from .emails import follower_notification
 from .utils import OAuthSignIn, PhotoPage, MembersPage, SignupPage, LoginPage, allowed_file
-from datetime import timedelta
-from functools import update_wrapper
 from flask.views import MethodView
 import os
 import json
 basedir = os.path.abspath(os.path.dirname(__file__))
-
-
-class RegexConverter(BaseConverter):
-    def __init__(self, url_map, *items):
-        super(RegexConverter, self).__init__(url_map)
-        self.regex = items[0]
-
-app.url_map.converters['regex'] = RegexConverter
-
-
-# this URL should return with 200: http://localhost:8000/abc0/foo/
-# this URL should will return with 404: http://localhost:8000/abcd/foo/
-@app.route('/<regex("[abcABC0-9]{4,6}"):uid>/<slug>/')
-def example(uid, slug):
-    return "uid: %s, slug: %s" % (uid, slug)
 
 
 @app.route('/', methods=['GET'])
@@ -42,65 +22,6 @@ def home():
         return redirect(url_for('photos', category="latest"))
     else:
         return PhotoPage(title="home").render()
-
-
-class PhotoAPI(MethodView):
-    @login_required
-    def post(self):
-        page = PhotoPage(category="upload", form=PostForm()).render()
-        return page
-
-    def get(self, post_id=None, category=None):
-        if current_user.is_authenticated() or category != "upload":
-            if post_id is None:
-                return PhotoPage(category=category).render()
-            else:
-                return PhotoPage(post_id=post_id).render()
-        else:
-            return LoginPage(title="login").render()
-
-    # Update Post
-    @login_required
-    def put(self, post_id):
-        form = PostForm()
-        if form.validate_on_submit():
-            update_post = Post.query.get(post_id)
-            update_post.body = form.data['body']
-            db.session.commit()
-            response = update_post.json_view()
-            response['updatedsuccess'] = True
-            return json.dumps(response)
-        else:
-            result = {'updatedsuccess': False}
-            return json.dumps(result)
-
-    # Delete Post
-    @login_required
-    def delete(self, post_id):
-        post = Post.query.get(post_id)
-        db.session.delete(post)
-        db.session.commit()
-        result = {'deletedsuccess': True}
-        return json.dumps(result)
-
-
-# urls for Photo API
-photo_api_view = PhotoAPI.as_view('photos')
-# Read all posts for a given page, Create a new post
-app.add_url_rule('/photos/',
-                 view_func=photo_api_view, methods=["GET", "POST"])
-# Get photos of a given category
-app.add_url_rule('/photos/<any("all", "latest", "favorite", "starred", "upload", "home"):category>/',
-                 view_func=photo_api_view, methods=["GET", "POST"])
-# Update or Delete a single post
-app.add_url_rule('/photos/<int:post_id>/',
-                 view_func=photo_api_view, methods=["GET", "PUT", "DELETE"])
-
-
-@app.route('/logout', methods=['GET'])
-def logout():
-        logout_user()
-        return redirect(url_for('login'))
 
 
 class SignupAPI(MethodView):
@@ -163,6 +84,12 @@ app.add_url_rule('/login/<get_provider>', view_func=login_api_view, methods=["GE
 app.add_url_rule('/callback/<provider>', view_func=login_api_view, methods=["GET", ])
 
 
+@app.route('/logout', methods=['GET'])
+def logout():
+        logout_user()
+        return redirect(url_for('login'))
+
+
 class MembersAPI(MethodView):
     def post(self, nickname=None):
         form = EditForm()  # Update Member Data
@@ -187,7 +114,7 @@ class MembersAPI(MethodView):
                 return page
 
     @login_required
-    def get(self, nickname=None, category=None):
+    def get(self, nickname=None, category="latest"):
         if nickname is None:  # Display all members
             if request.is_xhr:
                 employee_dict = User.query.all()
@@ -200,18 +127,20 @@ class MembersAPI(MethodView):
                 g.user.profile_photo = request.args['key']
                 db.session.add(g.user)
                 db.session.commit()
-            page = MembersPage(nickname=nickname, category=category).render()
-            return page
+            page = MembersPage(nickname=nickname, category=category)
+            if category not in ["follow", "unfollow"]:
+                return page.render()
+            else:
+                return redirect(url_for("members", nickname=nickname))
 
     @login_required
     def delete(self, nickname):
         pass
 
-
 members_api_view = MembersAPI.as_view('members')  # URLS for MEMBER API
 app.add_url_rule('/members/',  # Read all members
                  view_func=members_api_view, methods=["GET"])
-app.add_url_rule('/members/<any("all", "latest", "favorite", "starred", "followed", "followers"):category>',
+app.add_url_rule('/members/<any("all", "latest", "starred", "followed", "followers", "follow", "unfollow"):category>',
                  view_func=members_api_view, methods=["GET"])
 app.add_url_rule('/members/<nickname>/',  # Read, Update and Destroy a single member
                  view_func=members_api_view, methods=["GET", "POST", "PUT", "DELETE"])
@@ -221,79 +150,62 @@ app.add_url_rule('/members/<nickname>/<category>/',  # Get photos of a given cat
 # app.add_url_rule('/people/<action>/<nickname>', view_func=people_api_view, methods=["GET"])
 
 
-class ActionsAPI(MethodView):
-        def post(self, action=None, post_id=None):
-            if action == 'vote':   # Vote on post
-                post_id = post_id
-                user_id = g.user.id
-                if not post_id:
-                    abort(404)
-                post = Post.query.get_or_404(int(post_id))
-                vote_status = post.vote(user_id=user_id)
-                return jsonify(new_votes=post.votes, vote_status=vote_status)
+class PhotoAPI(MethodView):
+    @login_required
+    def post(self):
+        page = PhotoPage(category="upload", form=PostForm())
+        if page.assets['body_form']:
+            return page.render()
+        else:
+            return redirect(url_for("photos"))
 
-        def get(self, action=None, post_id=None, nickname=None):
-            if action == 'update':
-                # profile_data = ViewData(page_mark="profile", render_form=True, nickname=nickname)
-                profile_data = "stump"
-                return render_template(profile_data.template_name, **profile_data.context)
-            elif action == 'follow':
-                user = User.query.filter_by(nickname=nickname).first()
-                if user is None:
-                    flash('User %s not found.' % nickname)
-                    return redirect(url_for('home'))
-                if user == g.user:
-                    flash('You can\'t follow yourself!')
-                    return redirect(redirect_url())
-                u = g.user.follow(user)
-                if u is None:
-                    flash('Cannot follow %s.' % nickname)
-                    return redirect(redirect_url())
-                db.session.add(u)
-                db.session.commit()
-                flash('You are now following %s.' % nickname)
-                follower_notification(user, g.user)
-                # profile_data = ViewData("profile", nickname=nickname)
-                profile_data = "stump"
-                return render_template(profile_data.template_name, **profile_data.context)
-            elif action == 'unfollow':
-                user = User.query.filter_by(nickname=nickname).first()
-                if user is None:
-                    flash('User %s not found.' % nickname)
-                    return redirect(redirect_url())
-                if user == g.user:
-                    flash('You can\'t unfollow yourself!')
-                    return redirect(redirect_url())
-                u = g.user.unfollow(user)
-                if u is None:
-                    flash('Cannot unfollow %s.' % nickname)
-                    return redirect(redirect_url())
-                db.session.add(u)
-                db.session.commit()
-                flash('You have stopped following %s.' % nickname)
-                # profile_data = ViewData("profile", nickname=nickname)
-                profile_data = "stump"
-                return render_template(profile_data.template_name, **profile_data.context)
-            elif action == 'vote':   # Vote on post
-                post_id = post_id
-                user_id = g.user.id
-                if not post_id:
-                    abort(404)
-                post = Post.query.get_or_404(int(post_id))
-                post.vote(user_id=user_id)
-                return redirect(redirect_url())
+    def get(self, post_id=None, category=None):
+        if current_user.is_authenticated() or category != "upload":
+            if post_id is None:
+                return PhotoPage(category=category).render()
+            else:
+                return PhotoPage(post_id=post_id).render()
+        else:
+            return LoginPage(title="login").render()
 
-actions_api_view = ActionsAPI.as_view('actions')
-app.add_url_rule('/actions/<page_mark>/<action>/<int:post_id>', view_func=actions_api_view, methods=["POST", "GET"])
+    # Update Post
+    @login_required
+    def put(self, post_id):
+        form = PostForm()
+        if form.validate_on_submit():
+            update_post = Post.query.get(post_id)
+            update_post.body = form.data['body']
+            db.session.commit()
+            response = update_post.json_view()
+            response['updatedsuccess'] = True
+            return json.dumps(response)
+        else:
+            result = {'updatedsuccess': False}
+            return json.dumps(result)
 
+    # Delete Post
+    @login_required
+    def delete(self, post_id):
+        post = Post.query.get(post_id)
+        db.session.delete(post)
+        db.session.commit()
+        result = {'deletedsuccess': True}
+        return json.dumps(result)
 
-# Helper functions #
-
-
-def redirect_url(default='home'):
-    return request.args.get('next') or \
-           request.referrer or \
-           url_for(default)
+# urls for Photo API
+photo_api_view = PhotoAPI.as_view('photos')
+# Read all posts for a given page, Create a new post
+app.add_url_rule('/photos/',
+                 view_func=photo_api_view, methods=["GET", "POST"])
+# Get photos of a given category
+app.add_url_rule('/photos/<any("all", "latest", "favorite", "starred", "upload", "home"):category>/',
+                 view_func=photo_api_view, methods=["GET", "POST"])
+# Update or Delete a single post
+app.add_url_rule('/photos/<int:post_id>/',
+                 view_func=photo_api_view, methods=["GET", "PUT", "DELETE"])
+# Vote on a single post
+app.add_url_rule('/photos/<int:post_id>/vote',
+                 view_func=photo_api_view, methods=["GET", "POST"])
 
 
 @app.context_processor
@@ -346,45 +258,3 @@ def not_found_error(error):
 def internal_error(error):
     db.session.rollback()
     return render_template('500.html', error=error), 500
-
-
-def crossdomain(origin=None, methods=None, headers=None,
-                max_age=21600, attach_to_all=True,
-                automatic_options=True):
-    if methods is not None:
-        methods = ', '.join(sorted(x.upper() for x in methods))
-    if headers is not None and not isinstance(headers, basestring):
-        headers = ', '.join(x.upper() for x in headers)
-    if not isinstance(origin, basestring):
-        origin = ', '.join(origin)
-    if isinstance(max_age, timedelta):
-        max_age = max_age.total_seconds()
-
-    def get_methods():
-        if methods is not None:
-            return methods
-
-        options_resp = current_app.make_default_options_response()
-        return options_resp.headers['allow']
-
-    def decorator(f):
-        def wrapped_function(*args, **kwargs):
-            if automatic_options and request.method == 'OPTIONS':
-                resp = current_app.make_default_options_response()
-            else:
-                resp = make_response(f(*args, **kwargs))
-            if not attach_to_all and request.method != 'OPTIONS':
-                return resp
-
-            h = resp.headers
-
-            h['Access-Control-Allow-Origin'] = origin
-            h['Access-Control-Allow-Methods'] = get_methods()
-            h['Access-Control-Max-Age'] = str(max_age)
-            if headers is not None:
-                h['Access-Control-Allow-Headers'] = headers
-            return resp
-
-        f.provide_automatic_options = False
-        return update_wrapper(wrapped_function, f)
-    return decorator

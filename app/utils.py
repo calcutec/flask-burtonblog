@@ -4,11 +4,12 @@ from forms import SignupForm, EditForm, PostForm, CommentForm, LoginForm
 from rauth import OAuth2Service
 import json
 import urllib2
-from flask import request, redirect, url_for, render_template, g, jsonify, session
+from flask import request, redirect, url_for, render_template, g, jsonify, session, abort, flash
 from flask.ext.login import login_user
 from models import User, Post
 from datetime import timedelta
 from datetime import datetime
+from .emails import follower_notification
 from uuid import uuid4
 import hmac
 from base64 import b64encode
@@ -22,9 +23,9 @@ class BasePage(object):
             self.title = title
         else:
             self.title = request.endpoint
-        self.form = form
         self.nickname = nickname
         self.category = category
+        self.form = form
         self.post_id = post_id
         if self.nickname is not None:
             self.assets['person'] = User.query.filter_by(nickname=self.nickname).first()
@@ -101,6 +102,15 @@ class PhotoPage(BasePage):
         super(PhotoPage, self).__init__(*args, **kwargs)
         self.get_page_assets()
 
+    def vote(self):
+        post_id = self.post_id
+        user_id = g.user.id
+        if not post_id:
+            abort(404)
+        post = Post.query.get_or_404(int(post_id))
+        post.vote(user_id=user_id)
+        return redirect(redirect_url())
+
     def get_page_assets(self):
         if self.title == "home":
             if request.is_xhr:
@@ -137,7 +147,7 @@ class MembersPage(BasePage):
             if request.is_xhr:
                 pass
             else:
-                archive_photos_context = None
+                archive_photos_context = {'posts': self.posts}
                 if "profile_photo_form" in self.assets:
                     user_context = {'profile_user': self.assets['person'],
                                     'profile_photo_form': self.assets['profile_photo_form']}
@@ -145,9 +155,11 @@ class MembersPage(BasePage):
                     user_context = {'profile_user': self.assets['person']}
                 self.assets['main_entry'] = self.get_asset(template='person.html', context=user_context)
                 if self.assets['category'] == "latest":
-                    archive_photos_context = {'posts': self.posts[0:6]}
-                if self.assets['category'] == "all":
                     archive_photos_context = {'posts': self.posts}
+                if self.assets['category'] == "follow":
+                    self.follow()
+                if self.assets['category'] == "unfollow":
+                    self.unfollow()
                 self.assets['archives'] = self.get_asset(template="archives.html", context=archive_photos_context)
         else:
             if request.is_xhr:
@@ -155,6 +167,39 @@ class MembersPage(BasePage):
             else:
                 members_context = {'posts': self.posts[0:12]}
                 self.assets['archives'] = self.get_asset(template="members.html", context=members_context)
+
+    def follow(self):
+        user = self.assets['person']
+        if user is None:
+            flash('User %s not found.' % self.nickname)
+            return redirect(url_for('home'))
+        if user == g.user:
+            flash('You can\'t follow yourself!')
+            return redirect(redirect_url())
+        u = g.user.follow(user)
+        if u is None:
+            flash('Cannot follow %s.' % self.nickname)
+            return redirect(redirect_url())
+        db.session.add(u)
+        db.session.commit()
+        flash('You are now following %s.' % self.nickname)
+        follower_notification(user, g.user)
+
+    def unfollow(self):
+        user = self.assets['person']
+        if user is None:
+            flash('User %s not found.' % self.nickname)
+            return redirect(redirect_url())
+        if user == g.user:
+            flash('You can\'t unfollow yourself!')
+            return redirect(redirect_url())
+        u = g.user.unfollow(user)
+        if u is None:
+            flash('Cannot unfollow %s.' % self.nickname)
+            return redirect(redirect_url())
+        db.session.add(u)
+        db.session.commit()
+        flash('You have stopped following %s.' % self.nickname)
 
     def __str__(self):
         return "This is the %s page" % self.title
@@ -502,3 +547,9 @@ class GoogleSignIn(OAuthSignIn):
         nickname = User.make_valid_nickname(nickname)
         nickname = User.make_unique_nickname(nickname)
         return nickname, me['email']
+
+
+def redirect_url(default='home'):
+    return request.args.get('next') or \
+           request.referrer or \
+           url_for(default)

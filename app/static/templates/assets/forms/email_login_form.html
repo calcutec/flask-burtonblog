@@ -1,0 +1,23 @@
+<h3>Email Login</h3>
+<form action="/login/" id="login-form" method="post" accept-charset="utf-8">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div class="form-group">
+        <label for="email">Email</label>
+        {{ loginform.email(id="email", placeholder="Email") }}
+{#        <input id="email" name="email" placeholder="Email" type="email" value="">#}
+        {% for error in loginform.email.errors %}
+            <span class="help-inline" style="color:red">[{{ error }}]</span><br>
+        {% endfor %}
+        <span id="error_email" class="help-inline" style="color:red"></span>
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        {{ loginform.password(id="password", placeholder="Password") }}
+{#        <input id="password" name="password" placeholder="Password" type="password" value="">#}
+        {% for error in loginform.password.errors %}
+            <span class="help-inline" style="color:red">[{{ error }}]</span><br>
+        {% endfor %}
+        <span id="error_password" class="help-inline" style="color:red"></span>
+    </div>
+    <input class="button-primary" id="login-form-submit" type="submit" value="Login">
+</form>
