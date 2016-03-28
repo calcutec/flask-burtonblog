@@ -10,7 +10,7 @@ from config import DATABASE_QUERY_TIMEOUT
 from .forms import SignupForm, LoginForm, EditForm, PostForm
 from .models import User, Post
 from .emails import follower_notification
-from .utils import OAuthSignIn, PhotoPage, MembersPage, SignupPage, allowed_file
+from .utils import OAuthSignIn, PhotoPage, MembersPage, SignupPage, LoginPage, allowed_file
 from datetime import timedelta
 from functools import update_wrapper
 from flask.views import MethodView
@@ -36,34 +36,28 @@ def example(uid, slug):
 
 @app.route('/', methods=['GET'])
 @app.route('/home/', methods=['GET'])
-def index():
+@app.route('/photos/', methods=['GET'])
+def home():
     if current_user.is_authenticated():
-        return redirect(url_for('photos', category='latest'))
+        return redirect(url_for('photos', category="latest"))
     else:
-        return redirect(url_for('photos', category='home'))
+        return PhotoPage(title="home").render()
 
 
 class PhotoAPI(MethodView):
     @login_required
     def post(self):
-        page = PhotoPage(title=request.endpoint, category="upload", form=PostForm()).render()
+        page = PhotoPage(category="upload", form=PostForm()).render()
         return page
 
     def get(self, post_id=None, category=None):
         if current_user.is_authenticated() or category != "upload":
             if post_id is None:
-                if category:
-                    page = PhotoPage(title=request.endpoint, category=category).render()
-                else:
-                    page = PhotoPage(title=request.endpoint, category="all").render()
-                return page
+                return PhotoPage(category=category).render()
             else:
-                page = PhotoPage(title=request.endpoint, post_id=post_id).render()
-                return page
+                return PhotoPage(post_id=post_id).render()
         else:
-            assets = PhotoPage(title="login").assets
-            context = {'assets': assets}
-            return render_template("base.html", **context)
+            return LoginPage(title="login").render()
 
     # Update Post
     @login_required
@@ -93,12 +87,14 @@ class PhotoAPI(MethodView):
 # urls for Photo API
 photo_api_view = PhotoAPI.as_view('photos')
 # Read all posts for a given page, Create a new post
-app.add_url_rule('/photos/', view_func=photo_api_view, methods=["GET", "POST"])
+app.add_url_rule('/photos/',
+                 view_func=photo_api_view, methods=["GET", "POST"])
 # Get photos of a given category
-app.add_url_rule('/photos/<any("all", "latest", "favorite", "starred", "upload", "home):category>/',
+app.add_url_rule('/photos/<any("all", "latest", "favorite", "starred", "upload", "home"):category>/',
                  view_func=photo_api_view, methods=["GET", "POST"])
 # Update or Delete a single post
-app.add_url_rule('/photos/<int:post_id>/', view_func=photo_api_view, methods=["GET", "PUT", "DELETE"])
+app.add_url_rule('/photos/<int:post_id>/',
+                 view_func=photo_api_view, methods=["GET", "PUT", "DELETE"])
 
 
 @app.route('/logout', methods=['GET'])
@@ -109,43 +105,11 @@ def logout():
 
 class SignupAPI(MethodView):
     def post(self):
-        form = SignupForm()
-        response = self.process_signup(form)
-        return response
-
-    def process_signup(self, form):
-        if request.is_xhr:
-            if form.validate_on_submit():
-                result = {'iserror': False}
-                newuser = self.save_user(form)
-                result['savedsuccess'] = True
-                result['newuser_nickname'] = newuser.nickname
-                return json.dumps(result)
-            else:
-                form.errors['iserror'] = True
-                return json.dumps(form.errors)
+        page = SignupPage(form=SignupForm())
+        if page.assets['body_form']:
+            return page.render()
         else:
-            if form.validate_on_submit():
-                newuser = self.save_user(form)
-                page = MembersPage(title='members', nickname=newuser.nickname).render()
-                return page
-            else:
-                page = SignupPage(title=request.endpoint, form=form).render()
-                return page
-
-    def save_user(self, form):
-        newuser = User(form.firstname.data, form.email.data, firstname=form.firstname.data,
-                       lastname=form.lastname.data,
-                       password=form.password.data)
-        db.session.add(newuser)
-        db.session.add(newuser.follow(newuser))
-        db.session.commit()
-        remember_me = False
-        if 'remember_me' in session:
-            remember_me = session['remember_me']
-            session.pop('remember_me', None)
-        login_user(newuser, remember=remember_me)
-        return newuser
+            return redirect(url_for("members", nickname=current_user.nickname))
 
 signup_api_view = SignupAPI.as_view('signup')  # URLS for MEMBER API
 app.add_url_rule('/signup/', view_func=signup_api_view, methods=["GET", "POST"])  # Display and Validate Signup Form
@@ -153,25 +117,11 @@ app.add_url_rule('/signup/', view_func=signup_api_view, methods=["GET", "POST"])
 
 class LoginAPI(MethodView):
     def post(self):
-        form = LoginForm()  # LOGIN VALIDATION
-        if request.is_xhr:
-            if form.validate_on_submit():
-                result = {'iserror': False}
-                returninguser = self.login_returning_user(form)
-                result['savedsuccess'] = True
-                result['returninguser_nickname'] = returninguser.nickname
-                return json.dumps(result)
-            else:
-                form.errors['iserror'] = True
-                return json.dumps(form.errors)
+        page = LoginPage(form=LoginForm())
+        if page.assets['body_form']:
+            return page.render()
         else:
-            if form.validate_on_submit():
-                returninguser = self.login_returning_user(form)
-                return redirect(url_for('members', nickname=returninguser.nickname))
-            else:
-                # login_data = ViewData("login", form=form)
-                login_data = "stump"
-                return render_template(login_data.template_name, **login_data.context)
+            return redirect(url_for("photos"))
 
     def get(self, get_provider=None, provider=None):
         if get_provider is not None:    # GET OAUTH PROVIDER
@@ -201,18 +151,8 @@ class LoginAPI(MethodView):
             return redirect(request.args.get('next') or '/photos/latest')
         else:   # LOGIN PAGE
             if g.user is not None and g.user.is_authenticated():
-                return redirect(url_for('photos', category="recent"))
-            page = MembersPage(title=request.endpoint, category=request.endpoint).render()
-            return page
-
-    def login_returning_user(self, form):
-        returninguser = User.query.filter_by(email=form.email.data).first()
-        remember_me = False
-        if 'remember_me' in session:
-            remember_me = session['remember_me']
-            session.pop('remember_me', None)
-        login_user(returninguser, remember=remember_me)
-        return returninguser
+                return redirect(url_for('photos'))
+            return LoginPage().render()
 
 login_api_view = LoginAPI.as_view('login')  # Urls for Login API
 # Authenticate user
@@ -242,31 +182,25 @@ class MembersAPI(MethodView):
                 db.session.commit()
                 page = MembersPage(title='members', nickname=nickname).render()
                 return page
-            else: # Return errors
+            else:  # Return errors
                 page = MembersPage(title='members', nickname=nickname).render()
                 return page
 
     @login_required
-    def get(self, nickname=None, action=None, category=None):
+    def get(self, nickname=None, category=None):
         if nickname is None:  # Display all members
             if request.is_xhr:
                 employee_dict = User.query.all()
                 return jsonify(employees=[i.json_view() for i in employee_dict])
             else:
-                if category:
-                    page = MembersPage(title=request.endpoint, category=category).render()
-                else:
-                    page = MembersPage(title=request.endpoint, category="all").render()
+                page = MembersPage(category=category).render()
                 return page
-        else: # Display a single member
+        else:  # Display a single member
             if "key" in request.args:
                 g.user.profile_photo = request.args['key']
                 db.session.add(g.user)
                 db.session.commit()
-            if category:
-                page = MembersPage(title=request.endpoint, nickname=nickname, category=category).render()
-            else:
-                page = MembersPage(title=request.endpoint, nickname=nickname, category="all").render()
+            page = MembersPage(nickname=nickname, category=category).render()
             return page
 
     @login_required
@@ -275,14 +209,14 @@ class MembersAPI(MethodView):
 
 
 members_api_view = MembersAPI.as_view('members')  # URLS for MEMBER API
-# Read all members
-app.add_url_rule('/members/', view_func=members_api_view, methods=["GET"])
-# Get members of a given category
-app.add_url_rule('/members/<any("all", "latest", "favorite", "starred", "followed", "followers"):category>', view_func=members_api_view, methods=["GET"])
-# Read, Update and Destroy a single member
-app.add_url_rule('/members/<nickname>/', view_func=members_api_view, methods=["GET", "POST", "PUT", "DELETE"])
-# Get photos of a given category for a given member
-app.add_url_rule('/members/<nickname>/<category>/', view_func=members_api_view, methods=["GET"])
+app.add_url_rule('/members/',  # Read all members
+                 view_func=members_api_view, methods=["GET"])
+app.add_url_rule('/members/<any("all", "latest", "favorite", "starred", "followed", "followers"):category>',
+                 view_func=members_api_view, methods=["GET"])
+app.add_url_rule('/members/<nickname>/',  # Read, Update and Destroy a single member
+                 view_func=members_api_view, methods=["GET", "POST", "PUT", "DELETE"])
+app.add_url_rule('/members/<nickname>/<category>/',  # Get photos of a given category for a given member
+                 view_func=members_api_view, methods=["GET"])
 # Update a member when JS is turned off)
 # app.add_url_rule('/people/<action>/<nickname>', view_func=people_api_view, methods=["GET"])
 
