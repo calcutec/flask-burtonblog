@@ -1,19 +1,39 @@
-<figure>
-<a href="/photos/{{ id }}">
-<img data-id="{{ id }}" sizes="92.5vw"
-src="https://aperturus.imgix.net/{{ photo }}?w=320q=85&auto=format&sharp=10"
-srcset="https://aperturus.imgix.net/{{ photo }}?w=320&q=85&auto=format&sharp=10 320w,
-https://aperturus.imgix.net/{{ photo }}?w=480&q=85&auto=format&sharp=10 480w,
-https://aperturus.imgix.net/{{ photo }}?w=640&q=85&auto=format&sharp=10 640w,
-https://aperturus.imgix.net/{{ photo }}?w=880&q=85&auto=format&sharp=10 800w,
-https://aperturus.imgix.net/{{ photo }}?w=880&q=85&auto=format&sharp=10 960w,
-https://aperturus.imgix.net/{{ photo }}?w=1280&q=85&auto=format&sharp=10 1280w"
-alt="{{ photo }}" class="main-responsive-img">
-<span class="main rounded-icon">
-    <svg width="22" height="22" viewBox="0 0 22 22"><path d="M3.4 20.2L9 14.5 7.5 13l-5.7 5.6L1 14H0v7.5l.5.5H8v-1l-4.6-.8M18.7 1.9L13 7.6 14.4 9l5.7-5.7.5 4.7h1.2V.6l-.5-.5H14v1.2l4.7.6"></path></svg>
-</span>
-</a>
-<figcaption class="caption caption--main caption--img" itemprop="description">
-{{ body }}
-</figcaption>
-</figure>
+<ul class="img-list">
+    <li>
+    <img data-id="{{ post.id }}" sizes="92.5vw"
+    src="https://aperturus.imgix.net/{{ post.photo }}?w=320&h=320&fit=crop&q=85&auto=format&sharp=10"
+    srcset="https://aperturus.imgix.net/{{ post.photo }}?w=320&h=320&fit=crop&q=85&auto=format&sharp=10 320w,
+    https://aperturus.imgix.net/{{ post.photo }}?w=480&h=480&fit=crop&q=85&auto=format&sharp=10 480w,
+    https://aperturus.imgix.net/{{ post.photo }}?w=640&h=640&fit=crop&q=85&auto=format&sharp=10 640w,
+    https://aperturus.imgix.net/{{ post.photo }}?w=880&h=880&fit=crop&q=85&auto=format&sharp=10 880w,
+    https://aperturus.imgix.net/{{ post.photo }}?w=1080&h=1080&fit=crop&q=85&auto=format&sharp=10 1080w,
+    https://aperturus.imgix.net/{{ post.photo }}?w=1280&h=1280&fit=crop&q=85&auto=format&sharp=10 1280w"
+    alt="{{ post.photo }}"
+    class="main-responsive-img">
+    <span onclick="" class="profile-content">
+        <span>
+            <a href="{{ url_for('members', nickname=post.author.nickname) }}" rel="tag">{{ post.author.nickname }}</a><br>
+            <b>{{ post.timestamp.strftime('%d %b %Y') }}</b><br>
+            {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
+            {% if post.comments.all()|length > 0 %}
+                <a href="{{ url_for('posts', slug=post.slug) }}">
+                    {% with total=post.comments.all()|length %}
+                        {{ total }} comment{% if total != 1 %}s{% endif %}
+                    {% endwith %}
+                </a>
+            {% endif %}
+        </span>
+    </span>
+    <a href="/photos/{{ post.id }}">
+        <span class="main rounded-icon">
+            <svg width="22" height="22" viewBox="0 0 22 22">
+                <path d="M3.4 20.2L9 14.5 7.5 13l-5.7 5.6L1 14H0v7.5l.5.5H8v-1l-4.6-.8M18.7 1.9L13 7.6 14.4 9l5.7-5.7.5 4.7h1.2V.6l-.5-.5H14v1.2l4.7.6">
+                </path>
+            </svg>
+        </span>
+    </a>
+    </li>
+</ul>
+{#<div>#}
+{#{{ post.body }}#}
+{#</div>#}

@@ -9,9 +9,9 @@ class="responsive-img"
 alt="{{ post.photo }}">
 <span onclick="" class="text-content">
     <span>
-        By: <a href="{{ url_for('members', nickname=post.author.nickname) }}" rel="tag">{{ post.author.nickname }}</a><br>
-        Posted: <b>{{ post.timestamp.strftime('%d %b %Y') }}</b><br>
-        {{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>
+        <a href="{{ url_for('members', nickname=post.author.nickname) }}" rel="tag">{{ post.author.nickname }}</a><br>
+        <b>{{ post.timestamp.strftime('%d %b %Y') }}</b><br>
+        {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
         {% if post.comments.all()|length > 0 %}
             <a href="{{ url_for('posts', slug=post.slug) }}">
                 {% with total=post.comments.all()|length %}

@@ -1,15 +1,16 @@
-<ul id="img-list">
+<ul class="img-list">
     <li data-id="{{ profile_user.id }}">
         {% if profile_user.profile_photo %}
-                <img src="https://aperturus.imgix.net/{{ profile_user.profile_photo }}?w=175&h=175&fit=crop&q=85&auto=format&sharp=10"
-                    srcset="https://aperturus.imgix.net/{{ profile_user.profile_photo }}?w=175&h=175&fit=crop&q=85&auto=format&sharp=10 175w,
-                    https://aperturus.imgix.net/{{ profile_user.profile_photo }}?w=190&h=190&fit=crop&q=85&auto=format&sharp=10 190w,
-                    https://aperturus.imgix.net/{{ profile_user.profile_photo }}?w=220&h=220&fit=crop&q=85&auto=format&sharp=10 220w,
-                    https://aperturus.imgix.net/{{ profile_user.profile_photo }}?w=320&h=320&fit=crop&q=85&auto=format&sharp=10 320w,
-                    https://aperturus.imgix.net/{{ profile_user.profile_photo }}?w=640&h=640&fit=crop&q=85&auto=format&sharp=10 640w"
-                    sizes="92.5vw"
-                    class="profile-img"
-                    alt="{{ profile_user.profile_photo }}">
+            <img data-id="{{ post.id }}" sizes="92.5vw"
+            src="https://aperturus.imgix.net/{{ post.photo }}?w=320&h=320&fit=crop&q=85&auto=format&sharp=10"
+            srcset="https://aperturus.imgix.net/{{ post.photo }}?w=320&h=320&fit=crop&q=85&auto=format&sharp=10 320w,
+            https://aperturus.imgix.net/{{ post.photo }}?w=480&h=480&fit=crop&q=85&auto=format&sharp=10 480w,
+            https://aperturus.imgix.net/{{ post.photo }}?w=640&h=640&fit=crop&q=85&auto=format&sharp=10 640w,
+            https://aperturus.imgix.net/{{ post.photo }}?w=880&h=880&fit=crop&q=85&auto=format&sharp=10 880w,
+            https://aperturus.imgix.net/{{ post.photo }}?w=1080&h=1080&fit=crop&q=85&auto=format&sharp=10 1080w,
+            https://aperturus.imgix.net/{{ post.photo }}?w=1280&h=1280&fit=crop&q=85&auto=format&sharp=10 1280w"
+            class="profile-img"
+            alt="{{ profile_user.profile_photo }}">
         {% else %}
             <img src="{{ profile_user.avatar(128) }}" class="img-polaroid" alt="profile_pic">
         {% endif %}

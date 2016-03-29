@@ -116,17 +116,17 @@ class PhotoPage(BasePage):
             if request.is_xhr:
                 pass
             else:
-                home_context = {'photo': self.posts[0].photo, 'id': self.posts[0].id}
+                home_context = {'post': self.posts[0]}
                 self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=home_context)
         if self.title == "photos" and not self.category == "upload":
             if self.post_id:
-                main_photo_context = {'photo': self.posts[0].photo, 'id': self.posts[0].id, 'body': self.posts[0].body}
-                self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=main_photo_context)
+                main_photo_context = {'post': self.posts[0]}
+                self.assets['main_entry'] = self.get_asset(template="photo_detail.html", context=main_photo_context)
             else:
                 if request.is_xhr:
                     self.assets['collection'] = self.get_asset(context=[i.json_view() for i in self.posts[0:6]])
                 else:
-                    main_photo_context = {'photo': self.posts[0].photo, 'id': self.posts[0].id}
+                    main_photo_context = {'post': self.posts[0]}
                     archive_photos_context = {'posts': self.posts[1:]}
                     self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=main_photo_context)
                     self.assets['archives'] = self.get_asset(template="archives.html", context=archive_photos_context)
