@@ -62,7 +62,7 @@ class LoginAPI(MethodView):
             if not currentuser:
                 currentuser = User(nickname=nickname, email=email)
                 db.session.add(currentuser)
-                db.session.add(currentuser.follow(currentuser))
+                # db.session.add(currentuser.follow(currentuser))  # Testing removing self as follower of own posts
                 db.session.commit()
             remember_me = False
             if 'remember_me' in session:

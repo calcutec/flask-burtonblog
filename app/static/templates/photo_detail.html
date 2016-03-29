@@ -14,7 +14,7 @@
                     </a>
                 {% endif %}
                 {% if g.user.is_authenticated() and post.author.id == g.user.id %}
-                    <a href="#">Edit</a><br>
+{#                    <a href="#">Edit</a><br>#}
                     <a href="#">Delete</a>
                 {% endif %}
 

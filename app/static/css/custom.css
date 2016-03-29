@@ -279,7 +279,7 @@ ul.img-list li {
 }
 span.text-content {
     position: absolute;
-    background: rgba(0,0,0,0.5);
+    /*background: rgba(0,0,0,0.5);*/
     color: white;
     display: table;
     height: 46vw;
@@ -297,7 +297,7 @@ span.text-content span {
 }
 span.profile-content {
     position: absolute;
-    background: rgba(0,0,0,0.5);
+    /*background: rgba(0,0,0,0.5);*/
     color: white;
     display: table;
     height: 62vw;
