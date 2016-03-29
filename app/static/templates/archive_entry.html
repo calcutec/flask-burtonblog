@@ -8,11 +8,24 @@ sizes="(min-width: 40em) 30.5vw, (min-width: 60em) 22.75vw, 46vw"
 class="responsive-img"
 alt="{{ post.photo }}">
 <span onclick="" class="text-content">
-    <span>Montreal</span>
+    <span>
+        By: <a href="{{ url_for('members', nickname=post.author.nickname) }}" rel="tag">{{ post.author.nickname }}</a><br>
+        Posted: <b>{{ post.timestamp.strftime('%d %b %Y') }}</b><br>
+        {{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>
+        {% if post.comments.all()|length > 0 %}
+            <a href="{{ url_for('posts', slug=post.slug) }}">
+                {% with total=post.comments.all()|length %}
+                    {{ total }} comment{% if total != 1 %}s{% endif %}
+                {% endwith %}
+            </a>
+        {% endif %}
+    </span>
 </span>
-<span onclick="" class="rounded-icon">
-<svg width="22" height="22" viewBox="0 0 22 22">
-<path d="M3.4 20.2L9 14.5 7.5 13l-5.7 5.6L1 14H0v7.5l.5.5H8v-1l-4.6-.8M18.7 1.9L13 7.6 14.4 9l5.7-5.7.5 4.7h1.2V.6l-.5-.5H14v1.2l4.7.6">
-</path>
-</svg>
+<a href="/photos/{{ post.id }}">
+<span class="rounded-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="22" height="22" viewBox="0 0 22 22">
+        <path d="M3.4 20.2L9 14.5 7.5 13l-5.7 5.6L1 14H0v7.5l.5.5H8v-1l-4.6-.8M18.7 1.9L13 7.6 14.4 9l5.7-5.7.5 4.7h1.2V.6l-.5-.5H14v1.2l4.7.6">
+        </path>
+    </svg>
 </span>
+</a>

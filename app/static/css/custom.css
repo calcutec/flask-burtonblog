@@ -271,7 +271,7 @@ ul#img-list li:hover span.profile-content {
     opacity: 1;
 }
 ul#img-list li:hover span.rounded-icon {
-    cursor: pointer;
+    /*cursor: pointer;*/
     opacity: 1;
 }
 ul#img-list {
@@ -288,7 +288,7 @@ span.text-content {
     position: absolute;
     background: rgba(0,0,0,0.5);
     color: white;
-    cursor: pointer;
+    /*cursor: pointer;*/
     display: table;
     height: 46vw;
     left: 0;
@@ -299,6 +299,8 @@ span.text-content {
 }
 span.text-content span {
     display: table-cell;
+    padding: 1rem;
+    line-height: 1.5;
 }
 span.profile-content {
     position: absolute;
