@@ -30,6 +30,7 @@ class User(UserMixin, db.Model):
     comments = db.relationship('Comment', backref='author', lazy='dynamic')
     about_me = db.Column(db.String(140))
     profile_photo = db.Column(db.String(240))
+    photo = db.Column(db.String(240))
     thumbnail = db.Column(db.String(240))
     last_seen = db.Column(db.DateTime)
     followed = db.relationship('User',
@@ -51,7 +52,7 @@ class User(UserMixin, db.Model):
 
     def json_view(self):
         return {'id': self.id, 'type': self.type, 'firstName': self.firstname, 'lastName': self.lastname,
-                'nickname': self.nickname, 'title': self.about_me, 'last_seen': self.last_seen, 'pic': self.thumbnail}
+                'nickname': self.nickname, 'title': self.about_me, 'last_seen': self.last_seen, 'photo': self.photo}
 
     def set_password(self, password):
         self.pwdhash = generate_password_hash(password)

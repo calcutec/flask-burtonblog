@@ -149,10 +149,10 @@ class MembersPage(BasePage):
             else:
                 archive_photos_context = {'posts': self.posts}
                 if "profile_photo_form" in self.assets:
-                    user_context = {'profile_user': self.assets['person'],
+                    user_context = {'post': self.assets['person'],
                                     'profile_photo_form': self.assets['profile_photo_form']}
                 else:
-                    user_context = {'profile_user': self.assets['person']}
+                    user_context = {'post': self.assets['person']}
                 self.assets['main_entry'] = self.get_asset(template='person.html', context=user_context)
                 if self.assets['category'] == "latest":
                     archive_photos_context = {'posts': self.posts}

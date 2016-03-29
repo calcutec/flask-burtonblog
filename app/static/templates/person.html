@@ -1,40 +1,31 @@
 <ul class="img-list">
-    <li data-id="{{ profile_user.id }}">
-        {% if profile_user.profile_photo %}
-            <img data-id="{{ post.id }}" sizes="92.5vw"
-            src="https://aperturus.imgix.net/{{ post.photo }}?w=320&h=320&fit=crop&q=85&auto=format&sharp=10"
-            srcset="https://aperturus.imgix.net/{{ post.photo }}?w=320&h=320&fit=crop&q=85&auto=format&sharp=10 320w,
-            https://aperturus.imgix.net/{{ post.photo }}?w=480&h=480&fit=crop&q=85&auto=format&sharp=10 480w,
-            https://aperturus.imgix.net/{{ post.photo }}?w=640&h=640&fit=crop&q=85&auto=format&sharp=10 640w,
-            https://aperturus.imgix.net/{{ post.photo }}?w=880&h=880&fit=crop&q=85&auto=format&sharp=10 880w,
-            https://aperturus.imgix.net/{{ post.photo }}?w=1080&h=1080&fit=crop&q=85&auto=format&sharp=10 1080w,
-            https://aperturus.imgix.net/{{ post.photo }}?w=1280&h=1280&fit=crop&q=85&auto=format&sharp=10 1280w"
-            class="profile-img"
-            alt="{{ profile_user.profile_photo }}">
+    <li data-id="{{ post.id }}">
+        {% if post.photo %}
+            {% include "main_image.html" %}
         {% else %}
-            <img src="{{ profile_user.avatar(128) }}" class="img-polaroid" alt="profile_pic">
+            <img src="{{ post.avatar(128) }}" class="img-polaroid" alt="profile_pic">
         {% endif %}
         <span onclick="" class="profile-content">
             <span>
-                {% if profile_user.about_me %}
-                    About: {{ profile_user.about_me }}<br>
+                {% if post.about_me %}
+                    About: {{ post.about_me }}<br>
                 {% endif %}
 
-                <p>Followers: {{ profile_user.followers.count() - 1 }} | Following: {{ profile_user.followed.count() - 1 }}</p>
+                <p>Followers: {{ post.followers.count() - 1 }} | Following: {{ post.followed.count() - 1 }}</p>
 
-                {% if profile_user.last_seen %}
-                    <p><em>Last seen:{{ momentjs(profile_user.last_seen).calendar() }}</em></p>
+                {% if post.last_seen %}
+                    <p><em>Last seen:{{ momentjs(post.last_seen).calendar() }}</em></p>
                 {% endif %}
 
-                {% if profile_user.nickname == g.user.nickname %}
-                    <a href="/members/update/{{ profile_user.nickname }}" >Edit Profile</a>
+                {% if post.nickname == g.user.nickname %}
+                    <a href="/members/update/{{ post.nickname }}" >Edit Profile</a>
                 {% endif %}
 
-                {% if profile_user.nickname != g.user.nickname %}
-                    {% if g.user.is_following(profile_user) %}
-                        <a href="{{ url_for('members', category='unfollow', nickname=profile_user.nickname) }}"><strong>Unfollow</strong></a>
+                {% if post.nickname != g.user.nickname %}
+                    {% if g.user.is_following(post) %}
+                        <a href="{{ url_for('members', category='unfollow', nickname=post.nickname) }}"><strong>Unfollow</strong></a>
                     {% else %}
-                        <a href="{{ url_for('members', category='follow', nickname=profile_user.nickname) }}"><strong>Follow</strong></a>
+                        <a href="{{ url_for('members', category='follow', nickname=post.nickname) }}"><strong>Follow</strong></a>
                     {% endif %}
                 {% endif %}
             </span>
