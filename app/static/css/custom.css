@@ -178,6 +178,14 @@ table {
 }
 
 /* Forms */
+
+.custom-file-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 1rem;
+    cursor: pointer;
+}
+
 input[type="email"],
     input[type="number"],
     input[type="search"],
@@ -279,7 +287,6 @@ ul.img-list li {
 }
 span.text-content {
     position: absolute;
-    /*background: rgba(0,0,0,0.5);*/
     color: white;
     display: table;
     height: 46vw;
@@ -297,7 +304,6 @@ span.text-content span {
 }
 span.profile-content {
     position: absolute;
-    /*background: rgba(0,0,0,0.5);*/
     color: white;
     display: table;
     height: 62vw;

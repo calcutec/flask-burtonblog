@@ -1,4 +1,3 @@
-from werkzeug.utils import secure_filename
 from flask import render_template, flash, redirect, session, url_for, g, jsonify, request
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from flask.ext.sqlalchemy import get_debug_queries
@@ -7,7 +6,7 @@ from app import app, db, lm
 from config import DATABASE_QUERY_TIMEOUT
 from .forms import SignupForm, LoginForm, EditForm, PostForm
 from .models import User, Post
-from .utils import OAuthSignIn, PhotoPage, MembersPage, SignupPage, LoginPage, allowed_file
+from .utils import OAuthSignIn, PhotoPage, MembersPage, SignupPage, LoginPage
 from flask.views import MethodView
 import os
 import json
@@ -26,7 +25,7 @@ def home():
 
 class SignupAPI(MethodView):
     def post(self):
-        page = SignupPage(form=SignupForm())
+        page = SignupPage(form=SignupForm(), category="signup")
         if page.assets['body_form']:
             return page.render()
         else:
@@ -42,7 +41,7 @@ class LoginAPI(MethodView):
         if page.assets['body_form']:
             return page.render()
         else:
-            return redirect(url_for("photos"))
+            return redirect(url_for("members", nickname=current_user.nickname))
 
     def get(self, get_provider=None, provider=None):
         if get_provider is not None:    # GET OAUTH PROVIDER
@@ -60,20 +59,15 @@ class LoginAPI(MethodView):
                 return redirect("/photos/recent/")
             currentuser = User.query.filter_by(email=email).first()
             if not currentuser:
-                currentuser = User(nickname=nickname, email=email)
+                currentuser = User(nickname=nickname, email=email, photo="profile.jpg")
                 db.session.add(currentuser)
-                # db.session.add(currentuser.follow(currentuser))  # Testing removing self as follower of own posts
                 db.session.commit()
-            remember_me = False
-            if 'remember_me' in session:
-                remember_me = session['remember_me']
-                session.pop('remember_me', None)
-            login_user(currentuser, remember=remember_me)
+            login_user(currentuser)
             return redirect(request.args.get('next') or '/photos/latest')
         else:   # LOGIN PAGE
             if g.user is not None and g.user.is_authenticated():
                 return redirect(url_for('photos'))
-            return LoginPage().render()
+            return LoginPage(category="login").render()
 
 login_api_view = LoginAPI.as_view('login')  # Urls for Login API
 # Authenticate user
@@ -91,27 +85,12 @@ def logout():
 
 
 class MembersAPI(MethodView):
-    def post(self, nickname=None):
-        form = EditForm()  # Update Member Data
-        if request.is_xhr:  # First validate form using an async request
-            if form.validate(current_user=current_user):
-                result = {'iserror': False, 'savedsuccess': True}
-                return json.dumps(result)
-            form.errors['iserror'] = True
-            return json.dumps(form.errors)
-        else:  # Once form is valid, original form is called and processed
-            if form.validate(current_user=current_user):
-                if hasattr(form, "photo") and allowed_file(form.photo.data):
-                    g.user.profile_photo = secure_filename(form.photo.data)
-                g.user.nickname = form.nickname.data
-                g.user.about_me = form.about_me.data
-                db.session.add(g.user)
-                db.session.commit()
-                page = MembersPage(title='members', nickname=nickname).render()
-                return page
-            else:  # Return errors
-                page = MembersPage(title='members', nickname=nickname).render()
-                return page
+    def post(self, nickname=None, category=None):
+        page = MembersPage(form=EditForm(), category=category)
+        if 'body_form' in page.assets and page.assets['body_form'] is not None:
+            return page.render()
+        else:
+            return redirect(url_for("members", nickname=g.user.nickname))
 
     @login_required
     def get(self, nickname=None, category="latest"):
@@ -124,14 +103,11 @@ class MembersAPI(MethodView):
                 return page
         else:  # Display a single member
             if "key" in request.args:
-                g.user.profile_photo = request.args['key']
+                g.user.photo = request.args['key']
                 db.session.add(g.user)
                 db.session.commit()
-            page = MembersPage(nickname=nickname, category=category)
-            if category not in ["follow", "unfollow"]:
-                return page.render()
-            else:
                 return redirect(url_for("members", nickname=nickname))
+            return MembersPage(nickname=nickname, category=category).render()
 
     @login_required
     def delete(self, nickname):
@@ -140,8 +116,8 @@ class MembersAPI(MethodView):
 members_api_view = MembersAPI.as_view('members')  # URLS for MEMBER API
 app.add_url_rule('/members/',  # Read all members
                  view_func=members_api_view, methods=["GET"])
-app.add_url_rule('/members/<any("all", "latest", "starred", "followed", "followers", "follow", "unfollow"):category>',
-                 view_func=members_api_view, methods=["GET"])
+app.add_url_rule('/members/<any("all", "latest", "starred", "followed", "followers", "follow", "unfollow", "update", "upload"):category>/',
+                 view_func=members_api_view, methods=["GET", "POST"])
 app.add_url_rule('/members/<nickname>/',  # Read, Update and Destroy a single member
                  view_func=members_api_view, methods=["GET", "POST", "PUT", "DELETE"])
 app.add_url_rule('/members/<nickname>/<category>/',  # Get photos of a given category for a given member

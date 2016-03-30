@@ -1,3 +1,4 @@
+{% include "full_image.html" %}
 <form id="poem-form" class="form-horizontal" action="/photos/" method="post" enctype="multipart/form-data" name="post">
     {{ form.csrf_token }}
     <div class="form-group{% if form.body.errors %} error{% endif %}">
@@ -12,5 +13,5 @@
         {{ form.photo() }}
         <span id="error_post" class="help-inline"></span><br>
     </div>
-    {{ form.submit() }}
+    {{ form.submit(class="button button-primary") }}
 </form>

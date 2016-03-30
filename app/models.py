@@ -2,7 +2,7 @@ from hashlib import md5
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
 from app import db
-from flask import url_for, render_template, g
+from flask import url_for
 from flask.ext.login import UserMixin
 
 import json
@@ -29,9 +29,7 @@ class User(UserMixin, db.Model):
     posts = db.relationship('Post', backref='author', lazy='dynamic')
     comments = db.relationship('Comment', backref='author', lazy='dynamic')
     about_me = db.Column(db.String(140))
-    profile_photo = db.Column(db.String(240))
     photo = db.Column(db.String(240))
-    thumbnail = db.Column(db.String(240))
     last_seen = db.Column(db.DateTime)
     followed = db.relationship('User',
                                secondary=followers,
@@ -40,9 +38,10 @@ class User(UserMixin, db.Model):
                                backref=db.backref('followers', lazy='dynamic'),
                                lazy='dynamic')
 
-    def __init__(self, nickname, email, password=None, firstname=None, lastname=None):
+    def __init__(self, nickname, email, password=None, firstname=None, lastname=None, photo=None):
         self.nickname = self.make_unique_nickname(self.make_valid_nickname(nickname))
         self.email = email.lower()
+        self.photo = photo
         if password is not None:
             self.set_password(password)
         if firstname is not None:
@@ -152,21 +151,14 @@ class Post(db.Model):
     body = db.Column(db.Text())
     timestamp = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    writing_type = db.Column(db.String(32))
+    writing_type = db.Column(db.String(32), default="writing-type")
     photo = db.Column(db.String(240))
-    thumbnail = db.Column(db.String(240))
     comments = db.relationship('Comment', backref='original_post', lazy='dynamic')
     slug = db.Column(db.String(255))
     votes = db.Column(db.Integer, default=1)
 
     def __init__(self, **kwargs):
         super(Post, self).__init__(**kwargs)
-        if self.writing_type is None:
-            self.writing_type == "entry"
-
-    def get_post_widget(self):
-        post_widget = render_template('assets/posts/post_content.html', page_mark='portfolio', post=self, g=g)
-        return post_widget
 
     def get_voter_ids(self):
         """
@@ -197,7 +189,7 @@ class Post(db.Model):
         to unvote the post, return status of the vote for that user
         """
         already_voted = self.has_voted(user_id)
-        vote_status = None
+        # vote_status = None
         if not already_voted:
             # vote up the post
             db.engine.execute(

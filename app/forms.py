@@ -1,8 +1,14 @@
+from app import app
+from flask import request
 from flask.ext.wtf import Form
 from wtforms import StringField, BooleanField, TextAreaField, SubmitField, PasswordField, SelectField
-from flask.ext.wtf.file import FileField, FileAllowed
 from wtforms.validators import DataRequired, Email, Length
 from .models import User
+from datetime import datetime, timedelta
+import hmac
+from base64 import b64encode
+import hashlib
+import json
 
 
 class LoginForm(Form):
@@ -53,6 +59,7 @@ class SignupForm(Form):
 class EditForm(Form):
     nickname = StringField('nickname', validators=[DataRequired()])
     about_me = TextAreaField('about_me', validators=[Length(min=0, max=140)])
+    photo = StringField('Photo')
 
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)
@@ -97,3 +104,72 @@ class ContactForm(Form):
     subject = StringField("Subject")
     message = TextAreaField("Message")
     submit = SubmitField("Send")
+
+
+class UploadForm(object):
+    def __init__(self, key, message):
+        self.access_key = app.config['AWS_ACCESS_KEY_ID']
+        self.secret_key = app.config['AWS_SECRET_ACCESS_KEY']
+        self.region = app.config['S3_REGION']
+        self.bucket = 'aperturus'
+        self.key = key
+        self.message = message
+        self.prefix = None
+        self.target_url = request.base_url
+
+    def s3_upload_form(self):
+        assert (self.key is not None) or (self.prefix is not None)
+        if (self.key is not None) and (self.prefix is not None):
+            assert self.key.startswith(self.prefix)
+        now = datetime.utcnow()
+        form = {
+            'acl': 'private',
+            'success_action_status': '200',
+            'success_action_redirect': self.target_url,
+            'x-amz-algorithm': 'AWS4-HMAC-SHA256',
+            'x-amz-credential': '{}/{}/{}/s3/aws4_request'.format(self.access_key, now.strftime('%Y%m%d'), self.region),
+            'x-amz-date': now.strftime('%Y%m%dT000000Z'),
+        }
+        expiration = now + timedelta(minutes=30)
+        policy = {
+            'expiration': expiration.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            'conditions': [
+                {'bucket': self.bucket},
+                {'acl': 'private'},
+                ['content-length-range', 32, 10485760],
+                {'success_action_status': form['success_action_status']},
+                {'success_action_redirect': form['success_action_redirect']},
+                {'x-amz-algorithm': form['x-amz-algorithm']},
+                {'x-amz-credential': form['x-amz-credential']},
+                {'x-amz-date': form['x-amz-date']},
+            ]
+        }
+        if self.region == 'us-east-1':
+            form['action'] = 'https://{}.s3.amazonaws.com/'.format(self.bucket)
+        else:
+            form['action'] = 'https://{}.s3-{}.amazonaws.com/'.format(self.bucket, self.region)
+        if self.key is not None:
+            form['key'] = self.key
+            policy['conditions'].append(
+                {'key': self.key},
+            )
+        if self.prefix is not None:
+            form['prefix'] = self.prefix
+            policy['conditions'].append(
+                ["starts-with", "$key", self.prefix],
+            )
+        form['policy'] = b64encode(json.dumps(policy))
+        form['x-amz-signature'] = self.sign(self.secret_key, now, self.region, 's3', form['policy'])
+        form['message'] = self.message
+        return form
+
+    def hmac_sha256(self, key, msg):
+        return hmac.new(key, msg.encode('utf-8'), hashlib.sha256).digest()
+
+    def sign(self, key, date, region, service, msg):
+        date = date.strftime('%Y%m%d')
+        hash1 = self.hmac_sha256('AWS4' + key, date)
+        hash2 = self.hmac_sha256(hash1, region)
+        hash3 = self.hmac_sha256(hash2, service)
+        key = self.hmac_sha256(hash3, 'aws4_request')
+        return hmac.new(key, msg.encode('utf-8'), hashlib.sha256).hexdigest()

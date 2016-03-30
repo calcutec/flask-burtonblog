@@ -1,51 +1,67 @@
 from app import app, db
+from flask.ext.login import current_user
 from config import ALLOWED_EXTENSIONS
-from forms import SignupForm, EditForm, PostForm, CommentForm, LoginForm
 from rauth import OAuth2Service
 import json
 import urllib2
-from flask import request, redirect, url_for, render_template, g, jsonify, session, abort, flash
+from flask import request, redirect, url_for, render_template, g, jsonify, abort, flash
 from flask.ext.login import login_user
 from models import User, Post
-from datetime import timedelta
-from datetime import datetime
 from .emails import follower_notification
-from uuid import uuid4
-import hmac
-from base64 import b64encode
-import hashlib
+from .form_processor import UploadFormProcessor, LoginFormProcessor, PhotosFormProcessor,\
+    SignupFormProcessor, UpdateFormProcessor
 
 
 class BasePage(object):
     def __init__(self, title=None, nickname=None, category="latest", post_id=None, form=None):
         self.assets = dict()
-        if title:
-            self.title = title
-        else:
-            self.title = request.endpoint
+        self.entity = None
+        self.posts = None
         self.nickname = nickname
         self.category = category
         self.form = form
         self.post_id = post_id
+        if title:
+            self.title = title
+        else:
+            self.title = request.endpoint
+
         if self.nickname is not None:
             self.assets['person'] = User.query.filter_by(nickname=self.nickname).first()
-        self.get_header_assets()
-        self.get_form_assets()
-        self.posts = self.get_posts()
+        self.get_entity()
+        self.get_rendered_header()
 
-    def get_form_assets(self):
-        if self.form:  # Handles instantiated forms
-            self.assets['body_form'] = Form(self).form_asset
+        if self.category in ["login", "upload", "update", "signup"]:
+            self.get_rendered_form()
         else:
-            if self.category == "upload":
-                self.assets['body_form'] = Form(page=self, template="upload_form.html").form_asset
-            elif self.title in ["login", "photo", "signup"]:
-                self.assets['body_form'] = Form(self).form_asset
-            elif self.title == "members" and self.nickname is not None and self.nickname == g.user.nickname:
-                self.assets['body_form'] = Form(page=self, template="members_form.html").form_asset
-                self.assets['profile_photo_form'] = Form(page=self, template="upload_form.html").form_asset
+            self.get_posts()
 
-    def get_header_assets(self):
+    def get_entity(self):
+        if request.endpoint == 'home':
+            self.entity = 'editor'
+        elif request.endpoint == 'photos':
+            if self.post_id:
+                self.entity = "photo"
+            else:
+                self.entity = "photos"
+        elif request.endpoint == 'members' and 'person' in self.assets and self.assets['person'] == g.user:
+            self.entity = "author"
+        elif request.endpoint == 'members' and 'person' in self.assets and self.assets['person'] != g.user:
+            self.entity = "member"
+        elif request.endpoint == 'members':
+            self.entity = "members"
+
+    def get_rendered_form(self):
+        processor_dict = {
+            "upload": UploadFormProcessor,
+            "signup": SignupFormProcessor,
+            "photo":  PhotosFormProcessor,
+            "update": UpdateFormProcessor,
+            "login": LoginFormProcessor
+        }
+        self.assets['body_form'] = processor_dict[self.category](page=self).rendered_form
+
+    def get_rendered_header(self):
         if not request.is_xhr:
             self.assets['title'] = self.title
             self.assets['category'] = self.category
@@ -53,30 +69,23 @@ class BasePage(object):
             self.assets['title'] = jsonify(title=self.assets['title']).data
 
     def get_posts(self):
-        posts = None
-        if self.category == 'upload':
-            return posts
-        elif self.title == 'home':
-            posts = Post.query.filter_by(writing_type="op-ed").order_by(Post.timestamp.desc())
-        elif self.title == 'photos':
-            if self.post_id:
-                posts = Post.query.filter_by(id=self.post_id)
-            else:
-                if self.category == 'all':
-                    posts = Post.query.filter_by(writing_type="entry").order_by(Post.timestamp.desc())
-                elif self.category == 'latest':
-                    posts = Post.query.filter_by(writing_type="entry").order_by(Post.timestamp.desc())[0:6]
-        elif self.title == 'members' and 'person' in self.assets and self.assets['person'] == g.user:
-            posts = Post.query.filter_by(author=g.user).order_by(Post.timestamp.desc())
-        elif self.title == 'members' and 'person' in self.assets and self.assets['person'] != g.user:
-            posts = Post.query.filter_by(author=self.assets['person']).order_by(Post.timestamp.desc())
-        elif self.title == 'members':
-            if self.category == 'all':
-                posts = User.query.all()
-            elif self.category == 'latest':
-                posts = User.query.all()[0:6]
+        posts_dict = {
+            "editor": {'obj': "post", 'filter': {'writing_type': 'op-ed'}},
+            "photo": {'obj': "post", 'filter': {'id': self.post_id}},
+            "photos": {'obj': "post", 'filter': {'writing_type': 'entry'}},
+            "author": {'obj': "post", 'filter': {'author': current_user}},
+            "members": {'obj': "user"}
+        }
 
-        return posts
+        if 'person' in self.assets:
+            posts_dict['member'] = {'obj': "post", 'filter': {'author': self.assets['person']}}
+
+        posts_dict = posts_dict[self.entity]
+
+        if posts_dict['obj'] == "user":
+            self.posts = User.query.all()
+        else:
+            self.posts = Post.query.filter_by(**posts_dict['filter']).order_by(Post.timestamp.desc())
 
     def get_asset(self, template=None, context=None):
         if request.is_xhr:
@@ -141,27 +150,28 @@ class MembersPage(BasePage):
         self.get_page_assets()
 
     def get_page_assets(self):
-        if self.category == "login":
-            pass
-        elif "person" in self.assets:
+        if self.entity == "member":
             if request.is_xhr:
                 pass
             else:
-                archive_photos_context = {'posts': self.posts}
-                if "profile_photo_form" in self.assets:
-                    user_context = {'post': self.assets['person'],
-                                    'profile_photo_form': self.assets['profile_photo_form']}
-                else:
-                    user_context = {'post': self.assets['person']}
+                user_context = {'post': self.assets['person']}
                 self.assets['main_entry'] = self.get_asset(template='person.html', context=user_context)
-                if self.assets['category'] == "latest":
-                    archive_photos_context = {'posts': self.posts}
+
                 if self.assets['category'] == "follow":
                     self.follow()
                 if self.assets['category'] == "unfollow":
                     self.unfollow()
+
+                archive_photos_context = {'posts': self.posts}
                 self.assets['archives'] = self.get_asset(template="archives.html", context=archive_photos_context)
-        else:
+        elif self.entity == "author":
+            if request.is_xhr:
+                pass
+            else:
+                user_context = {'post': self.assets['person']}
+                self.assets['main_entry'] = self.get_asset(template='person.html', context=user_context)
+
+        elif self.entity == "members" and self.posts:
             if request.is_xhr:
                 self.assets['collection'] = [i.json_view() for i in self.posts[0:6]]
             else:
@@ -214,17 +224,11 @@ class SignupPage(BasePage):
         pass
 
     def save_user(self, form):
-        newuser = User(form.firstname.data, form.email.data, firstname=form.firstname.data,
-                       lastname=form.lastname.data,
-                       password=form.password.data)
+        newuser = User(form.firstname.data, form.email.data, firstname=form.firstname.data, lastname=form.lastname.data,
+                       password=form.password.data, photo="profile.jpg")
         db.session.add(newuser)
-        db.session.add(newuser.follow(newuser))
         db.session.commit()
-        remember_me = False
-        if 'remember_me' in session:
-            remember_me = session['remember_me']
-            session.pop('remember_me', None)
-        login_user(newuser, remember=remember_me)
+        login_user(newuser)
         return newuser
 
     def __str__(self):
@@ -234,213 +238,14 @@ class SignupPage(BasePage):
 class LoginPage(BasePage):
     def __init__(self, *args, **kwargs):
         super(LoginPage, self).__init__(*args, **kwargs)
-        self.get_page_assets()
-
-    def get_page_assets(self):
-        pass
 
     def login_returning_user(self, form):
         returninguser = User.query.filter_by(email=form.email.data).first()
-        remember_me = False
-        if 'remember_me' in session:
-            remember_me = session['remember_me']
-            session.pop('remember_me', None)
-        login_user(returninguser, remember=remember_me)
+        login_user(returninguser)
         return returninguser
 
     def __str__(self):
         return "This is the %s page" % self.title
-
-
-class Form(object):
-    def __init__(self, page, template=None):
-        self.page = page
-        self.template = template
-
-        if not self.page.form:
-            self.form = self.get_form()
-            self.form_template = self.get_form_template()
-            self.form_asset = self.prepare_form()
-        else:
-            self.form = self.page.form
-            self.form = self.process_form()
-
-    def process_form(self):
-        if self.page.category == 'upload':
-            if self.form.validate_on_submit():
-                photo_name = self.form.photo.data
-                post = Post(body=self.form.body.data, timestamp=datetime.utcnow(),
-                            author=g.user, photo=photo_name, writing_type="entry")
-                db.session.add(post)
-                db.session.commit()
-                if request.is_xhr:
-                    response = post.json_view()
-                    response['savedsuccess'] = True
-                    return json.dumps(response)
-                else:
-                    self.form = None
-                    self.form_asset = None
-            else:
-                if request.is_xhr:
-                    self.form.errors['iserror'] = True
-                    return json.dumps(self.form.errors)
-                else:
-                    self.template = "post_form.html"
-                    self.form_template = self.get_form_template()
-                    self.form_asset = self.prepare_form()
-
-        elif self.page.title == 'login':
-            if self.form.validate_on_submit():
-                returninguser = self.page.login_returning_user(self.form)
-                if request.is_xhr:
-                        result = {'iserror': False,
-                                  'savedsuccess': True,
-                                  'returninguser_nickname': returninguser.nickname}
-                        return json.dumps(result)
-                else:
-                    self.form = None
-                    self.form_asset = None
-            else:
-                if request.is_xhr:
-                    self.form.errors['iserror'] = True
-                    return json.dumps(self.form.errors)
-                else:
-                    self.template = "email_login_form.html"
-                    self.form_template = self.get_form_template()
-                    self.form_asset = self.prepare_form()
-
-        elif self.page.title == 'signup':
-            if self.form.validate_on_submit():
-                newuser = self.page.save_user(self.form)
-                if request.is_xhr:
-                        result = {'iserror': False,
-                                  'savedsuccess': True,
-                                  'newuser_nickname': newuser.nickname}
-                        return json.dumps(result)
-                else:
-                    self.form = None
-                    self.form_asset = None
-            else:
-                if request.is_xhr:
-                    self.form.errors['iserror'] = True
-                    return json.dumps(self.form.errors)
-                else:
-                    self.template = "signup_form.html"
-                    self.form_template = self.get_form_template()
-                    self.form_asset = self.prepare_form()
-
-    def get_form(self):
-        form = None
-        if self.page.category == 'upload':
-            if 'key' in request.args:
-                form = PostForm()
-                form.photo.data = request.args['key']
-                self.template = "post_form.html"
-            else:
-                key = "user-images/" + str(uuid4()) + ".jpeg"
-                # form = self.s3_upload_form(app.config['AWS_ACCESS_KEY_ID'], app.config['AWS_SECRET_ACCESS_KEY'],
-                #                            app.config['S3_REGION'], 'aperturus', prefix="user-images/")
-                form = self.s3_upload_form(app.config['AWS_ACCESS_KEY_ID'], app.config['AWS_SECRET_ACCESS_KEY'],
-                                           app.config['S3_REGION'], 'aperturus', key=key, target_url=request.base_url)
-        elif self.page.title == 'photos':
-            form = PostForm
-        elif self.page.title == 'login':
-            form = {"loginform": LoginForm(), "signupform": SignupForm()}
-        elif self.page.title == "members" and self.template == "upload_form.html":
-            key = "user-images/profile_image/" + str(uuid4()) + ".jpeg"
-            form = self.s3_upload_form(app.config['AWS_ACCESS_KEY_ID'], app.config['AWS_SECRET_ACCESS_KEY'],
-                                       app.config['S3_REGION'], 'aperturus', key=key, target_url=request.base_url)
-        elif self.page.title == "members" and self.template == "members_form.html":
-            form = EditForm()
-            form.nickname.data = g.user.nickname
-            form.about_me.data = g.user.about_me
-        elif self.page.title == 'detail':
-            form = CommentForm()
-        return form
-
-    def get_form_template(self):
-        form_template = None
-        if request.is_xhr:
-            pass
-        else:
-            if self.template:
-                form_template = "/assets/forms/" + self.template
-            else:
-                form_template = "/assets/forms/" + self.page.title + "_form.html"
-
-        return form_template
-
-    def prepare_form(self):
-        form_asset = None
-        if self.form:
-            if self.page.title == "login":
-                if self.form_template == '/assets/forms/login_form.html':
-                    context = {'loginform': self.form['loginform'], 'signupform': self.form['signupform']}
-                    form_asset = render_template(self.form_template, **context)
-                elif self.form_template == '/assets/forms/email_login_form.html':
-                    context = {'loginform': self.form}
-                    form_asset = render_template(self.form_template, **context)
-            else:
-                form_asset = render_template(self.form_template, form=self.form)
-        else:
-            form_asset = render_template(self.form_template)
-        return form_asset
-
-    def s3_upload_form(self, access_key, secret_key, region, bucket, key=None, prefix=None, target_url=None):
-        assert (key is not None) or (prefix is not None)
-        if (key is not None) and (prefix is not None):
-            assert key.startswith(prefix)
-        now = datetime.utcnow()
-        form = {
-            'acl': 'private',
-            'success_action_status': '200',
-            'success_action_redirect': target_url,
-            'x-amz-algorithm': 'AWS4-HMAC-SHA256',
-            'x-amz-credential': '{}/{}/{}/s3/aws4_request'.format(access_key, now.strftime('%Y%m%d'), region),
-            'x-amz-date': now.strftime('%Y%m%dT000000Z'),
-        }
-        expiration = now + timedelta(minutes=30)
-        policy = {
-          'expiration': expiration.strftime('%Y-%m-%dT%H:%M:%SZ'),
-          'conditions': [
-            {'bucket': bucket},
-            {'acl': 'private'},
-            ['content-length-range', 32, 10485760],
-            {'success_action_status': form['success_action_status']},
-            {'success_action_redirect': form['success_action_redirect']},
-            {'x-amz-algorithm':       form['x-amz-algorithm']},
-            {'x-amz-credential':      form['x-amz-credential']},
-            {'x-amz-date':            form['x-amz-date']},
-          ]
-        }
-        if region == 'us-east-1':
-            form['action'] = 'https://{}.s3.amazonaws.com/'.format(bucket)
-        else:
-            form['action'] = 'https://{}.s3-{}.amazonaws.com/'.format(bucket, region)
-        if key is not None:
-            form['key'] = key
-            policy['conditions'].append(
-              {'key':    key},
-            )
-        if prefix is not None:
-            form['prefix'] = prefix
-            policy['conditions'].append(
-              ["starts-with", "$key", prefix],
-            )
-        form['policy'] = b64encode(json.dumps(policy))
-        form['x-amz-signature'] = self.sign(secret_key, now, region, 's3', form['policy'])
-        return form
-
-    def hmac_sha256(self, key, msg):
-        return hmac.new(key, msg.encode('utf-8'), hashlib.sha256).digest()
-
-    def sign(self, key, date, region, service, msg):
-        date = date.strftime('%Y%m%d')
-        hash1 = self.hmac_sha256('AWS4'+key, date)
-        hash2 = self.hmac_sha256(hash1, region)
-        hash3 = self.hmac_sha256(hash2, service)
-        key = self.hmac_sha256(hash3, 'aws4_request')
-        return hmac.new(key, msg.encode('utf-8'), hashlib.sha256).hexdigest()
 
 
 def allowed_file(filename):

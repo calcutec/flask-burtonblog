@@ -1,26 +1,20 @@
 <ul class="img-list">
     <li data-id="{{ post.id }}">
         {% if post.photo %}
-            {% include "main_image.html" %}
+            {% include "full_image.html" %}
         {% else %}
             <img src="{{ post.avatar(128) }}" class="img-polaroid" alt="profile_pic">
         {% endif %}
         <span onclick="" class="profile-content">
             <span>
-                {% if post.about_me %}
-                    About: {{ post.about_me }}<br>
-                {% endif %}
-
-                <p>Followers: {{ post.followers.count() - 1 }} | Following: {{ post.followed.count() - 1 }}</p>
-
                 {% if post.last_seen %}
                     <p><em>Last seen:{{ momentjs(post.last_seen).calendar() }}</em></p>
                 {% endif %}
-
+                <p>Followers: {{ post.followers.count() }} | Following: {{ post.followed.count() }}</p>
                 {% if post.nickname == g.user.nickname %}
-                    <a href="/members/update/{{ post.nickname }}" >Edit Profile</a>
+                    <a class="button button-primary" href="/members/update" >Update Info</a>
+                    <a class="button button-primary" href="/members/upload" >Change Image</a>
                 {% endif %}
-
                 {% if post.nickname != g.user.nickname %}
                     {% if g.user.is_following(post) %}
                         <a href="{{ url_for('members', category='unfollow', nickname=post.nickname) }}"><strong>Unfollow</strong></a>
@@ -32,6 +26,11 @@
         </span>
     </li>
 </ul>
+<div>
+    {% if post.about_me %}
+        About: {{ post.about_me }}<br>
+    {% endif %}
+</div>
 
 
 
