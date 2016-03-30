@@ -1,0 +1,10 @@
+{% include "full_image.html" %}
+<form action="{{ url_for('members', category="update") }}" method="post" enctype="multipart/form-data">
+    {{ form.csrf_token }}
+    {{ form.nickname(class="hide") }}
+    {{ form.about_me(class="hide") }}
+    {{ form.photo(class="hide") }}
+    <div class="controls">
+        <input class="button button-primary" type="submit" value="Confirm">
+    </div>
+</form>
