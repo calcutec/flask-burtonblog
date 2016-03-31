@@ -3,7 +3,7 @@
         {% include "full_image.html" %}
         <span onclick="" class="profile-content">
             <span>
-                <a href="{{ url_for('members', nickname=post.author.nickname) }}" rel="tag">{{ post.author.nickname }}</a><br>
+                <a class="link-white" href="{{ url_for('members', nickname=post.author.nickname) }}" rel="tag">{{ post.author.nickname }}</a><br>
                 <b>{{ post.timestamp.strftime('%d %b %Y') }}</b><br>
                 {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
                 {% if post.comments.all()|length > 0 %}
@@ -15,7 +15,7 @@
                 {% endif %}
                 {% if g.user.is_authenticated() and post.author.id == g.user.id %}
 {#                    <a href="#">Edit</a><br>#}
-                    <a href="#">Delete</a>
+                    <a class="icon-white" href="#">Delete</a>
                 {% endif %}
 
                 {% if g.user.is_authenticated() and post.author.id != g.user.id %}

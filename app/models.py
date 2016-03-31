@@ -189,7 +189,7 @@ class Post(db.Model):
         to unvote the post, return status of the vote for that user
         """
         already_voted = self.has_voted(user_id)
-        # vote_status = None
+        vote_status = None
         if not already_voted:
             # vote up the post
             db.engine.execute(

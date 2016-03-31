@@ -14,42 +14,43 @@ from .form_processor import UploadFormProcessor, LoginFormProcessor, PhotosFormP
 
 class BasePage(object):
     def __init__(self, title=None, nickname=None, category="latest", post_id=None, form=None):
-        self.assets = dict()
-        self.entity = None
         self.posts = None
-        self.nickname = nickname
-        self.category = category
         self.form = form
+        self.nickname = nickname
         self.post_id = post_id
+        self.assets = dict()
+        self.assets['category'] = category
         if title:
-            self.title = title
+            self.assets['title'] = title
         else:
-            self.title = request.endpoint
+            self.assets['title'] = request.endpoint
 
         if self.nickname is not None:
             self.assets['person'] = User.query.filter_by(nickname=self.nickname).first()
-        self.get_entity()
-        self.get_rendered_header()
 
-        if self.category in ["login", "upload", "update", "signup"]:
+        self.get_entity()
+
+        if self.assets['category'] in ["login", "upload", "update", "signup"]:
             self.get_rendered_form()
         else:
             self.get_posts()
 
     def get_entity(self):
+        entity = None
         if request.endpoint == 'home':
-            self.entity = 'editor'
+            entity = 'editor'
         elif request.endpoint == 'photos':
             if self.post_id:
-                self.entity = "photo"
+                entity = "photo"
             else:
-                self.entity = "photos"
+                entity = "photos"
         elif request.endpoint == 'members' and 'person' in self.assets and self.assets['person'] == g.user:
-            self.entity = "author"
+            entity = "author"
         elif request.endpoint == 'members' and 'person' in self.assets and self.assets['person'] != g.user:
-            self.entity = "member"
+            entity = "member"
         elif request.endpoint == 'members':
-            self.entity = "members"
+            entity = "members"
+        self.assets['entity'] = entity
 
     def get_rendered_form(self):
         processor_dict = {
@@ -59,14 +60,7 @@ class BasePage(object):
             "update": UpdateFormProcessor,
             "login": LoginFormProcessor
         }
-        self.assets['body_form'] = processor_dict[self.category](page=self).rendered_form
-
-    def get_rendered_header(self):
-        if not request.is_xhr:
-            self.assets['title'] = self.title
-            self.assets['category'] = self.category
-        else:
-            self.assets['title'] = jsonify(title=self.assets['title']).data
+        self.assets['body_form'] = processor_dict[self.assets['category']](page=self).rendered_form
 
     def get_posts(self):
         posts_dict = {
@@ -80,19 +74,24 @@ class BasePage(object):
         if 'person' in self.assets:
             posts_dict['member'] = {'obj': "post", 'filter': {'author': self.assets['person']}}
 
-        posts_dict = posts_dict[self.entity]
+        posts_dict = posts_dict[self.assets['entity']]
 
         if posts_dict['obj'] == "user":
-            self.posts = User.query.all()
+            posts = User.query.all()
         else:
-            self.posts = Post.query.filter_by(**posts_dict['filter']).order_by(Post.timestamp.desc())
+            posts = Post.query.filter_by(**posts_dict['filter']).order_by(Post.timestamp.desc())
+
+        if self.assets['category'] == "latest":
+            self.posts = posts[0:6]
+        else:
+            self.posts = posts
 
     def get_asset(self, template=None, context=None):
         if request.is_xhr:
             asset = jsonify(context)
         else:
             if template is None:
-                asset = render_template(self.title + ".html", **context)
+                asset = render_template(self.assets['title'] + ".html", **context)
             else:
                 asset = render_template(template, **context)
         return asset
@@ -103,27 +102,28 @@ class BasePage(object):
         return page
 
     def __str__(self):
-        return "%s has %s posts" % (self.title, self.posts.count())
+        return "%s has %s posts" % (self.assets['title'], self.posts.count())
 
 
 class PhotoPage(BasePage):
     def __init__(self, *args, **kwargs):
         super(PhotoPage, self).__init__(*args, **kwargs)
-        self.get_page_assets()
+        if self.assets['category'] not in ["login", "upload", "update", "signup"]:
+            self.get_page_assets()
 
     def get_page_assets(self):
-        if self.entity == "editor":
+        if self.assets['entity'] == "editor":
             if request.is_xhr:
                 pass
             else:
                 home_context = {'post': self.posts[0]}
                 self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=home_context)
-        elif self.entity == "photo":
+        elif self.assets['entity'] == "photo":
             main_photo_context = {'post': self.posts[0]}
             self.assets['main_entry'] = self.get_asset(template="photo_detail.html", context=main_photo_context)
-            if self.category == "vote":
+            if self.assets['category'] == "vote":
                 self.vote()
-        elif self.entity == "photos":
+        elif self.assets['entity'] == "photos":
             if request.is_xhr:
                 self.assets['collection'] = self.get_asset(context=[i.json_view() for i in self.posts])
             else:
@@ -141,16 +141,17 @@ class PhotoPage(BasePage):
         post.vote(user_id=user_id)
 
     def __str__(self):
-        return "This is the %s page" % self.title
+        return "This is the %s page" % self.assets['title']
 
 
 class MembersPage(BasePage):
     def __init__(self, *args, **kwargs):
         super(MembersPage, self).__init__(*args, **kwargs)
-        self.get_page_assets()
+        if self.assets['category'] not in ["login", "upload", "update", "signup"]:
+            self.get_page_assets()
 
     def get_page_assets(self):
-        if self.entity == "author" or self.entity == "member":
+        if self.assets['entity'] == "author" or self.assets['entity'] == "member":
             if request.is_xhr:
                 pass
             else:
@@ -159,12 +160,12 @@ class MembersPage(BasePage):
 
                 archive_photos_context = {'posts': self.posts}
                 self.assets['archives'] = self.get_asset(template="archives.html", context=archive_photos_context)
-            if self.category == "follow":
+            if self.assets['category'] == "follow":
                 self.follow()
-            if self.category == "unfollow":
+            if self.assets['category'] == "unfollow":
                 self.unfollow()
 
-        elif self.entity == "members":
+        elif self.assets['entity'] == "members":
             if request.is_xhr:
                 self.assets['collection'] = [i.json_view() for i in self.posts]
             else:
@@ -205,7 +206,7 @@ class MembersPage(BasePage):
         flash('You have stopped following %s.' % self.nickname)
 
     def __str__(self):
-        return "This is the %s page" % self.title
+        return "This is the %s page" % self.assets['title']
 
 
 class SignupPage(BasePage):
@@ -225,7 +226,7 @@ class SignupPage(BasePage):
         return newuser
 
     def __str__(self):
-        return "This is the %s page" % self.title
+        return "This is the %s page" % self.assets['title']
 
 
 class LoginPage(BasePage):
@@ -238,7 +239,7 @@ class LoginPage(BasePage):
         return returninguser
 
     def __str__(self):
-        return "This is the %s page" % self.title
+        return "This is the %s page" % self.assets['title']
 
 
 def allowed_file(filename):

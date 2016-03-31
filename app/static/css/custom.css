@@ -61,16 +61,16 @@ a {
 a:hover {
     color: #0FA0CE;
 }
-
 table {
     table-layout: fixed;
     width: 100%
 }
-
 .icon-white {
     color: white
 }
-
+.link-white {
+    color: white
+}
 /* Buttons */
 .button,
     button,

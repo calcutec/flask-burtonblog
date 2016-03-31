@@ -25,7 +25,7 @@ class FormProcessor(object):
             if self.template:
                 form_template = "/assets/forms/" + self.template
             else:
-                form_template = "/assets/forms/" + self.page.category + "_form.html"
+                form_template = "/assets/forms/" + self.page.assets['category'] + "_form.html"
 
         return form_template
 
@@ -248,4 +248,3 @@ class UploadFormProcessor(FormProcessor):
                 self.template = "post_form.html"
                 self.form_template = self.get_form_template()
                 self.rendered_form = self.render_form()
-
