@@ -30,7 +30,6 @@ class SignupAPI(MethodView):
             return page.render()
         else:
             return redirect(url_for("members", nickname=current_user.nickname))
-
 signup_api_view = SignupAPI.as_view('signup')  # URLS for MEMBER API
 app.add_url_rule('/signup/', view_func=signup_api_view, methods=["GET", "POST"])  # Display and Validate Signup Form
 
@@ -68,7 +67,6 @@ class LoginAPI(MethodView):
             if g.user is not None and g.user.is_authenticated():
                 return redirect(url_for('photos'))
             return LoginPage(category="login").render()
-
 login_api_view = LoginAPI.as_view('login')  # Urls for Login API
 # Authenticate user
 app.add_url_rule('/login/', view_func=login_api_view, methods=["GET", "POST"])
@@ -107,7 +105,11 @@ class MembersAPI(MethodView):
                 db.session.add(g.user)
                 db.session.commit()
                 return redirect(url_for("members", nickname=nickname))
-            return MembersPage(nickname=nickname, category=category).render()
+            elif category in ["follow", "unfollow"]:
+                MembersPage(nickname=nickname, category=category)
+                return redirect(redirect_url())
+            else:
+                return MembersPage(nickname=nickname, category=category).render()
 
     @login_required
     def delete(self, nickname):
@@ -116,7 +118,7 @@ class MembersAPI(MethodView):
 members_api_view = MembersAPI.as_view('members')  # URLS for MEMBER API
 app.add_url_rule('/members/',  # Read all members
                  view_func=members_api_view, methods=["GET"])
-app.add_url_rule('/members/<any("all", "latest", "starred", "followed", "followers", "follow", "unfollow", "update", "upload"):category>/',
+app.add_url_rule("/members/<any('all', 'latest', 'follow', 'unfollow', 'update', 'upload'):category>/",
                  view_func=members_api_view, methods=["GET", "POST"])
 app.add_url_rule('/members/<nickname>/',  # Read, Update and Destroy a single member
                  view_func=members_api_view, methods=["GET", "POST", "PUT", "DELETE"])
@@ -140,7 +142,7 @@ class PhotoAPI(MethodView):
             if post_id is None:
                 return PhotoPage(category=category).render()
             else:
-                return PhotoPage(post_id=post_id).render()
+                return PhotoPage(post_id=post_id, category=category).render()
         else:
             return LoginPage(title="login").render()
 
@@ -168,7 +170,6 @@ class PhotoAPI(MethodView):
         result = {'deletedsuccess': True}
         return json.dumps(result)
 
-# urls for Photo API
 photo_api_view = PhotoAPI.as_view('photos')
 # Read all posts for a given page, Create a new post
 app.add_url_rule('/photos/',
@@ -180,7 +181,7 @@ app.add_url_rule('/photos/<any("all", "latest", "favorite", "starred", "upload",
 app.add_url_rule('/photos/<int:post_id>/',
                  view_func=photo_api_view, methods=["GET", "PUT", "DELETE"])
 # Vote on a single post
-app.add_url_rule('/photos/<int:post_id>/vote',
+app.add_url_rule('/photos/<int:post_id>/<any("vote"):category>',
                  view_func=photo_api_view, methods=["GET", "POST"])
 
 
@@ -234,3 +235,8 @@ def not_found_error(error):
 def internal_error(error):
     db.session.rollback()
     return render_template('500.html', error=error), 500
+
+def redirect_url(default='photos'):
+    return request.args.get('next') or \
+           request.referrer or \
+           url_for(default)

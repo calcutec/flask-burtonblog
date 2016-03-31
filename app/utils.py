@@ -111,6 +111,27 @@ class PhotoPage(BasePage):
         super(PhotoPage, self).__init__(*args, **kwargs)
         self.get_page_assets()
 
+    def get_page_assets(self):
+        if self.entity == "editor":
+            if request.is_xhr:
+                pass
+            else:
+                home_context = {'post': self.posts[0]}
+                self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=home_context)
+        elif self.entity == "photo":
+            main_photo_context = {'post': self.posts[0]}
+            self.assets['main_entry'] = self.get_asset(template="photo_detail.html", context=main_photo_context)
+            if self.category == "vote":
+                self.vote()
+        elif self.entity == "photos":
+            if request.is_xhr:
+                self.assets['collection'] = self.get_asset(context=[i.json_view() for i in self.posts])
+            else:
+                main_photo_context = {'post': self.posts[0]}
+                archive_photos_context = {'posts': self.posts[1:]}
+                self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=main_photo_context)
+                self.assets['archives'] = self.get_asset(template="archives.html", context=archive_photos_context)
+
     def vote(self):
         post_id = self.post_id
         user_id = g.user.id
@@ -118,27 +139,6 @@ class PhotoPage(BasePage):
             abort(404)
         post = Post.query.get_or_404(int(post_id))
         post.vote(user_id=user_id)
-        return redirect(redirect_url())
-
-    def get_page_assets(self):
-        if self.title == "home":
-            if request.is_xhr:
-                pass
-            else:
-                home_context = {'post': self.posts[0]}
-                self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=home_context)
-        if self.title == "photos" and not self.category == "upload":
-            if self.post_id:
-                main_photo_context = {'post': self.posts[0]}
-                self.assets['main_entry'] = self.get_asset(template="photo_detail.html", context=main_photo_context)
-            else:
-                if request.is_xhr:
-                    self.assets['collection'] = self.get_asset(context=[i.json_view() for i in self.posts[0:6]])
-                else:
-                    main_photo_context = {'post': self.posts[0]}
-                    archive_photos_context = {'posts': self.posts[1:]}
-                    self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=main_photo_context)
-                    self.assets['archives'] = self.get_asset(template="archives.html", context=archive_photos_context)
 
     def __str__(self):
         return "This is the %s page" % self.title
@@ -150,32 +150,25 @@ class MembersPage(BasePage):
         self.get_page_assets()
 
     def get_page_assets(self):
-        if self.entity == "member":
+        if self.entity == "author" or self.entity == "member":
             if request.is_xhr:
                 pass
             else:
                 user_context = {'post': self.assets['person']}
                 self.assets['main_entry'] = self.get_asset(template='person.html', context=user_context)
-
-                if self.assets['category'] == "follow":
-                    self.follow()
-                if self.assets['category'] == "unfollow":
-                    self.unfollow()
 
                 archive_photos_context = {'posts': self.posts}
                 self.assets['archives'] = self.get_asset(template="archives.html", context=archive_photos_context)
-        elif self.entity == "author":
-            if request.is_xhr:
-                pass
-            else:
-                user_context = {'post': self.assets['person']}
-                self.assets['main_entry'] = self.get_asset(template='person.html', context=user_context)
+            if self.category == "follow":
+                self.follow()
+            if self.category == "unfollow":
+                self.unfollow()
 
-        elif self.entity == "members" and self.posts:
+        elif self.entity == "members":
             if request.is_xhr:
-                self.assets['collection'] = [i.json_view() for i in self.posts[0:6]]
+                self.assets['collection'] = [i.json_view() for i in self.posts]
             else:
-                members_context = {'posts': self.posts[0:12]}
+                members_context = {'posts': self.posts}
                 self.assets['archives'] = self.get_asset(template="members.html", context=members_context)
 
     def follow(self):
