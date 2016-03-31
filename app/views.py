@@ -90,7 +90,6 @@ class MembersAPI(MethodView):
         else:
             return redirect(url_for("members", nickname=g.user.nickname))
 
-    @login_required
     def get(self, nickname=None, category="latest"):
         if nickname is None:  # Display all members
             if request.is_xhr:

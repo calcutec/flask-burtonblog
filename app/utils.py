@@ -117,9 +117,10 @@ class PhotoPage(BasePage):
                 pass
             else:
                 home_context = {'post': self.posts[0]}
-                self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=home_context)
+                self.assets['main_entry'] = self.get_asset(template="home_page.html", context=home_context)
         elif self.assets['entity'] == "photo":
             main_photo_context = {'post': self.posts[0]}
+            self.assets['photo_id'] = self.posts[0].id
             self.assets['main_entry'] = self.get_asset(template="photo_detail.html", context=main_photo_context)
             if self.assets['category'] == "vote":
                 self.vote()

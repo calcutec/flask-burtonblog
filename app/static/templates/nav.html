@@ -1,10 +1,20 @@
 <input class="burger-check" id="burger-check" type="checkbox"><label for="burger-check" class="burger"></label>
-    {%  if assets.entity == "member" and request.endpoint == "members" %}
-        <div id="title"><span id="title-text">{{ assets.person.nickname }} - {{ assets.category }}</span></div>
-    {%  elif assets.entity == "author" %}
-        <div id="title"><span id="title-text">{{ current_user.nickname }} - {{ assets.category }}</span></div>
+    {% if assets.entity == "author" %}
+        <div id="title"><i class="fa fa-briefcase"></i><span id="subtitle">{{ assets.category }}</span></div>
+    {% elif request.endpoint == "login" %}
+        <div id="title"><i class="fa fa-sign-in"></i></div>
+    {% elif request.endpoint == "home" %}
+        <div id="title"><i class="fa fa-home"></i></div>
+    {% elif assets.entity == "photo"  %}
+        <div id="title"><i class="fa fa-picture-o"></i><span id="subtitle">#{{ assets['photo_id'] }}</span></div>
+    {% elif assets.entity == "photos"  %}
+        <div id="title"><i class="fa fa-picture-o"></i><span id="subtitle">{{ assets.category }}</span></div>
+    {% elif assets.entity == "member" %}
+        <div id="title"><i class="fa fa-user"></i><span id="subtitle">{{ assets.category }}</span></div>
+    {% elif assets.entity == "members"  %}
+        <div id="title"><i class="fa fa-users"></i><span id="subtitle">{{ assets.category }}</span></div>
     {% else %}
-        <div id="title"><span id="title-text">{{ request.endpoint }} - {{ assets.category }}</span></div>
+        <div id="title"><span id="title-text">{{ request.endpoint }}</span></i><span id="subtitle"> - {{ assets.category }}</span></div>
     {% endif %}
 <span class="loginlogout">
     {% if g.user.is_authenticated() %}
@@ -16,6 +26,7 @@
 <nav id="nav" class="navigation">
     <ul>
     {% if not current_user.is_authenticated() %}
+        <li><a class="{% if request.endpoint == "login"  %}current {% endif %}button button-primary" href="/login">Login</a></li>
         <li><a class="{% if assets.entity == "editor"  %}current {% endif %}button button-primary" href="/home">Home</a></li>
     {% endif %}
         <li><a class="{% if assets.entity == "photos"  %}current {% endif %}button button-primary"href="/photos/latest">Photos</a></li>
@@ -25,7 +36,6 @@
         <li><a class="button button-primary" href="/photos/upload">Upload</a></li>
     {% endif %}
     </ul>
-    {% if current_user.is_authenticated() and assets.entity in ["photos", "members", "member", "author"]  %}
     <ul>
     {% if assets.entity == "photos" %}
         <li><a class="{% if assets.category == "latest"  %}current {% endif %}button button-primary" href="/photos/latest">Latest</a></li>
@@ -58,5 +68,4 @@
         <li><a class="button button-primary" href="/members/{{ current_user.nickname }}/unpublished">Unpublished</a></li>
     {% endif %}
     </ul>
-    {% endif %}
 </nav>

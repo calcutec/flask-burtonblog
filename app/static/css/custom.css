@@ -359,11 +359,59 @@ span.rounded-icon svg {
     padding: 2px 0 0 .5rem;
     vertical-align: top;
 }
+.banner-logo {
+    vertical-align: top;
+    margin-right: 1rem;
+    max-width: 28px;
+}
+
 #title-text {
     font-size: 3rem;
     font-weight: 300;
     letter-spacing: -3px;
     text-transform: uppercase;
+}
+#subtitle {
+    font-size: 3rem;
+    font-weight: 300;
+    letter-spacing: -3px;
+    text-transform: uppercase;
+}
+i.fa-users{
+    font-size: 2.5rem !important;
+    color: #3A7734;
+    vertical-align: top;
+    margin: 0 1rem 0 .5rem;
+}
+i.fa-user{
+    font-size: 2.8rem !important;
+    color: #3A7734;
+    vertical-align: top;
+    margin: 0 1rem 0 .5rem;
+}
+i.fa-picture-o{
+    font-size: 2.8rem !important;
+    color: #3A7734;
+    vertical-align: top;
+    margin: 0 1rem 0 .5rem;
+}
+i.fa-briefcase{
+    font-size: 3rem !important;
+    color: #3A7734;
+    vertical-align: top;
+    margin: 0 1rem 0 .5rem;
+}
+i.fa-home{
+    font-size: 3.2rem !important;
+    color: #3A7734;
+    vertical-align: top;
+    margin: -.2rem 1rem 0 .5rem;
+}
+i.fa-sign-in{
+    font-size: 3.2rem !important;
+    color: #3A7734;
+    vertical-align: top;
+    margin: -.2rem 1rem 0 .5rem;
 }
 .burger {
     display: inline-block;
@@ -493,10 +541,10 @@ ul#auto-login li a{
     color: #bbb;
     border: 1px solid transparent;
 }
-#loginforms > label[for*='1']:before { content: '\f1cb'; }
-#loginforms > label[for*='2']:before { content: '\f17d'; }
-#loginforms > label[for*='3']:before { content: '\f16b'; }
-#loginforms > label[for*='4']:before { content: '\f1a9'; }
+/*#loginforms > label[for*='1']:before { content: '\f1cb'; }*/
+/*#loginforms > label[for*='2']:before { content: '\f17d'; }*/
+/*#loginforms > label[for*='3']:before { content: '\f16b'; }*/
+/*#loginforms > label[for*='4']:before { content: '\f1a9'; }*/
 
 #loginforms > label:hover {
     color: #888;
