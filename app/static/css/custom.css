@@ -10,12 +10,31 @@ body {
     padding: 0;
     margin: 0;
 }
-main {
-    margin-top: .5rem;
+nav {
+    position: fixed;
+    width: 100vw;
+    margin: 0 0 0 3.5vw;
+    padding-top: .5rem;
+    background-color: #FFFFFF;
+    top: 0;
+    z-index:9999;
 }
-.bodycontainer {
+header {
     max-width: 1280px;
-    margin: 3.9rem 3.5vw 0 3.5vw;
+    margin: 4rem 3.5vw 0 3.5vw;
+    width: 92.5vw;
+    padding: .4rem 0 .4rem 0;
+    font-size: 3rem;
+    font-weight: 300;
+    letter-spacing: -3px;
+    text-transform: uppercase;
+    text-align: center;
+    background-color: #11557C;
+    color: white;
+}
+main {
+    max-width: 1280px;
+    margin: 0 3.5vw 0 3.5vw;
     width: 93vw;
 }
 .hide {
@@ -24,7 +43,7 @@ main {
 .loginlogout {
     float: right;
     display: inline-block;
-    /*margin-right: 1rem;*/
+    margin-right: 8vw;
 }
 .well {
     box-shadow: 0 0 5px #888;
@@ -32,6 +51,11 @@ main {
     border-radius: 5px;
     margin-right: 0.5vw;
     margin-bottom: 1rem;
+}
+.home_pic {
+    max-width: 35%;
+    float: right;
+    display: inline-block;
 }
 /** Typography **/
 h1, h2, h3, h4, h5, h6 {
@@ -349,13 +373,6 @@ span.rounded-icon svg {
     position: absolute;
 }
 /** Navbar styling **/
-nav {
-    position: fixed;
-    padding-top: 5px;
-    background-color: #FFFFFF;
-    top: 0;
-    z-index:9999;
-}
 #title {
     display: inline-block;
     vertical-align: top;
@@ -364,17 +381,6 @@ nav {
     font-size: 3rem;
     font-weight: 300;
     text-transform: capitalize;
-}
-#header {
-    padding: .5rem 0 .5rem 0;
-    font-size: 3rem;
-    font-weight: 300;
-    letter-spacing: -3px;
-    text-transform: uppercase;
-    text-align: center;
-    background-color: #11557C;
-    color: white;
-    width: 92.5vw;
 }
 .burger {
     display: inline-block;
@@ -443,6 +449,7 @@ nav {
     max-height: 0;
     -webkit-transition: max-height 0.5s ease-in-out;
     transition: max-height 0.5s ease-in-out;
+    width: 92.5vw;
 }
 .burger-check:checked ~ .navigation {
     max-height: 500px;
@@ -450,9 +457,6 @@ nav {
     transition: max-height 0.5s ease-in-out;
     border-bottom: 1px solid #000000;
     border-top: 1px dotted #000000;
-}
-#nav {
-    width: 92.52vw;
 }
 #nav ul {
     margin: 0;
@@ -562,7 +566,7 @@ input.button-primary {
 /* Select */
 #element-label {
     vertical-align: top;
-    width: 150px;
+    width: 110px;
     display: inline-block;
     padding: 0;
     margin: .6rem 0 0 0;

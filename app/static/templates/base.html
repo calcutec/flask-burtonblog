@@ -36,39 +36,37 @@
         <link rel="icon" type="image/png" href="{{ local_static_url }}img/favicon-32x32.png" sizes="32x32" />
     </head>
 	<body>
-        <div class="bodycontainer">
-            <nav>
-                {% include 'nav.html' %}
-            </nav>
-            <div id="header">
-                {% if assets.entity == "author" %}
-                    {{ current_user.nickname }}'s Photos
-                {% elif request.endpoint == "login" %}
-                    Login/Signup
-                {% elif request.endpoint == "home" %}
-                    This Great Pic
-                {% elif assets.category == "upload"  %}
-                    Upload Photo
-                {% elif assets.entity == "photo"  %}
-                    Photo #{{ assets['photo_id'] }}
-                {% elif assets.entity == "photos"  %}
-                    Photos
-                {% elif assets.entity == "member" %}
-                    {{ assets['person'].nickname }}'s Photos
-                {% elif assets.entity == "members"  %}
-                    Members
-                {% else %}
-                    {{ request.endpoint }} - {{ assets.category }}
-                {% endif %}
-            </div>
-            <main>
-            {% if assets %}
-                <div id="photo-main">{{ assets.main_entry|safe if assets.main_entry != None }}</div>
-                <ul class="img-list">{{ assets.archives|safe if assets.archives != None }}</ul>
-                <div id="body-form">{{ assets.body_form|safe if assets.body_form != None }}</div>
+        <nav>
+            {% include 'nav.html' %}
+        </nav>
+        <header>
+            {% if assets.entity == "author" %}
+                {{ current_user.nickname }}'s Photos
+            {% elif request.endpoint == "login" %}
+                Login/Signup
+            {% elif request.endpoint == "home" %}
+                This Great Pic
+            {% elif assets.category == "upload"  %}
+                Upload Photo
+            {% elif assets.entity == "photo"  %}
+                Photo #{{ assets['photo_id'] }}
+            {% elif assets.entity == "photos"  %}
+                Photos
+            {% elif assets.entity == "member" %}
+                {{ assets['person'].nickname }}'s Photos
+            {% elif assets.entity == "members"  %}
+                Members
+            {% else %}
+                {{ request.endpoint }} - {{ assets.category }}
             {% endif %}
-            </main>
-        </div>
+        </header>
+        <main>
+        {% if assets %}
+            <div id="photo-main">{{ assets.main_entry|safe if assets.main_entry != None }}</div>
+            <ul class="img-list">{{ assets.archives|safe if assets.archives != None }}</ul>
+            <div id="body-form">{{ assets.body_form|safe if assets.body_form != None }}</div>
+        {% endif %}
+        </main>
         {% block scripts %}
 
 {#            <script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>#}
