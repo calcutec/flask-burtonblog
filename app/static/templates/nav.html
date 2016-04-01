@@ -25,6 +25,27 @@
         {% if not request.endpoint == "login"  %}<a href="/login"><i class="fa fa-sign-in fa-2x"></i></a>{% endif %}
     {% endif %}
 </span>
+<div id="header">
+    {% if assets.entity == "author" %}
+        {{ current_user.nickname }}'s Portfolio
+    {% elif request.endpoint == "login" %}
+        Login/Signup
+    {% elif request.endpoint == "home" %}
+        This Great Pic
+    {% elif assets.category == "upload"  %}
+        Load your best picture
+    {% elif assets.entity == "photo"  %}
+        Photo #{{ assets['photo_id'] }}
+    {% elif assets.entity == "photos"  %}
+        Photos
+    {% elif assets.entity == "member" %}
+        {{ assets['person'].nickname }}'s Photos
+    {% elif assets.entity == "members"  %}
+        Members
+    {% else %}
+        {{ request.endpoint }} - {{ assets.category }}
+    {% endif %}
+</div>
 <div id="nav" class="navigation">
     <ul>
     {% if not current_user.is_authenticated() %}
