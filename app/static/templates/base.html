@@ -41,7 +41,7 @@
             </nav>
             <div id="header">
                 {% if assets.entity == "author" %}
-                    {{ current_user.nickname }}'s Portfolio
+                    {{ current_user.nickname }}'s Photos
                 {% elif request.endpoint == "login" %}
                     Login/Signup
                 {% elif request.endpoint == "home" %}
