@@ -582,6 +582,17 @@ input.button-primary {
     width: 100%;
 }
 
+/* Fix for zooming upon select in ios */
+input, textarea, select {
+  font-size: 16px;
+}
+
+@media (min-width: 768px) {
+    input, textarea, select {
+      font-size: 14px;
+    }
+}
+
 /** 400 pixels or greater (larger than common mobiles in portrait) **/
 @media screen and (min-width: 25em) {
     #loginforms > label { padding: 15px 25px; }

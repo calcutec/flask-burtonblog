@@ -67,7 +67,7 @@
 {#        <li><a class="button button-primary" href="/members/{{ current_user.nickname }}/unpublished">Unpublished</a></li>#}
 {#    {% endif %}#}
     </ul>
-    {% if assets.entity in ["photos", "members", "member", "author"] and assets.category != "upload" %}
+    {% if assets.entity in ["photos", "members", "member"] and assets.category != "upload" %}
     <label id="element-label" for="element">
         <select name="element" id="element">
             <option value="1">Latest</option>
