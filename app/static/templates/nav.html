@@ -25,70 +25,66 @@
         {% if not request.endpoint == "login"  %}<a href="/login"><i class="fa fa-sign-in fa-2x"></i></a>{% endif %}
     {% endif %}
 </span>
-<div id="header">
-    {% if assets.entity == "author" %}
-        {{ current_user.nickname }}'s Portfolio
-    {% elif request.endpoint == "login" %}
-        Login/Signup
-    {% elif request.endpoint == "home" %}
-        This Great Pic
-    {% elif assets.category == "upload"  %}
-        Load your best picture
-    {% elif assets.entity == "photo"  %}
-        Photo #{{ assets['photo_id'] }}
-    {% elif assets.entity == "photos"  %}
-        Photos
-    {% elif assets.entity == "member" %}
-        {{ assets['person'].nickname }}'s Photos
-    {% elif assets.entity == "members"  %}
-        Members
-    {% else %}
-        {{ request.endpoint }} - {{ assets.category }}
-    {% endif %}
-</div>
 <div id="nav" class="navigation">
     <ul>
     {% if not current_user.is_authenticated() %}
-        <li><a class="{% if request.endpoint == "login"  %}current {% endif %}" href="/login"><i class="fa fa-sign-in"></i></a></li>
-        <li><a class="{% if assets.entity == "editor"  %}current {% endif %}" href="/home"><i class="fa fa-home"></i></a></li>
+        <li class="{% if assets.entity == "editor"  %}current{% endif %}"><a href="/home"><i class="fa fa-home"></i></a></li>
     {% endif %}
-        <li><a class="{% if assets.entity == "photos" and assets.category != "upload"  %}current {% endif %}" href="/photos/latest"><i class="fa fa-picture-o"></i></a></li>
+        <li class="{% if assets.entity == "photos" and assets.category != "upload"  %}current{% endif %}"><a href="/photos/latest"><i class="fa fa-picture-o"></i></a></li>
     {% if current_user.is_authenticated()  %}
-        <li><a class="{% if assets.entity == "members" %}current {% endif %}" href="/members/latest"><i class="fa fa-users"></i></a></li>
-        <li><a class="{%  if assets.entity == "author" %}current{% endif %}" href="/members/{{ current_user.nickname }}/latest"><i class="fa fa-briefcase"></i></a></li>
-        <li><a class="{% if assets.category == "upload" %}current{% endif %}" href="/photos/upload"><i class="fa fa-upload"></i></a></li>
+        <li class="{% if assets.entity == "members" %}current{% endif %}"><a href="/members/latest"><i class="fa fa-users"></i></a></li>
+        <li class="{%  if assets.entity == "author" %}current{% endif %}"><a href="/members/{{ current_user.nickname }}/latest"><i class="fa fa-briefcase"></i></a></li>
+        <li class="{% if assets.category == "upload" %}current{% endif %}"><a href="/photos/upload"><i class="fa fa-upload"></i></a></li>
     {% endif %}
+{#    {% if assets.entity == "photos" %}#}
+{#        <li><a class="{% if assets.category == "latest"  %}current {% endif %}button button-primary" href="/photos/latest">Latest</a></li>#}
+{#        <li><a class="{% if assets.category == "all"  %}current {% endif %}button button-primary" href="/photos/all">All</a></li>#}
+{#        <li><a class="button button-primary" href="/photos/starred">Starred</a></li>#}
+{#        <li><a class="button button-primary" href="/photos/themed">Theme</a></li>#}
+{#        <li><a class="button button-primary" href="/photos/popular">Popular</a></li>#}
+{#    {% endif %}#}
+{#    {% if assets.entity == "members" %}#}
+{#        <li><a class="{% if assets.category == "latest" %}current {% endif %}button button-primary" href="/members/latest">Latest</a></li>#}
+{#        <li><a class="{% if assets.category == "all" %}current {% endif %}button button-primary" href="/members/all">All</a></li>#}
+{#        <li><a class="button button-primary" href="/members/starred">Starred</a></li>#}
+{#        <li><a class="button button-primary" href="/members/popular">Popular</a></li>#}
+{#        <li><a class="button button-primary" href="/members/followed">Followed</a></li>#}
+{#        <li><a class="button button-primary" href="/members/followers">Followers</a></li>#}
+{#    {% endif %}#}
+{#    {% if assets.entity == "member" %}#}
+{#        <li><a class="{% if assets.category == "latest" %}current {% endif %}button button-primary" href="/members/{{ assets.person.nickname }}/latest">Latest</a></li>#}
+{#        <li><a class="{% if assets.category == "all" %}current {% endif %}button button-primary" href="/members/{{ assets.person.nickname }}/all">All</a></li>#}
+{#        <li><a class="button button-primary" href="/members/{{ assets.person.nickname }}/starred">Starred</a></li>#}
+{#        <li><a class="button button-primary" href="/members/{{ assets.person.nickname }}/<theme>">Theme</a></li>#}
+{#        <li><a class="button button-primary" href="/members/{{ assets.person.nickname }}/popular">Popular</a></li>#}
+{#    {%  elif assets.entity == "author" %}#}
+{#        <li><a class="{% if assets.category == "latest" %}current {% endif %}button button-primary" href="/members/{{ current_user.nickname }}/latest">Latest</a></li>#}
+{#        <li><a class="{% if assets.category == "all" %}current {% endif %}button button-primary" href="/members/{{ current_user.nickname }}/all">All</a></li>#}
+{#        <li><a class="button button-primary" href="/members/{{ current_user.nickname }}/starred">Starred</a></li>#}
+{#        <li><a class="button button-primary" href="/members/{{ current_user.nickname }}/<theme>">Theme</a></li>#}
+{#        <li><a class="button button-primary" href="/members/{{ current_user.nickname }}/popular">Popular</a></li>#}
+{#        <li><a class="button button-primary" href="/members/{{ current_user.nickname }}/published">Published</a></li>#}
+{#        <li><a class="button button-primary" href="/members/{{ current_user.nickname }}/unpublished">Unpublished</a></li>#}
+{#    {% endif %}#}
     </ul>
-    <ul>
-    {% if assets.entity == "photos" %}
-        <li><a class="{% if assets.category == "latest"  %}current {% endif %}button button-primary" href="/photos/latest">Latest</a></li>
-        <li><a class="{% if assets.category == "all"  %}current {% endif %}button button-primary" href="/photos/all">All</a></li>
-        <li><a class="button button-primary" href="/photos/starred">Starred</a></li>
-        <li><a class="button button-primary" href="/photos/themed">Theme</a></li>
-        <li><a class="button button-primary" href="/photos/popular">Popular</a></li>
-    {% endif %}
-    {% if assets.entity == "members" %}
-        <li><a class="{% if assets.category == "latest" %}current {% endif %}button button-primary" href="/members/latest">Latest</a></li>
-        <li><a class="{% if assets.category == "all" %}current {% endif %}button button-primary" href="/members/all">All</a></li>
-        <li><a class="button button-primary" href="/members/starred">Starred</a></li>
-        <li><a class="button button-primary" href="/members/popular">Popular</a></li>
-        <li><a class="button button-primary" href="/members/followed">Followed</a></li>
-        <li><a class="button button-primary" href="/members/followers">Followers</a></li>
-    {% endif %}
-    {% if assets.entity == "member" %}
-        <li><a class="{% if assets.category == "latest" %}current {% endif %}button button-primary" href="/members/{{ assets.person.nickname }}/latest">Latest</a></li>
-        <li><a class="{% if assets.category == "all" %}current {% endif %}button button-primary" href="/members/{{ assets.person.nickname }}/all">All</a></li>
-        <li><a class="button button-primary" href="/members/{{ assets.person.nickname }}/starred">Starred</a></li>
-        <li><a class="button button-primary" href="/members/{{ assets.person.nickname }}/<theme>">Theme</a></li>
-        <li><a class="button button-primary" href="/members/{{ assets.person.nickname }}/popular">Popular</a></li>
-    {%  elif assets.entity == "author" %}
-        <li><a class="{% if assets.category == "latest" %}current {% endif %}button button-primary" href="/members/{{ current_user.nickname }}/latest">Latest</a></li>
-        <li><a class="{% if assets.category == "all" %}current {% endif %}button button-primary" href="/members/{{ current_user.nickname }}/all">All</a></li>
-        <li><a class="button button-primary" href="/members/{{ current_user.nickname }}/starred">Starred</a></li>
-        <li><a class="button button-primary" href="/members/{{ current_user.nickname }}/<theme>">Theme</a></li>
-        <li><a class="button button-primary" href="/members/{{ current_user.nickname }}/popular">Popular</a></li>
-        <li><a class="button button-primary" href="/members/{{ current_user.nickname }}/published">Published</a></li>
-        <li><a class="button button-primary" href="/members/{{ current_user.nickname }}/unpublished">Unpublished</a></li>
-    {% endif %}
-    </ul>
+    <label id="element-label" for="element">
+        <select name="element" id="element">
+            <option value="1">All</option>
+            <option value="2">Latest</option>
+            <option value="3">Starred</option>
+            <option value="4">Popular</option>
+            {%  if assets.entity == "author" %}
+                <option value="5">Published</option>
+                <option value="6">Unpublished</option>
+            {% elif assets.entity == "members" %}
+                <option value="5">Followed</option>
+                <option value="6">Followers</option>
+            {%  elif assets.entity == "photos" %}
+                <option value="5">Landscape</option>
+                <option value="6">Family</option>
+                <option value="6">Portrait</option>
+                <option value="6">Street</option>
+            {% endif %}
+        </select>
+    </label>
 </div>

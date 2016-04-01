@@ -12,7 +12,7 @@ body {
 }
 .bodycontainer {
     max-width: 1280px;
-    margin: 8rem 3.5vw 0 3.5vw;
+    margin: 4rem 3.5vw 0 3.5vw;
     width: 93vw;
 }
 .hide {
@@ -356,20 +356,7 @@ nav {
 }
 #title {
     display: inline-block;
-    padding: 2px 0 0 .5rem;
     vertical-align: top;
-}
-.banner-logo {
-    vertical-align: top;
-    margin-right: 1rem;
-    max-width: 28px;
-}
-
-#title-text {
-    font-size: 3rem;
-    font-weight: 300;
-    letter-spacing: -3px;
-    text-transform: uppercase;
 }
 #subtitle {
     font-size: 3rem;
@@ -386,62 +373,6 @@ nav {
     background-color: #11557C;
     color: white;
     width: 92.5vw;
-}
-i.fa-users {
-    font-size: 2.5rem !important;
-    color: #BBBBBB;
-    vertical-align: top;
-    margin: 0 1rem 0 .5rem;
-}
-i.fa-user {
-    font-size: 2.8rem !important;
-    color: #BBBBBB;
-    vertical-align: top;
-    margin: 0 1rem 0 .5rem;
-}
-i.fa-picture-o {
-    font-size: 2.8rem !important;
-    color: #BBBBBB;
-    vertical-align: top;
-    margin: 0 1rem 0 .5rem;
-}
-i.fa-briefcase {
-    font-size: 3rem !important;
-    color: #BBBBBB;
-    vertical-align: top;
-    margin: 0 1rem 0 .5rem;
-}
-i.fa-home {
-    font-size: 3.2rem !important;
-    color: #BBBBBB;
-    vertical-align: top;
-    margin: -.2rem 1rem 0 .5rem;
-}
-i.fa-sign-in {
-    font-size: 3.2rem !important;
-    color: #BBBBBB;
-    vertical-align: top;
-    margin: -.2rem 1rem 0 .5rem;
-}
-i.fa-sign-out {
-    font-size: 3.4rem !important;
-    color: #BBBBBB;
-    vertical-align: top;
-}
-i.fa-upload {
-    font-size: 3rem !important;
-    color: #BBBBBB;
-    vertical-align: top;
-    margin: -.2rem 1rem 0 .5rem;
-}
-i.current {
-    color: #3A7734 !important;
-}
-a i.current {
-    display: none;
-}
-a.current {
-    display: none;
 }
 .burger {
     display: inline-block;
@@ -521,31 +452,65 @@ a.current {
 }
 #nav {
     width: 92.52vw;
+    border-top: 1px solid #000000;
 }
 #nav ul {
     margin: 0;
-    border-top: 1px dotted darkblue;
-    padding-bottom: .5rem;
+    display: inline-block;
 }
 #nav li {
     display: inline-block;
-    margin-top: .5rem;
+    margin: 8px 1.5rem 0 0;
+    vertical-align: top;
+}
+#nav li.current {
+    display: none;
 }
 #nav li a{
     color: #FFFFFF;
     font-size: 1.2rem;
-    padding: 0 .5rem 0 .5rem;
-}
-#nav li > :last-child {
-    margin-right: 0 !important;
 }
 #nav a {
     color:#333333;
     text-decoration:none;
 }
-#nav img {
-    display:block;
-    margin:0 auto;
+i.fa-users {
+    font-size: 2.6rem !important;
+    color: #BBBBBB;
+}
+i.fa-user {
+    font-size: 2.8rem !important;
+    color: #BBBBBB;
+}
+i.fa-picture-o {
+    font-size: 2.8rem !important;
+    color: #BBBBBB;
+}
+i.fa-briefcase {
+    font-size: 3.1rem !important;
+    color: #BBBBBB;
+    margin-top: -2px;
+}
+i.fa-home {
+    font-size: 3.2rem !important;
+    color: #BBBBBB;
+}
+i.fa-sign-in {
+    font-size: 3.2rem !important;
+    color: #BBBBBB;
+}
+i.fa-sign-out {
+    font-size: 3.4rem !important;
+    color: #BBBBBB;
+}
+i.fa-upload {
+    font-size: 3rem !important;
+    color: #BBBBBB;
+    margin: -3px 0 0 0;
+}
+i.current {
+    color: #3A7734 !important;
+    margin: 0 1rem 0 1rem;
 }
 
 /* Login Forms */
@@ -597,6 +562,44 @@ ul#auto-login li a{
 input.button-primary {
     margin-top: 1rem;
 }
+
+/* Select */
+#element-label {
+    vertical-align: top;
+    width: 150px;
+    display: inline-block;
+    padding: 0;
+}
+#element{
+	-webkit-align-items: center;
+	-webkit-appearance: menulist-button;
+	-webkit-rtl-ordering: logical;
+	-webkit-writing-mode: horizontal-tb;
+	background-color: rgb(255, 255, 255);
+	border-radius: 0;
+	border: 1px solid rgb(204, 204, 204);
+	border-image-outset: 0;
+	border-image-repeat: stretch;
+	border-image-slice: 100%;
+	border-image-source: none;
+	border-image-width: 1;
+	box-sizing: border-box;
+	color: rgb(85, 85, 85);
+	cursor: pointer;
+	font-size: 14px;
+	font-weight: normal;
+	height: 30px;
+	letter-spacing: normal;
+	line-height: normal;
+	text-align: start;
+	text-indent: 0;
+	text-shadow: none;
+	text-transform: none;
+	vertical-align: middle;
+	white-space: pre;
+	word-spacing: 0;
+}
+
 /** 400 pixels or greater (larger than common mobiles in portrait) **/
 @media screen and (min-width: 25em) {
     #loginforms > label { padding: 15px 25px; }

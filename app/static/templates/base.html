@@ -23,7 +23,7 @@
 {#        {% assets "css_app" %}#}
 {#            <link rel="stylesheet" href="{{ local_static_url }}gen/app.css">#}
 {#        {% endassets %}#}
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="{{ local_static_url }}font-awesome/css/font-awesome.min.css">
         <link rel="stylesheet" href="{{ local_static_url }}css/fix.css">
         <link rel="stylesheet" href="{{ local_static_url }}css/custom.css">
 
@@ -39,6 +39,27 @@
             <nav>
                 {% include 'nav.html' %}
             </nav>
+            <div id="header">
+                {% if assets.entity == "author" %}
+                    {{ current_user.nickname }}'s Portfolio
+                {% elif request.endpoint == "login" %}
+                    Login/Signup
+                {% elif request.endpoint == "home" %}
+                    This Great Pic
+                {% elif assets.category == "upload"  %}
+                    Upload Photo
+                {% elif assets.entity == "photo"  %}
+                    Photo #{{ assets['photo_id'] }}
+                {% elif assets.entity == "photos"  %}
+                    Photos
+                {% elif assets.entity == "member" %}
+                    {{ assets['person'].nickname }}'s Photos
+                {% elif assets.entity == "members"  %}
+                    Members
+                {% else %}
+                    {{ request.endpoint }} - {{ assets.category }}
+                {% endif %}
+            </div>
             <main>
             {% if assets %}
                 <div id="photo-main">{{ assets.main_entry|safe if assets.main_entry != None }}</div>
@@ -64,13 +85,13 @@
             <script src="{{ local_static_url }}js/_libs/backbone/backbone.js"></script>
             <script src="{{ local_static_url }}js/_libs/backbone/backbone.localStorage-min.js"></script>
             <script src="{{ local_static_url }}js/data.js"></script>
-            <script>
-                $(document).ready(function () {
-                    $('#burger-check').click(function () {
-                        $('main').toggleClass('nav-expanded');
-                    })
-                });
-            </script>
+{#            <script>#}
+{#                $(document).ready(function () {#}
+{#                    $('#burger-check').click(function () {#}
+{#                        $('main').toggleClass('nav-expanded');#}
+{#                    })#}
+{#                });#}
+{#            </script>#}
 {#            <script src="{{ local_static_url }}js/main.js"></script>#}
         {% endblock %}
 	</body>
