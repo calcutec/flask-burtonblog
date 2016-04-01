@@ -460,7 +460,7 @@ nav {
 }
 #nav li {
     display: inline-block;
-    margin: 8px 1.5rem 0 0;
+    margin: 0 1.5rem 0 0;
     vertical-align: top;
 }
 #nav li.current {
@@ -474,38 +474,33 @@ nav {
     color:#333333;
     text-decoration:none;
 }
+i {
+    color: #BBBBBB;
+}
 i.fa-users {
     font-size: 2.6rem !important;
-    color: #BBBBBB;
 }
 i.fa-user {
     font-size: 2.8rem !important;
-    color: #BBBBBB;
 }
 i.fa-picture-o {
     font-size: 2.8rem !important;
-    color: #BBBBBB;
 }
 i.fa-briefcase {
     font-size: 3.1rem !important;
-    color: #BBBBBB;
     margin-top: -2px;
 }
 i.fa-home {
     font-size: 3.2rem !important;
-    color: #BBBBBB;
 }
 i.fa-sign-in {
     font-size: 3.2rem !important;
-    color: #BBBBBB;
 }
 i.fa-sign-out {
     font-size: 3.4rem !important;
-    color: #BBBBBB;
 }
 i.fa-upload {
     font-size: 3rem !important;
-    color: #BBBBBB;
     margin: -3px 0 0 0;
 }
 i.current {
@@ -569,35 +564,11 @@ input.button-primary {
     width: 150px;
     display: inline-block;
     padding: 0;
+    margin: 3px 0 0 0;
 }
-#element{
-	-webkit-align-items: center;
-	-webkit-appearance: menulist-button;
-	-webkit-rtl-ordering: logical;
-	-webkit-writing-mode: horizontal-tb;
-	background-color: rgb(255, 255, 255);
-	border-radius: 0;
-	border: 1px solid rgb(204, 204, 204);
-	border-image-outset: 0;
-	border-image-repeat: stretch;
-	border-image-slice: 100%;
-	border-image-source: none;
-	border-image-width: 1;
-	box-sizing: border-box;
-	color: rgb(85, 85, 85);
-	cursor: pointer;
-	font-size: 14px;
-	font-weight: normal;
-	height: 30px;
-	letter-spacing: normal;
-	line-height: normal;
-	text-align: start;
-	text-indent: 0;
-	text-shadow: none;
-	text-transform: none;
-	vertical-align: middle;
-	white-space: pre;
-	word-spacing: 0;
+
+#element-label select {
+    height: 26px;
 }
 
 /** 400 pixels or greater (larger than common mobiles in portrait) **/
