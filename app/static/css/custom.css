@@ -10,9 +10,12 @@ body {
     padding: 0;
     margin: 0;
 }
+main {
+    margin-top: .5rem;
+}
 .bodycontainer {
     max-width: 1280px;
-    margin: 4rem 3.5vw 0 3.5vw;
+    margin: 3.9rem 3.5vw 0 3.5vw;
     width: 93vw;
 }
 .hide {
@@ -197,8 +200,7 @@ input[type="email"],
     input[type="tel"],
     input[type="url"],
     input[type="password"],
-    textarea,
-    select {
+    textarea {
         height: 38px;
         padding: 6px 10px; /* The 6px vertically centers text on FF, ignored by Webkit */
         background-color: #fff;
@@ -446,13 +448,11 @@ nav {
     max-height: 500px;
     -webkit-transition: max-height 0.5s ease-in-out;
     transition: max-height 0.5s ease-in-out;
-}
-.nav-expanded {
-    padding-top: 80px;  /*you can change the value to more accuracy */
+    border-bottom: 1px solid #000000;
+    border-top: 1px dotted #000000;
 }
 #nav {
     width: 92.52vw;
-    border-top: 1px solid #000000;
 }
 #nav ul {
     margin: 0;
@@ -460,7 +460,7 @@ nav {
 }
 #nav li {
     display: inline-block;
-    margin: 0 1.5rem 0 0;
+    margin: .7rem 1.5rem .2rem 0;
     vertical-align: top;
 }
 #nav li.current {
@@ -484,14 +484,15 @@ i.fa-user {
     font-size: 2.8rem !important;
 }
 i.fa-picture-o {
-    font-size: 2.8rem !important;
+    font-size: 3rem !important;
 }
 i.fa-briefcase {
     font-size: 3.1rem !important;
     margin-top: -2px;
 }
 i.fa-home {
-    font-size: 3.2rem !important;
+    font-size: 3.3rem !important;
+    margin-top: -3px;
 }
 i.fa-sign-in {
     font-size: 3.2rem !important;
@@ -564,11 +565,17 @@ input.button-primary {
     width: 150px;
     display: inline-block;
     padding: 0;
-    margin: 3px 0 0 0;
+    margin: .6rem 0 0 0;
 }
 
 #element-label select {
     height: 26px;
+    background-color: #fff;
+    border: 1px solid #D1D1D1;
+    border-radius: 4px;
+    box-shadow: none;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 /** 400 pixels or greater (larger than common mobiles in portrait) **/

@@ -70,8 +70,8 @@
     {% if assets.entity in ["photos", "members", "member", "author"] and assets.category != "upload" %}
     <label id="element-label" for="element">
         <select name="element" id="element">
-            <option value="1">All</option>
-            <option value="2">Latest</option>
+            <option value="1">Latest</option>
+            <option value="2">All</option>
             <option value="3">Starred</option>
             <option value="4">Popular</option>
             {%  if assets.entity == "author" %}
