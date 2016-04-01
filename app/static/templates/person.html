@@ -22,24 +22,12 @@
                         <a href="{{ url_for('members', category='follow', nickname=post.nickname) }}"><strong>Follow</strong></a>
                     {% endif %}
                 {% endif %}
+                <div>
+                    {% if post.about_me %}
+                        About: {{ post.about_me }}<br>
+                    {% endif %}
+                </div>
             </span>
         </span>
     </li>
 </ul>
-<div>
-    {% if post.about_me %}
-        About: {{ post.about_me }}<br>
-    {% endif %}
-</div>
-
-
-
-
-
-
-
-
-
-
-
-

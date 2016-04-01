@@ -25,6 +25,7 @@
                         <a data-voted="false" style="color:#000;" href="{{ url_for('photos', category='vote', post_id=post.id) }}" class="{{ post.id }} likeme"><i class="fa fa-meh-o fa-lg icon-white"></i></a>
                     {% endif %}
                         Like/Unlike
+                        {{ post.body }}
 {#                        <a href="{{ url_for('photos', id=post.id) }}">Add Comment</a>#}
                 {% endif %}
             </span>
