@@ -35,18 +35,18 @@
         <link rel="icon" type="image/png" href="{{ local_static_url }}img/favicon-32x32.png" sizes="32x32" />
     </head>
 	<body>
-        <main>
-            <div class="bodycontainer">
-                <div id="fixed-nav">
-                    {% include 'nav.html' %}
-                </div>
-                {% if assets %}
-                    <div id="photo-main">{{ assets.main_entry|safe if assets.main_entry != None }}</div>
-                    <ul class="img-list">{{ assets.archives|safe if assets.archives != None }}</ul>
-                    <div id="body-form">{{ assets.body_form|safe if assets.body_form != None }}</div>
-                {% endif %}
-            </div>
-        </main>
+        <div class="bodycontainer">
+            <nav>
+                {% include 'nav.html' %}
+            </nav>
+            <main>
+            {% if assets %}
+                <div id="photo-main">{{ assets.main_entry|safe if assets.main_entry != None }}</div>
+                <ul class="img-list">{{ assets.archives|safe if assets.archives != None }}</ul>
+                <div id="body-form">{{ assets.body_form|safe if assets.body_form != None }}</div>
+            {% endif %}
+            </main>
+        </div>
         {% block scripts %}
 {#            <script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>#}
 {#            {% assets "js_libs" %}#}
