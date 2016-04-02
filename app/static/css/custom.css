@@ -120,6 +120,7 @@ table {
         border-radius: 4px;
         border: 1px solid #BBB;
         cursor: pointer;
+        -webkit-appearance: none;
 }
 
 .button:hover,
