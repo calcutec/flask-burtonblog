@@ -1,5 +1,5 @@
 {% include "archive_image.html" %}
-<span onclick="" class="text-content">
+<span onclick="touchStart(event)" class="text-content">
     <span>
         <a href="{{ url_for('members', nickname=post.author.nickname) }}" rel="tag">{{ post.author.nickname }}</a><br>
         <b>{{ post.timestamp.strftime('%d %b %Y') }}</b><br>

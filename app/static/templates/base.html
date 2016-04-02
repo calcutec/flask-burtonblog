@@ -72,14 +72,28 @@
         {% block scripts %}
             <script src="{{ static_url }}blueimp/js/blueimp-gallery.min.js"></script>
             <script>
-                document.getElementById('links').ondblclick = function (event) {
+                function gallery(event) {
                     event = event || window.event;
                     var target = event.target || event.srcElement,
                         link = target.src ? target.parentNode : target,
                         options = {index: link, event: event},
-                        links = this.getElementsByClassName('gallery-image');
+                        links = window.document.getElementsByClassName('gallery-image');
                     blueimp.Gallery(links, options);
                 };
+                var clickTimer = null;
+
+                function touchStart(event) {
+                    if (clickTimer == null) {
+                        clickTimer = setTimeout(function () {
+                            clickTimer = null;
+                        }, 500)
+                    } else {
+                        clearTimeout(clickTimer);
+                        clickTimer = null;
+                        alert("double-click");
+                        gallery(event);
+                    }
+                }
             </script>
 {#            <script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>#}
 {#            {% assets "js_libs" %}#}
