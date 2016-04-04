@@ -71,6 +71,7 @@
             <ol class="indicator"></ol>
         </div>
         {% block scripts %}
+                        <script src="{{ static_url }}js/_libs/jquery/jquery-2.2.0.min.js"></script>
             <script src="{{ static_url }}blueimp/js/blueimp-gallery.min.js"></script>
             <script>
                 function gallery(event) {
@@ -94,7 +95,11 @@
                         gallery(event);
                     }
                 }
+                $('.expand-one').click(function(){
+                    $('.content-one').slideToggle('slow');
+                });
             </script>
+
 {#            <script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>#}
 {#            {% assets "js_libs" %}#}
 {#                <script type="text/javascript" src="{{ static_url }}gen/libs.js"></script>#}
