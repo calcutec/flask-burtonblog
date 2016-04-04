@@ -3,7 +3,12 @@
         {% if post.photo %}
             {% include "full_image.html" %}
         {% else %}
-            <img src="{{ post.avatar(128) }}" class="img-polaroid" alt="profile_pic">
+            <img sizes="92.5vw" src="https://aperturus.imgix.net/img/profile.jpg?w=300&q=85&auto=format&sharp=10"
+            srcset="https://aperturus.imgix.net/img/profile.jpg?w=300&q=85&sharp=10 300w,
+            https://aperturus.imgix.net/img/profile.jpg?w=600&q=85&sharp=10 600w,
+            https://aperturus.imgix.net/img/profile.jpg?w=900&q=85&sharp=10 900w,
+            https://aperturus.imgix.net/img/profile.jpg?w=1290&q=85&sharp=10 1290w"
+            alt="{{ post.photo }}" class="main-responsive-img">
         {% endif %}
         <span onclick="" class="profile-content">
             <span>
@@ -11,16 +16,18 @@
                     {% if post.last_seen %}
                         <p><em>Last seen:{{ momentjs(post.last_seen).calendar() }}</em></p>
                     {% endif %}
-                    <p>Followers: {{ post.followers.count() }} | Following: {{ post.followed.count() }}</p>
-                    {% if post.nickname == g.user.nickname %}
-                        <a class="button button-primary" href="/members/update" >Update Info</a>
-                        <a class="button button-primary" href="/members/upload" >Change Image</a>
-                    {% endif %}
-                    {% if post.nickname != g.user.nickname %}
-                        {% if g.user.is_following(post) %}
-                            <a class="link-button" href="{{ url_for('members', category='unfollow', nickname=post.nickname) }}"><strong>Unfollow</strong></a>
-                        {% else %}
-                            <a class="link-button" href="{{ url_for('members', category='follow', nickname=post.nickname) }}"><strong>Follow</strong></a>
+                    {% if g.user.is_authenticated() %}
+                        <p>Followers: {{ post.followers.count() }} | Following: {{ post.followed.count() }}</p>
+                        {% if post.nickname == g.user.nickname %}
+                            <a class="button button-primary" href="/members/update" >Update Info</a>
+                            <a class="button button-primary" href="/members/upload" >Change Image</a>
+                        {% endif %}
+                        {% if post.nickname != g.user.nickname %}
+                            {% if g.user.is_following(post) %}
+                                <a class="link-button" href="{{ url_for('members', category='unfollow', nickname=post.nickname) }}"><strong>Unfollow</strong></a>
+                            {% else %}
+                                <a class="link-button" href="{{ url_for('members', category='follow', nickname=post.nickname) }}"><strong>Follow</strong></a>
+                            {% endif %}
                         {% endif %}
                     {% endif %}
                     <div>
