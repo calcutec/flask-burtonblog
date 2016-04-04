@@ -5,21 +5,23 @@
 {% endif %}
 <span onclick="" class="text-content">
     <span>
-        {% if post.nickname %}
-            <p>{{ post.nickname }}
-        {% endif %}
-
-        {% if post.last_seen %}
-            <p><em>Last seen: {{ momentjs(post.last_seen).calendar() }}</em></p>
-        {% endif %}
-
-        {% if post.nickname != g.user.nickname %}
-            {% if g.user.is_following(post) %}
-                <a href="{{ url_for('members', category='unfollow', nickname=post.nickname) }}"><strong>Unfollow</strong></a>
-            {% else %}
-                <a href="{{ url_for('members', category='follow', nickname=post.nickname) }}"><strong>Follow</strong></a>
+        <div class="details-well">
+            {% if post.nickname %}
+                <a class="link-button" href="/members/{{ post.nickname }}">{{ post.nickname }}</a>
             {% endif %}
-        {% endif %}
+
+            {% if post.last_seen %}
+                <p><em>Last seen: {{ momentjs(post.last_seen).calendar() }}</em></p>
+            {% endif %}
+
+            {% if post.nickname != g.user.nickname %}
+                {% if g.user.is_following(post) %}
+                    <a class="link-button" href="{{ url_for('members', category='unfollow', nickname=post.nickname) }}"><strong>Unfollow</strong></a>
+                {% else %}
+                    <a class="link-button" href="{{ url_for('members', category='follow', nickname=post.nickname) }}"><strong>Follow</strong></a>
+                {% endif %}
+            {% endif %}
+        </div>
     </span>
 </span>
 <a href="/members/{{ post.nickname }}">

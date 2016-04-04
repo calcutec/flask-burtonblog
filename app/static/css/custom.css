@@ -52,6 +52,15 @@ main {
     margin-right: 0.5vw;
     margin-bottom: 1rem;
 }
+.details-well {
+    box-shadow: 0 0 5px #888;
+    background: rgba(0,0,0,0.5);
+    padding: 1rem;
+    border-radius: 5px;
+    width: auto;
+    margin-right: 0.5vw;
+    margin-bottom: 1rem;
+}
 .home_pic {
     max-width: 35%;
     float: right;
@@ -99,6 +108,31 @@ table {
     color: white
 }
 /* Buttons */
+.link-button {
+    display: inline-block;
+    vertical-align: top;
+    width: auto;
+    font-weight: bold;
+    text-decoration: none;
+    -webkit-border-radius: 62.5rem;
+    border-radius: 62.5rem;
+    border-width: 0.0625rem;
+    border-style: solid;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    font-size: 1.5rem;
+    height: 1.875rem;
+    padding: 0 0.625rem;
+    margin-right: 0.625rem;
+    line-height: 1.75rem;
+    color: #fff;
+    background-color: #4bc6df;
+    border-color: #005689;
+}
+.link-button.red{
+    background-color: #ff0000;
+}
 .button,
     button,
     input[type="submit"],
@@ -109,7 +143,7 @@ table {
         padding: 0 1.9rem;
         color: #555;
         text-align: center;
-        font-size: 0.7rem;
+        font-size: 1.2rem;
         font-weight: 600;
         line-height: 2.5rem;
         letter-spacing: 0.1rem;
@@ -501,7 +535,7 @@ i.fa-home {
     margin-top: -3px;
 }
 i.fa-sign-in {
-    font-size: 3.2rem !important;
+    font-size: 3.4rem !important;
 }
 i.fa-sign-out {
     font-size: 3.4rem !important;

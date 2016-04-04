@@ -6,4 +6,4 @@ Dear {{ user.nickname }},
 
 Regards,
 
-The netbard admin
+ The people at thisgreatpic.com

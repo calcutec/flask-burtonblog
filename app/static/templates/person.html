@@ -7,25 +7,27 @@
         {% endif %}
         <span onclick="" class="profile-content">
             <span>
-                {% if post.last_seen %}
-                    <p><em>Last seen:{{ momentjs(post.last_seen).calendar() }}</em></p>
-                {% endif %}
-                <p>Followers: {{ post.followers.count() }} | Following: {{ post.followed.count() }}</p>
-                {% if post.nickname == g.user.nickname %}
-                    <a class="button button-primary" href="/members/update" >Update Info</a>
-                    <a class="button button-primary" href="/members/upload" >Change Image</a>
-                {% endif %}
-                {% if post.nickname != g.user.nickname %}
-                    {% if g.user.is_following(post) %}
-                        <a href="{{ url_for('members', category='unfollow', nickname=post.nickname) }}"><strong>Unfollow</strong></a>
-                    {% else %}
-                        <a href="{{ url_for('members', category='follow', nickname=post.nickname) }}"><strong>Follow</strong></a>
+                <div class="details-well">
+                    {% if post.last_seen %}
+                        <p><em>Last seen:{{ momentjs(post.last_seen).calendar() }}</em></p>
                     {% endif %}
-                {% endif %}
-                <div>
-                    {% if post.about_me %}
-                        About: {{ post.about_me }}<br>
+                    <p>Followers: {{ post.followers.count() }} | Following: {{ post.followed.count() }}</p>
+                    {% if post.nickname == g.user.nickname %}
+                        <a class="button button-primary" href="/members/update" >Update Info</a>
+                        <a class="button button-primary" href="/members/upload" >Change Image</a>
                     {% endif %}
+                    {% if post.nickname != g.user.nickname %}
+                        {% if g.user.is_following(post) %}
+                            <a class="link-button" href="{{ url_for('members', category='unfollow', nickname=post.nickname) }}"><strong>Unfollow</strong></a>
+                        {% else %}
+                            <a class="link-button" href="{{ url_for('members', category='follow', nickname=post.nickname) }}"><strong>Follow</strong></a>
+                        {% endif %}
+                    {% endif %}
+                    <div>
+                        {% if post.about_me %}
+                            About: {{ post.about_me }}<br>
+                        {% endif %}
+                    </div>
                 </div>
             </span>
         </span>
