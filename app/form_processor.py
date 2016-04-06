@@ -20,7 +20,10 @@ class FormProcessor(object):
     def get_form_template(self):
         form_template = None
         if request.is_xhr:
-            pass
+            if self.template:
+                form_template = "/assets/forms/" + self.template
+            else:
+                form_template = "/assets/forms/" + self.page.assets['category'] + "_form.html"
         else:
             if self.template:
                 form_template = "/assets/forms/" + self.template
@@ -200,8 +203,11 @@ class UploadFormProcessor(FormProcessor):
             self.form = self.process_form()
         else:
             self.get_form()
-            self.form_template = self.get_form_template()
-            self.rendered_form = self.render_form()
+            if request.is_xhr:
+                self.rendered_form = self.form
+            else:
+                self.form_template = self.get_form_template()
+                self.rendered_form = self.render_form()
 
     def get_form(self):
         if 'key' in request.args:

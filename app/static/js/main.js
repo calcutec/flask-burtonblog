@@ -10,6 +10,7 @@ App.Router.MainRouter = Backbone.Router.extend({
     routes: { // sets the routes
         'home':     'home',
         'photos/latest/':   'photos',
+        'photos/upload/':   'upload',
         'create':   'create',
         'edit/:id': 'edit', // http://netbard.com/edit/7
         'people':   'people'
@@ -18,18 +19,23 @@ App.Router.MainRouter = Backbone.Router.extend({
         console.log('now in view' + Backbone.history.location.href);
     },
     photos: function() {
-        App.Collections.photolist = new App.Collections.PhotoList();
-        App.Collections.photolist.refreshFromServer({
+        App.Collections.PhotoList.photoList = new App.Collections.PhotoList();
+        App.Collections.PhotoList.photoList.refreshFromServer({
             success: function(freshData) {
-                App.Collections.photolist.set(freshData['collection']);
-                App.Views.mainView = new App.Views.MainView({collection: App.Collections.photolist});
-                App.Views.mainView.attachToPhotoListView();
-                App.Views.mainView.attachToPhotoMainView();
+                App.Collections.PhotoList.photoList.set(freshData['collection']);
+                App.Views.mainView = new App.Views.MainView({collection: App.Collections.PhotoList.photoList, el: $('#thisgreatpic')});
+                App.Views.mainView.attachCollectionToViews();
+                //App.Views.mainView.attachToPhotoListView();
+                //App.Views.mainView.attachToPhotoMainView();
+                //App.Views.navView = new App.Views.NavView({el: $('#nav')})
             },
             fail: function(error) {
                 console.log(error);
             }
         });
+    },
+    upload: function() {
+        console.log("upload requested")
     },
     edit: function(id){
         console.log('edit route with id: ' + id);
@@ -72,23 +78,29 @@ App.Models.Photo = Backbone.Model.extend( {
 });
 
 App.Views.PhotoMainView = Backbone.View.extend({
-    initialize: function() {
-        this.model.bind('change', this.render, this);
-    },
+    //initialize: function() {
+    //    this.listenTo(this.model, 'change', this.render);
+    //},
 
     events: {
         'click a.link-button':   'memberLink',
-        'click a.detail-link':   'detailLink',
+        'click a.detail-link':   'detailLink'
     },
 
     memberLink: function(e) {
-        e.preventDefault()
+        e.preventDefault();
         console.log('member link clicked');
     },
 
     detailLink: function(e) {
-        e.preventDefault()
+        e.preventDefault();
         console.log('detail link clicked');
+    },
+
+    attachToView: function() {
+        var id = this.$el.find('img').data().id;
+        var photo = App.Collections.PhotoList.photoList.get(id);
+        this.model = photo
     },
 
     render: function() {
@@ -109,6 +121,7 @@ App.Views.PhotoListView = Backbone.View.extend({
 
     events: {
         'click a.link-button':   'memberLink',
+        'click a.detail-link':   'detailLink',
         'click .edit':   'editPost',
         'click .edit-button':   'editPost',
         'click .submit-button':   'updatePost',
@@ -120,8 +133,9 @@ App.Views.PhotoListView = Backbone.View.extend({
         console.log('member link clicked');
     },
 
-    showImage: function() {
-        console.log('button clicked');
+    detailLink: function(e) {
+        e.preventDefault();
+        console.log('detail link clicked');
     },
 
     // savePost: function(){
@@ -174,15 +188,42 @@ App.Views.PhotoListView = Backbone.View.extend({
     }
 });
 
+App.Views.ArchiveView = Backbone.View.extend({
+    attachToView: function() {
+        this.$el.children('li').each(function(){
+            var photoEl = $(this);
+            var id = photoEl.data().id;
+            var photo = App.Collections.PhotoList.photoList.get(id);
+            new App.Views.PhotoListView({
+                model: photo,
+                el: photoEl
+            });
+        });
+    },
+    render: function() {
+        var self = this;
+        _.each( this.collection.models.slice(1,7), function(model) {
+            //console.log(model.get("id"));
+            self.addOneToList(model);
+        }, this);
+    },
+    addOneToList: function (photo) {
+        var photoView = new App.Views.PhotoListView({ model: photo});
+        $('ul#img-list', this.el).append(photoView.render().el);
+    }
+});
+
 App.Views.MainView = Backbone.View.extend({
     initialize: function(options){
         _.extend(this, _.pick(options, "page_mark"));
         //this.collection.bind('change', this.renderSideMenu, this);
         //this.renderSideMenu();
         //this.render();
-        this.listenTo(this.collection, 'add', this.render, this);
+        //this.listenTo(this.collection, 'add', this.render, this);
+        //this.listenTo(this.collection, 'change', this.render, this);
     },
     events: {
+        "click i.fa-upload":   "uploadLink",
         "change #labeler" : "applyLabel",
         "click #markallread" : "markallread",
         "click #archive" : "archive",
@@ -191,57 +232,59 @@ App.Views.MainView = Backbone.View.extend({
         "click #starred": "starred",
         "keyup #search" : "search"
     },
-    render: function() {
-        this.renderMainPhoto(this.collection.last());
-        this.renderPhotoList(this.collection);
-        this.renderTitle();
+
+    uploadLink: function(e) {
+        e.preventDefault();
+        console.log('upload link clicked');
+        Backbone.history.navigate(e.target.parentElement.pathname, {trigger: true});
+        App.Views.PhotoMainView.photoMainView.remove();
+        App.Views.ArchiveView.photoArchiveView.remove();
+        App.Views.PhotoFormView.photoFormView = new App.Views.PhotoFormView
+
+        //this.collection.models.forEach(function(model){
+        //    console.log("Model in collection: " + model.get("content"));
+        //});
+        //this.collection.models.forEach(function(model){
+        //    model.save();
+        //});
     },
-    renderTitle: function(){
-        var headline = $("#headline");
-        headline.html('');
-        headline.html(
-            nunjucks.render('title.html', {'page_mark': this.page_mark})
-        );
-    },
-    renderMainPhoto: function(latestrecord){
-        $('div#photo-main', this.el).html('');
-        var photoMainView = new App.Views.PhotoMainView({el:"#photo-main", model: latestrecord});
-        $('div#photo-main', this.el).append(photoMainView.render().el);
-    },
-    renderPhotoList: function(collection){
-        var target = $('ul#img-list', this.el);
-        target.html('');
-        var self = this;
-        _.each( collection.models.slice(1,7), function(model) {
-            //console.log(model.get("id"));
-            self.addOneToList(model);
-        }, this);
-    },
-    addOneToList: function (photo) {
-        var photoView = new App.Views.PhotoListView({ model: photo});
-        $('ul#img-list', this.el).append(photoView.render().el);
-    },
-    attachToPhotoListView: function(){
-        var self = this;
-        $("#links li").each(function(){
-            var photoEl = $(this);
-            var id = photoEl.data().id;
-            var photo = self.collection.get(id);
-            new App.Views.PhotoListView({
-                model: photo,
-                el: photoEl
-            });
-        });
+    attachCollectionToViews: function(){
+        this.attachToPhotoMainView();
+        this.attachToArchiveView();
     },
     attachToPhotoMainView: function(){
-        var mainPhotoEl = $("#main-image");
-        var id = mainPhotoEl.find('img').data().id;
-        var photo = this.collection.get(id);
-        App.Views.photoMainView = new App.Views.PhotoMainView({
-            model: photo,
-            el: mainPhotoEl
-        });
+        App.Views.PhotoMainView.photoMainView = new App.Views.PhotoMainView({el: "#main-image"});
+        App.Views.PhotoMainView.photoMainView.attachToView()
+    },
+    attachToArchiveView: function(){
+        App.Views.ArchiveView.photoArchiveView = new App.Views.ArchiveView({el: "#links"})
+        App.Views.ArchiveView.photoArchiveView.attachToView()
     }
+    //render: function() {
+    //    this.renderMainPhoto(this.collection.last());
+    //    this.renderPhotoList(this.collection);
+    //    this.renderTitle();
+    //},
+    //renderTitle: function(){
+    //    var headline = $("#headline");
+    //    headline.html('');
+    //    headline.html(
+    //        nunjucks.render('title.html', {'page_mark': this.page_mark})
+    //    );
+    //},
+    //renderMainPhoto: function(latestrecord){
+    //    $('div#photo-main', this.el).html('');
+    //    App.Views.PhotoMainView.photoMainView = new App.Views.PhotoMainView({el:"#photo-main", model: latestrecord});
+    //    $('div#photo-main', this.el).append(App.Views.PhotoMainView.photoMainView.render().el);
+    //},
+    //renderPhotoList: function(collection){
+    //    App.Views.ArchiveView.photoArdhiveView = new App.Views.ArchiveView({el:'ul#img-list', collection: this.collection});
+    //
+    //},
+    //addOneToList: function (photo) {
+    //    var photoView = new App.Views.PhotoListView({ model: photo});
+    //    $('ul#img-list', this.el).append(photoView.render().el);
+    //}
     //renderSideMenu: function(){
     //    $("#summary").html(
     //        nunjucks.render('summary_template.html', {
@@ -316,7 +359,7 @@ App.Views.PhotoFormView = Backbone.View.extend({
     el: '#body-form',
     initialize: function(){
         this.render();
-        new App.Views.S3FormView();
+        App.Views.S3FormView.s3FormView = new App.Views.S3FormView();
     },
     render: function() {
         this.$el.html('');
@@ -365,7 +408,14 @@ App.Views.PhotoTextFormView = Backbone.View.extend({
 });
 
 App.Models.S3Form = Backbone.Model.extend( {
-    url: "/upload"
+    url: "/photos/upload",
+
+    /**
+     * @param {{uploadForm:string}} response
+     */
+    parse: function(response){
+        return response.uploadForm
+    }
 });
 
 
@@ -375,7 +425,15 @@ App.Views.S3FormView = Backbone.View.extend({
         this.model = new App.Models.S3Form();
         this.listenTo(this.model, 'sync', this.render);
         this.listenTo(this.model, 'destroy', this.dispose);
-        this.model.fetch();
+        this.model.fetch({
+            success: function(freshData) {
+                console.log("success")
+            },
+            fail: function(error) {
+                console.log(error);
+            }
+        });
+        var checkoutmodel = "test";
     },
     events: {
         'change #file-input': 'validateanddisplaysample',
