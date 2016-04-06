@@ -20,7 +20,8 @@
         <link rel="stylesheet" href="{{ local_static_url }}css/fonts.css">
         <link rel="stylesheet" href="{{ static_url }}css/fix.css">
         <link rel="stylesheet" href="{{ local_static_url }}css/custom.css">
-        <link rel="stylesheet" href="{{ static_url }}blueimp/css/blueimp-gallery.min.css">
+        <link rel="stylesheet" href="{{ static_url }}blueimp/css/blueimp-gallery.css">
+        <link rel="stylesheet" href="{{ static_url }}blueimp/css/blueimp-gallery-indicator.css">
 
         <script src="{{ static_url }}js/_libs/moment.min.js"></script>
 
@@ -71,34 +72,45 @@
             <ol class="indicator"></ol>
         </div>
         {% block scripts %}
-                        <script src="{{ static_url }}js/_libs/jquery/jquery-2.2.0.min.js"></script>
-            <script src="{{ static_url }}blueimp/js/blueimp-gallery.min.js"></script>
-            <script>
-                function gallery(event) {
-                    event = event || window.event;
-                    var target = event.target || event.srcElement,
-                        link = target.src ? target.parentNode : target,
-                        options = {index: link, event: event},
-                        links = window.document.getElementsByClassName('gallery-image');
-                    blueimp.Gallery(links, options);
-                };
-                var clickTimer = null;
-
-                function touchStart(event) {
-                    if (clickTimer == null) {
-                        clickTimer = setTimeout(function () {
-                            clickTimer = null;
-                        }, 500)
-                    } else {
-                        clearTimeout(clickTimer);
-                        clickTimer = null;
-                        gallery(event);
-                    }
-                }
-                $('.expand-one').click(function(){
-                    $('.content-one').slideToggle('slow');
-                });
-            </script>
+            <script src="{{ local_static_url }}js/_libs/jquery/jquery-2.2.2.js"></script>
+            <script src="{{ static_url }}blueimp/js/blueimp-helper.js"></script>
+            <script src="{{ static_url }}blueimp/js/blueimp-gallery.js"></script>
+            <script src="{{ static_url }}blueimp/js/blueimp-gallery-fullscreen.js"></script>
+            <script src="{{ static_url }}blueimp/js/blueimp-gallery-indicator.js"></script>
+            <script src="{{ static_url }}js/_libs/nunjucks.js"></script>
+            <script src="{{ static_url }}js/_libs/canvas-to-blob.min.js"></script>
+            <script src="{{ static_url }}js/_libs/load-image.all.min.js"></script>
+            <script src="{{ static_url }}js/_libs/backbone/underscore.js"></script>
+            <script src="{{ static_url }}js/_libs/backbone/backbone.js"></script>
+            <script src="{{ static_url }}js/_libs/backbone/backbone.localStorage-min.js"></script>
+            <script src="{{ static_url }}js/data.js"></script>
+            <script src="{{ local_static_url }}js/main.js"></script>
+{#            <script>#}
+{#                function gallery(event) {#}
+{#                    event = event || window.event;#}
+{#                    var target = event.target || event.srcElement,#}
+{#                        link = target.src ? target.parentNode : target,#}
+{#                        options = {index: link, event: event},#}
+{#                        links = window.document.getElementsByClassName('gallery-image');#}
+{#                    blueimp.Gallery(links, options);#}
+{#                };#}
+{#                var clickTimer = null;#}
+{##}
+{#                function touchStart(event) {#}
+{#                    if (clickTimer == null) {#}
+{#                        clickTimer = setTimeout(function () {#}
+{#                            clickTimer = null;#}
+{#                        }, 500)#}
+{#                    } else {#}
+{#                        clearTimeout(clickTimer);#}
+{#                        clickTimer = null;#}
+{#                        gallery(event);#}
+{#                    }#}
+{#                }#}
+{#                $('.expand-one').click(function(){#}
+{#                    $('.content-one').slideToggle('slow');#}
+{#                });#}
+{#            </script>#}
 
 {#            <script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>#}
 {#            {% assets "js_libs" %}#}
@@ -107,15 +119,7 @@
 {#            {% assets "js_app" %}#}
 {#                <script type="text/javascript" src="{{ static_url }}gen/app.js"></script>#}
 {#            {% endassets %}#}
-{#            <script src="{{ static_url }}js/_libs/jquery/jquery-2.2.0.min.js"></script>#}
-{#            <script src="{{ static_url }}js/_libs/nunjucks.js"></script>#}
-{#            <script src="{{ static_url }}js/_libs/canvas-to-blob.min.js"></script>#}
-{#            <script src="{{ static_url }}js/_libs/load-image.all.min.js"></script>#}
-{#            <script src="{{ static_url }}js/_libs/backbone/underscore.js"></script>#}
-{#            <script src="{{ static_url }}js/_libs/backbone/backbone.js"></script>#}
-{#            <script src="{{ static_url }}js/_libs/backbone/backbone.localStorage-min.js"></script>#}
-{#            <script src="{{ static_url }}js/data.js"></script>#}
-{#            <script src="{{ static_url }}js/main.js"></script>#}
+
         {% endblock %}
 	</body>
 </html>

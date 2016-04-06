@@ -15,7 +15,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 @app.route('/', methods=['GET'])
 @app.route('/home/', methods=['GET'])
-@app.route('/photos/', methods=['GET'])
+# @app.route('/photos/', methods=['GET'])
 def home():
     if current_user.is_authenticated():
         return redirect(url_for('photos', category="latest"))

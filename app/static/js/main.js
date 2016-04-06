@@ -2,13 +2,14 @@ window.App = {
   Models: {},
   Collections: {},
   Views: {},
-  Router: {}
+  Router: {},
+  Data: {}
 };
 
 App.Router.MainRouter = Backbone.Router.extend({
     routes: { // sets the routes
         'home':     'home',
-        'photos':   'photos',
+        'photos/latest/':   'photos',
         'create':   'create',
         'edit/:id': 'edit', // http://netbard.com/edit/7
         'people':   'people'
@@ -46,10 +47,6 @@ App.Views.LoginFormView = Backbone.View.extend({
     render: function() {
         this.$el.html(nunjucks.render("assets/forms/login_form.html"));
         return this;
-    },
-
-    unrender: function(){
-        $(this.el).remove();
     }
 });
 
@@ -71,12 +68,27 @@ App.Models.Photo = Backbone.Model.extend( {
         if (!attrs.body){
             alert('Your post must have a story');
         }
-    },
+    }
 });
 
 App.Views.PhotoMainView = Backbone.View.extend({
     initialize: function() {
         this.model.bind('change', this.render, this);
+    },
+
+    events: {
+        'click a.link-button':   'memberLink',
+        'click a.detail-link':   'detailLink',
+    },
+
+    memberLink: function(e) {
+        e.preventDefault()
+        console.log('member link clicked');
+    },
+
+    detailLink: function(e) {
+        e.preventDefault()
+        console.log('detail link clicked');
     },
 
     render: function() {
@@ -89,67 +101,51 @@ App.Views.PhotoListView = Backbone.View.extend({
     tagName: "li",
     initialize: function() {
         this.model.bind('change', this.render, this);
+        console.log('model created');
         //this.listenTo(this.model, "change", this.savePost); // calls render function once name changed
         //this.listenTo(this.model, "destroy", this.removejunk); // calls remove function once model deleted
         //this.listenTo(this.model, "removeMe", this.removejunk); // calls remove function once model deleted
     },
 
     events: {
-        'click img':   'showImage',
+        'click a.link-button':   'memberLink',
         'click .edit':   'editPost',
         'click .edit-button':   'editPost',
         'click .submit-button':   'updatePost',
-        'click .delete-button': 'deletePost',
+        'click .delete-button': 'deletePost'
+    },
+
+    memberLink: function(e) {
+        e.preventDefault()
+        console.log('member link clicked');
     },
 
     showImage: function() {
-        alert('image clicked!');
+        console.log('button clicked');
     },
 
-    savePost: function(){
-        this.model.save(null, {
-            success: function (model, response) {
-                if (response.updatedsuccess == true){
-                    return response;
-                }
-                if (response.savedsuccess == true){
-                    new App.Views.Photo({model:model}).render();
-                    this.remove();
-                    return response;
-                }
-                return response;
-            },
-            error: function () {
-                alert('your poem did not save properly..')
-            },
-            wait: true
-        });
-    },
+    // savePost: function(){
+    //     this.model.save(null, {
+    //         success: function (model, response) {
+    //             if (response.updatedsuccess == true){
+    //                 return response;
+    //             }
+    //             if (response.savedsuccess == true){
+    //                 new App.Views.Photo({model:model}).render();
+    //                 this.remove();
+    //                 return response;
+    //             }
+    //             return response;
+    //         },
+    //         error: function () {
+    //             alert('your poem did not save properly..')
+    //         },
+    //         wait: true
+    //     });
+    // },
+    
     editPost: function(e){
         e.preventDefault();
-        if (!App.Views.Photo.editable) {
-            var $target = $(e.target);
-            $target.closest("article").find(".edit-me").addClass('edit-selected');
-            var editSelected = $('.edit-selected');
-            App.Views.Photo.currentwysihtml5 = editSelected.wysihtml5({
-                toolbar: {
-                    "style": true,
-                    "font-styles": true,
-                    "emphasis": true,
-                    "lists": true,
-                    "html": false,
-                    "link": false,
-                    "image": false,
-                    "color": false,
-                    fa: true
-                }
-            });
-            $target.closest("article").find('.edit-button').html("Submit Changes").attr('class', 'submit-button')
-                .css({'color':'red', 'style':'bold'});
-            editSelected.css({"border": "2px #2237ff dotted"});
-            editSelected.attr('contenteditable', false);
-            App.Views.Photo.editable = true;
-        }
     },
     updatePost: function(e){
         e.preventDefault();
@@ -164,14 +160,14 @@ App.Views.PhotoListView = Backbone.View.extend({
           }
         });
     },
-    removejunk: function(){
-        // same as this.$el.remove();
-        this.remove();
-        // unbind events that are set on this view
-        this.off();
-        // remove all models bindings made by this view
-        this.model.off( null, null, this );
-    },
+    // removejunk: function(){
+    //     // same as this.$el.remove();
+    //     this.remove();
+    //     // unbind events that are set on this view
+    //     this.off();
+    //     // remove all models bindings made by this view
+    //     this.model.off( null, null, this );
+    // },
     render: function() {
         this.$el.html(nunjucks.render("archive_entry.html", this.model.toJSON()));
         return this;
@@ -201,8 +197,9 @@ App.Views.MainView = Backbone.View.extend({
         this.renderTitle();
     },
     renderTitle: function(){
-        $("#headline").html('')
-        $("#headline").html(
+        var headline = $("#headline");
+        headline.html('');
+        headline.html(
             nunjucks.render('title.html', {'page_mark': this.page_mark})
         );
     },
@@ -226,7 +223,7 @@ App.Views.MainView = Backbone.View.extend({
     },
     attachToPhotoListView: function(){
         var self = this;
-        $("ul#img-list li").each(function(){
+        $("#links li").each(function(){
             var photoEl = $(this);
             var id = photoEl.data().id;
             var photo = self.collection.get(id);
@@ -237,8 +234,8 @@ App.Views.MainView = Backbone.View.extend({
         });
     },
     attachToPhotoMainView: function(){
-        var mainPhotoEl = $("#photo-main");
-        var id = mainPhotoEl.find('img').data().id
+        var mainPhotoEl = $("#main-image");
+        var id = mainPhotoEl.find('img').data().id;
         var photo = this.collection.get(id);
         App.Views.photoMainView = new App.Views.PhotoMainView({
             model: photo,
@@ -265,12 +262,15 @@ App.Collections.PhotoList = Backbone.Collection.extend({
         return Backbone.ajaxSync('read', this, options);
     },
 
+    /**
+     * @param {{myPhotos:string}} response
+     */
     parse: function(response){
         return response.myPhotos
     },
-    unread: function() {
-        return _(this.filter( function(photo) { return !photo.get('read');} ) );
-    },
+    // unread: function() {
+    //     return _(this.filter( function(photo) { return !photo.get('read');} ) );
+    // },
 
     inbox: function(){
         return _(this.filter( function(photo) { return !photo.get('archived');}));
@@ -280,17 +280,17 @@ App.Collections.PhotoList = Backbone.Collection.extend({
         return _(this.filter( function(photo) { return photo.get('star');}));
     },
 
-    unread_count: function() {
-        return (this.filter ( function(photo) { return !photo.get('read');})).length;
-    },
+    // unread_count: function() {
+    //     return (this.filter ( function(photo) { return !photo.get('read');})).length;
+    // },
 
-    labelled:function(label){
-        return _(this.filter( function(photo) { return label in photo.get('label') } ));
-    },
+    // labelled:function(label){
+    //     return _(this.filter( function(photo) { return label in photo.get('label') } ));
+    // },
 
-    starcount: function(){
-        return (this.filter( function(photo) { return photo.get('star')})).length;
-    },
+    // starcount: function(){
+    //     return (this.filter( function(photo) { return photo.get('star')})).length;
+    // },
 
     search: function(word){
         if (word=="") return this;
@@ -300,12 +300,12 @@ App.Collections.PhotoList = Backbone.Collection.extend({
             return pat.test(photo.get('subject')) || pat.test(photo.get('sender')); }));
     },
 
-    byauthor: function (author_id) {
-       var filtered = this.filter(function (post) {
-           return photo.get("author") === author_id;
-       });
-       return new App.Collections.PhotoList(filtered);
-    },
+    // byauthor: function (author_id) {
+    //    var filtered = this.filter(function (post) {
+    //        return photo.get("author") === author_id;
+    //    });
+    //    return new App.Collections.PhotoList(filtered);
+    // },
 
     comparator: function(photo){
         return photo.get('timestamp');
@@ -339,7 +339,7 @@ App.Views.PhotoTextFormView = Backbone.View.extend({
     postnewentry: function(e) {
         e.preventDefault();
         var newPostModel = new App.Models.Photo(this.$el.find('form').serializeObject());
-        if (currentFile === null){
+        if (App.Data.currentFile === null){
             alert("file upload has failed")
         } else {
             var photo = window.uploadedfilename;
@@ -347,7 +347,7 @@ App.Views.PhotoTextFormView = Backbone.View.extend({
         }
         newPostModel.save(null, {
             success: function (model, response) {
-                window.photolist.add(model);
+                App.Collections.photolist.add(model);
                 return response;
             },
             error: function () {
@@ -365,7 +365,7 @@ App.Views.PhotoTextFormView = Backbone.View.extend({
 });
 
 App.Models.S3Form = Backbone.Model.extend( {
-    url: "/upload",
+    url: "/upload"
 });
 
 
@@ -399,7 +399,7 @@ App.Views.S3FormView = Backbone.View.extend({
     capturesubmit: function(e) {
         e.preventDefault();
         var fd = new FormData();
-        window.uploadedfilename = 'user-images/' + (new Date).getTime() + '-' + currentFile.name;
+        window.uploadedfilename = 'user-images/' + (new Date).getTime() + '-' + App.Data.currentFile.name;
         fd.append('key', window.uploadedfilename);
         fd.append('acl', this.model.get('acl'));
         fd.append('policy', this.model.get('policy'));
@@ -408,23 +408,26 @@ App.Views.S3FormView = Backbone.View.extend({
         fd.append('x-amz-credential', this.model.get('x-amz-credential'));
         fd.append('x-amz-date', this.model.get('x-amz-date'));
         fd.append('x-amz-signature',this.model.get('x-amz-signature'));
-        if (typeof(serverBlob) !== "undefined") {
-            fd.append('file', serverBlob);
+        if (typeof(App.Data.serverBlob) !== "undefined") {
+            fd.append('file', App.Data.serverBlob);
         } else {
-            fd.append('file', currentFile);
+            fd.append('file', App.Data.currentFile);
         }
 
+        /**
+         * @param {{total:string}} e
+         */
         var xhr = new XMLHttpRequest();
         xhr.upload.addEventListener('progress',function(e){
             $( "#progress-bar").html(e.loaded+" of "+e.total+" bytes loaded");
         }, false);
 
         var self=this;
-        xhr.onreadystatechange = function(e){
+        xhr.onreadystatechange = function(){
             if(xhr.readyState == 4){
                 if(xhr.status == 200){
                     self.model.destroy();
-                    $('#exif').hide()
+                    $('#exif').hide();
                     new App.Views.PhotoTextFormView();
                 } else {
                     console.log(xhr.statusText);
@@ -439,13 +442,13 @@ App.Views.S3FormView = Backbone.View.extend({
     validateanddisplaysample: function(e) {
         e.preventDefault();
         //Get reference of FileUpload.
-        var fileUpload = this.$el.find("#file-input")
+        var fileUpload = this.$el.find("#file-input");
         //Check whether the file is valid Image.
         var regex = new RegExp("([a-zA-Z0-9\s_\\.\-:])+(.jpg|.png|.jpeg)$");
         if (regex.test(fileUpload.val().toLowerCase())) {
             //Check whether HTML5 is supported.
             if (fileUpload.prop('files') != "undefined") {
-                currentFile = e.target.files[0];
+                App.Data.currentFile = e.target.files[0];
                 //Initiate the FileReader object.
                 var reader = new FileReader();
                 //Read the contents of Image File.
@@ -460,15 +463,15 @@ App.Views.S3FormView = Backbone.View.extend({
                     image.onload = function () {
                         var height = this.height;
                         var width = this.width;
-                        var size = currentFile.size;
+                        var size = App.Data.currentFile.size;
                         if (width < 648 || height < 432) {
                             alert("Images must be at least 648px in width and 432px in height");
                             return false;
                         } else {
-                            self.generateUploadFormThumb(self, currentFile);
+                            self.generateUploadFormThumb(self, App.Data.currentFile);
                         }
                         if (height > 4896 || width > 4896 || size > 2000000) {
-                            self.generateServerFile(currentFile);
+                            self.generateServerFile(App.Data.currentFile);
                         }
                     };
                 }
@@ -482,16 +485,16 @@ App.Views.S3FormView = Backbone.View.extend({
         }
     },
 
-    generateUploadFormThumb: function(self, currentFile){
+    generateUploadFormThumb: function(self, nowCurrentFile){
         loadImage(
-           currentFile,
+           nowCurrentFile,
            function (img) {
                if(img.type === "error") {
-                   alert("Error loading image " + currentFile);
+                   alert("Error loading image " + nowCurrentFile);
                    return false;
                } else {
-                   self.replaceResults(img, currentFile);
-                   loadImage.parseMetaData(currentFile, function (data) {
+                   self.replaceResults(img, nowCurrentFile);
+                   loadImage.parseMetaData(nowCurrentFile, function (data) {
                        if (data.exif) {
                            self.displayExifData(data.exif);
                        }
@@ -502,17 +505,17 @@ App.Views.S3FormView = Backbone.View.extend({
         );
     },
 
-    generateServerFile: function(currentFile){
+    generateServerFile: function(nowCurrentFile){
         loadImage(
-            currentFile,
+            nowCurrentFile,
             function (img) {
                 if(img.type === "error") {
-                    console.log("Error loading image " + currentFile);
+                    console.log("Error loading image " + nowCurrentFile);
                 } else {
                     if (img.toBlob) {
                         img.toBlob(
                             function (blob) {
-                                serverBlob = blob
+                                App.Data.serverBlob = blob
 
                             },
                             'image/jpeg'
@@ -524,7 +527,7 @@ App.Views.S3FormView = Backbone.View.extend({
         );
     },
 
-    replaceResults: function (img, currentFile) {
+    replaceResults: function (img) {
         var content;
         if (!(img.src || img instanceof HTMLCanvasElement)) {
           content = $('<span>Loading image file failed</span>')

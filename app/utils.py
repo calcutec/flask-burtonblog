@@ -97,9 +97,15 @@ class BasePage(object):
         return asset
 
     def render(self):
-        context = {'assets': self.assets}
-        page = render_template("base.html", **context)
-        return page
+        if request.is_xhr:
+            response = dict()
+            response['success'] = True
+            response['collection'] = self.assets['collection']
+            return json.dumps(response)
+        else:
+            context = {'assets': self.assets}
+            page = render_template("base.html", **context)
+            return page
 
     def __str__(self):
         return "%s has %s posts" % (self.assets['title'], self.posts.count())
@@ -126,7 +132,8 @@ class PhotoPage(BasePage):
                 self.vote()
         elif self.assets['entity'] == "photos":
             if request.is_xhr:
-                self.assets['collection'] = self.get_asset(context=[i.json_view() for i in self.posts])
+                # self.assets['collection'] = self.get_asset(context=[i.json_view() for i in self.posts])
+                self.assets['collection'] = [i.json_view() for i in self.posts]
             else:
                 main_photo_context = {'post': self.posts[0]}
                 archive_photos_context = {'posts': self.posts[1:]}
