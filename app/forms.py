@@ -107,25 +107,24 @@ class ContactForm(Form):
 
 
 class UploadForm(object):
-    def __init__(self, key, message):
+    def __init__(self, key=None, message=None, prefix=None, redirect_url=None):
         self.access_key = app.config['AWS_ACCESS_KEY_ID']
         self.secret_key = app.config['AWS_SECRET_ACCESS_KEY']
         self.region = app.config['S3_REGION']
         self.bucket = 'aperturus'
         self.key = key
         self.message = message
-        self.prefix = None
-        self.target_url = request.base_url
+        self.prefix = prefix
+        self.redirect_url = redirect_url
 
     def s3_upload_form(self):
-        assert (self.key is not None) or (self.prefix is not None)
-        if (self.key is not None) and (self.prefix is not None):
-            assert self.key.startswith(self.prefix)
+        # assert (self.key is not None) or (self.prefix is not None)
+        # if (self.key is not None) and (self.prefix is not None):
+        #     assert self.key.startswith(self.prefix)
         now = datetime.utcnow()
         form = {
             'acl': 'private',
             'success_action_status': '200',
-            'success_action_redirect': self.target_url,
             'x-amz-algorithm': 'AWS4-HMAC-SHA256',
             'x-amz-credential': '{}/{}/{}/s3/aws4_request'.format(self.access_key, now.strftime('%Y%m%d'), self.region),
             'x-amz-date': now.strftime('%Y%m%dT000000Z'),
@@ -138,7 +137,6 @@ class UploadForm(object):
                 {'acl': 'private'},
                 ['content-length-range', 32, 10485760],
                 {'success_action_status': form['success_action_status']},
-                {'success_action_redirect': form['success_action_redirect']},
                 {'x-amz-algorithm': form['x-amz-algorithm']},
                 {'x-amz-credential': form['x-amz-credential']},
                 {'x-amz-date': form['x-amz-date']},
@@ -158,6 +156,12 @@ class UploadForm(object):
             policy['conditions'].append(
                 ["starts-with", "$key", self.prefix],
             )
+        if self.redirect_url is not None:
+            form['success_action_redirect'] = self.redirect_url
+            policy['conditions'].append(
+                {"success_action_redirect": self.redirect_url},
+            )
+
         form['policy'] = b64encode(json.dumps(policy))
         form['x-amz-signature'] = self.sign(self.secret_key, now, self.region, 's3', form['policy'])
         form['message'] = self.message

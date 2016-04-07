@@ -224,13 +224,19 @@ class UploadFormProcessor(FormProcessor):
                 self.form.nickname.data = g.user.nickname
                 self.template = "update_photo.html"
         else:
-            if request.endpoint == "photos":
-                key = "user-images/" + str(g.user.id) + "/" + str(uuid4()) + ".jpeg"
-                message = "Select New Photo"
+            if request.is_xhr:
+                if request.endpoint == "photos":
+                    self.form = UploadForm(prefix="").s3_upload_form()
             else:
-                key = "user-images/" + str(g.user.id) + "/profile_image/" + str(uuid4()) + ".jpeg"
-                message = "Change Profile Picture"
-            self.form = UploadForm(key, message).s3_upload_form()
+                if request.endpoint == "photos":
+                    key = "user-images/" + str(g.user.id) + "/" + str(uuid4()) + ".jpeg"
+                    message = "Select New Photo"
+                    redirect_url = request.base_url
+                else:
+                    key = "user-images/" + str(g.user.id) + "/profile_image/" + str(uuid4()) + ".jpeg"
+                    message = "Change Profile Picture"
+                    redirect_url = request.base_url
+                self.form = UploadForm(key=key, message=message, redirect_url=redirect_url).s3_upload_form()
 
     def process_form(self):
         if self.form.validate_on_submit():

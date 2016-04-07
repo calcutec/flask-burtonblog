@@ -23,8 +23,8 @@ App.Router.MainRouter = Backbone.Router.extend({
         App.Collections.PhotoList.photoList.refreshFromServer({
             success: function(freshData) {
                 App.Collections.PhotoList.photoList.set(freshData['collection']);
-                App.Views.mainView = new App.Views.MainView({collection: App.Collections.PhotoList.photoList, el: $('#thisgreatpic')});
-                App.Views.mainView.attachCollectionToViews();
+                App.Views.MainView.mainView = new App.Views.MainView({collection: App.Collections.PhotoList.photoList, el: $('#thisgreatpic')});
+                App.Views.MainView.mainView.attachCollectionToViews();
                 //App.Views.mainView.attachToPhotoListView();
                 //App.Views.mainView.attachToPhotoMainView();
                 //App.Views.navView = new App.Views.NavView({el: $('#nav')})
@@ -57,7 +57,7 @@ App.Views.LoginFormView = Backbone.View.extend({
 });
 
 App.Models.Photo = Backbone.Model.extend( {
-    url: "/photos",
+    url: "/photos/",
     defaults: {
         photoid: '',
         author: '',
@@ -96,7 +96,11 @@ App.Views.PhotoMainView = Backbone.View.extend({
         e.preventDefault();
         console.log('detail link clicked');
     },
-
+    dispose: function() {
+        this.remove();
+        this.off();
+        this.model.off( null, null, this );
+    },
     attachToView: function() {
         var id = this.$el.find('img').data().id;
         var photo = App.Collections.PhotoList.photoList.get(id);
@@ -104,7 +108,8 @@ App.Views.PhotoMainView = Backbone.View.extend({
     },
 
     render: function() {
-        this.$el.html(nunjucks.render("main_entry.html", {'photo': this.model.get('photo')}));
+        var post = this.model.toJSON();
+        this.$el.html(nunjucks.render("main_entry.html", {'post': post }));
         return this;
     }
 });
@@ -200,6 +205,10 @@ App.Views.ArchiveView = Backbone.View.extend({
             });
         });
     },
+    dispose: function() {
+        this.remove();
+        this.off();
+    },
     render: function() {
         var self = this;
         _.each( this.collection.models.slice(1,7), function(model) {
@@ -219,7 +228,7 @@ App.Views.MainView = Backbone.View.extend({
         //this.collection.bind('change', this.renderSideMenu, this);
         //this.renderSideMenu();
         //this.render();
-        //this.listenTo(this.collection, 'add', this.render, this);
+        this.listenTo(this.collection, 'add', this.render, this);
         //this.listenTo(this.collection, 'change', this.render, this);
     },
     events: {
@@ -237,16 +246,9 @@ App.Views.MainView = Backbone.View.extend({
         e.preventDefault();
         console.log('upload link clicked');
         Backbone.history.navigate(e.target.parentElement.pathname, {trigger: true});
-        App.Views.PhotoMainView.photoMainView.remove();
-        App.Views.ArchiveView.photoArchiveView.remove();
+        App.Views.PhotoMainView.photoMainView.dispose();
+        App.Views.ArchiveView.photoArchiveView.dispose();
         App.Views.PhotoFormView.photoFormView = new App.Views.PhotoFormView
-
-        //this.collection.models.forEach(function(model){
-        //    console.log("Model in collection: " + model.get("content"));
-        //});
-        //this.collection.models.forEach(function(model){
-        //    model.save();
-        //});
     },
     attachCollectionToViews: function(){
         this.attachToPhotoMainView();
@@ -259,28 +261,27 @@ App.Views.MainView = Backbone.View.extend({
     attachToArchiveView: function(){
         App.Views.ArchiveView.photoArchiveView = new App.Views.ArchiveView({el: "#links"})
         App.Views.ArchiveView.photoArchiveView.attachToView()
-    }
-    //render: function() {
-    //    this.renderMainPhoto(this.collection.last());
-    //    this.renderPhotoList(this.collection);
-    //    this.renderTitle();
-    //},
-    //renderTitle: function(){
+    },
+    render: function() {
+       this.renderMainPhoto(this.collection.last());
+       // this.renderPhotoList(this.collection);
+       // this.renderTitle();
+    },
+    // renderTitle: function(){
     //    var headline = $("#headline");
     //    headline.html('');
     //    headline.html(
     //        nunjucks.render('title.html', {'page_mark': this.page_mark})
     //    );
-    //},
-    //renderMainPhoto: function(latestrecord){
-    //    $('div#photo-main', this.el).html('');
-    //    App.Views.PhotoMainView.photoMainView = new App.Views.PhotoMainView({el:"#photo-main", model: latestrecord});
-    //    $('div#photo-main', this.el).append(App.Views.PhotoMainView.photoMainView.render().el);
-    //},
-    //renderPhotoList: function(collection){
-    //    App.Views.ArchiveView.photoArdhiveView = new App.Views.ArchiveView({el:'ul#img-list', collection: this.collection});
-    //
-    //},
+    // },
+    renderMainPhoto: function(latestrecord){
+        App.Views.PhotoMainView.photoMainView = new App.Views.PhotoMainView({el:"#photo-main", model: latestrecord});
+        App.Views.PhotoMainView.photoMainView.render()
+    },
+    renderPhotoList: function(collection){
+       App.Views.ArchiveView.photoArchiveView = new App.Views.ArchiveView({el:'ul#img-list', collection: this.collection});
+
+    },
     //addOneToList: function (photo) {
     //    var photoView = new App.Views.PhotoListView({ model: photo});
     //    $('ul#img-list', this.el).append(photoView.render().el);
@@ -388,10 +389,11 @@ App.Views.PhotoTextFormView = Backbone.View.extend({
             var photo = window.uploadedfilename;
             newPostModel.set({'photo': photo});
         }
+        var self = this;
         newPostModel.save(null, {
             success: function (model, response) {
-                App.Collections.photolist.add(model);
-                return response;
+                App.Views.PhotoFormView.photoFormView.remove()
+                App.Collections.PhotoList.photoList.add(model.toJSON());
             },
             error: function () {
                 alert('your poem did not save properly..')
@@ -401,8 +403,10 @@ App.Views.PhotoTextFormView = Backbone.View.extend({
     },
     render: function() {
         var csrfToken = $('meta[name=csrf-token]').attr('content');
+        var form = {};
+        form['photo'] = window.uploadedfilename;
         this.$el.html(nunjucks.render('/assets/forms/photo_text_form.html',
-            { "csrf_token": csrfToken }));
+            { "csrf_token": csrfToken, "form": form }));
         return this;
     }
 });
@@ -486,7 +490,7 @@ App.Views.S3FormView = Backbone.View.extend({
                 if(xhr.status == 200){
                     self.model.destroy();
                     $('#exif').hide();
-                    new App.Views.PhotoTextFormView();
+                    App.Views.PhotoTextFormView.photoTextFormView = new App.Views.PhotoTextFormView();
                 } else {
                     console.log(xhr.statusText);
                 }
