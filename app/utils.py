@@ -116,7 +116,8 @@ class PhotoPage(BasePage):
             if request.is_xhr:
                 pass
             else:
-                home_context = {'post': self.posts[0]}
+                # home_context = {'post': self.posts[0]}
+                home_context = {'hello': "hello world"}
                 self.assets['main_entry'] = self.get_asset(template="home_page.html", context=home_context)
         elif self.assets['entity'] == "photo":
             main_photo_context = {'post': self.posts[0]}
