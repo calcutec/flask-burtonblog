@@ -82,7 +82,7 @@ class BasePage(object):
             posts = Post.query.filter_by(**posts_dict['filter']).order_by(Post.timestamp.desc())
 
         if self.assets['category'] == "latest":
-            self.posts = posts[0:6]
+            self.posts = posts[0:10]
         else:
             self.posts = posts
 
