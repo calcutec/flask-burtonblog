@@ -9,7 +9,7 @@ window.App = {
 App.Router.MainRouter = Backbone.Router.extend({
     routes: { // sets the routes
         'home':     'home',
-        'photos/latest/':   'photos',
+        // 'photos/latest/':   'photos',
         'photos/upload/':   'upload',
         'create':   'create',
         'edit/:id': 'edit', // http://netbard.com/edit/7
@@ -46,6 +46,14 @@ App.Router.MainRouter = Backbone.Router.extend({
     },
     people: function() {
         console.log('now in view' + Backbone.history.location.href);
+    }
+});
+
+
+App.Views.ImagePreviewView = Backbone.View.extend({
+    render: function() {
+        this.$el.html(nunjucks.render("assets/forms/login_form.html"));
+        return this;
     }
 });
 
