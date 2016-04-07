@@ -36,7 +36,7 @@ app.add_url_rule('/signup/', view_func=signup_api_view, methods=["GET", "POST"])
 
 class LoginAPI(MethodView):
     def post(self):
-        page = LoginPage(form=LoginForm())
+        page = LoginPage(form=LoginForm(), category="login")
         if page.assets['body_form']:
             return page.render()
         else:
@@ -234,6 +234,7 @@ def not_found_error(error):
 def internal_error(error):
     db.session.rollback()
     return render_template('500.html', error=error), 500
+
 
 def redirect_url(default='photos'):
     return request.args.get('next') or \
