@@ -1,7 +1,7 @@
 {% include "archive_image.html" %}
 {#<span onclick="touchStart(event)" class="text-content">#}
 <span class="text-content">
-    <span>
+    <span class="inner-span">
         <div class="details-well">
             <a class="link-button" href="{{ url_for('members', nickname=post.author.nickname) }}" rel="tag">{{ post.author.nickname }}</a><br>
             <b>{{ post.timestamp.strftime('%d %b %Y') }}</b><br>
@@ -13,6 +13,7 @@
                     {% endwith %}
                 </a>
             {% endif %}
+            <a href="#" class="link-button gallery">Gallery</a>
         </div>
     </span>
 </span>

@@ -8,12 +8,12 @@ window.App = {
 
 App.Router.MainRouter = Backbone.Router.extend({
     routes: { // sets the routes
-        'home':     'home',
-        // 'photos/latest/':   'photos',
+        '':     'home',
+        'photos/latest/':   'photos',
         'photos/upload/':   'upload',
-        'create':   'create',
-        'edit/:id': 'edit', // http://netbard.com/edit/7
-        'people':   'people'
+        // 'create':   'create',
+        // 'edit/:id': 'edit', // http://netbard.com/edit/7
+        // 'people':   'people'
     },
     home: function() {
         console.log('now in view' + Backbone.history.location.href);
@@ -35,18 +35,228 @@ App.Router.MainRouter = Backbone.Router.extend({
         });
     },
     upload: function() {
-        console.log("upload requested")
-    },
-    edit: function(id){
-        console.log('edit route with id: ' + id);
-    },
-    create: function(){
-        console.log('now in view' + Backbone.history.location.href);
-        App.Views.PhotoFormView.photoFormView = new App.Views.PhotoFormView();
-    },
-    people: function() {
-        console.log('now in view' + Backbone.history.location.href);
+        console.log("upload requested");
+        // App.Views.ImagePreviewView.imagePreviewView = new App.Views.ImagePreviewView();
+        // var testload = "testload";
+        App.Views.PreviewFormView.previewFormView = new App.Views.PreviewFormView({el: "#image-preview"});
     }
+});
+
+
+App.Views.PreviewFormView = Backbone.View.extend({
+    events: {
+    'change #file-input': 'loadPreviewImage',
+    },
+
+    dispose: function() {
+            // same as this.$el.remove();
+        this.remove();
+
+        // unbind events that are
+        // set on this view
+        this.off();
+
+        // remove all models bindings
+        // made by this view
+        this.model.off( null, null, this );
+
+    },
+
+    capturesubmit: function(e) {
+        e.preventDefault();
+        var fd = new FormData();
+        window.uploadedfilename = 'user-images/' + (new Date).getTime() + '-' + App.Data.currentFile.name;
+        fd.append('key', window.uploadedfilename);
+        fd.append('acl', this.model.get('acl'));
+        fd.append('policy', this.model.get('policy'));
+        fd.append('success_action_status', this.model.get('success_action_status'));
+        fd.append('x-amz-algorithm', this.model.get('x-amz-algorithm'));
+        fd.append('x-amz-credential', this.model.get('x-amz-credential'));
+        fd.append('x-amz-date', this.model.get('x-amz-date'));
+        fd.append('x-amz-signature',this.model.get('x-amz-signature'));
+        if (typeof(App.Data.serverBlob) !== "undefined") {
+            fd.append('file', App.Data.serverBlob);
+        } else {
+            fd.append('file', App.Data.currentFile);
+        }
+
+        /**
+         * @param {{total:string}} e
+         */
+        var xhr = new XMLHttpRequest();
+        xhr.upload.addEventListener('progress',function(e){
+            $( "#progress-bar").html(e.loaded+" of "+e.total+" bytes loaded");
+        }, false);
+
+        var self=this;
+        xhr.onreadystatechange = function(){
+            if(xhr.readyState == 4){
+                if(xhr.status == 200){
+                    self.model.destroy();
+                    $('#exif').hide();
+                    App.Views.PhotoTextFormView.photoTextFormView = new App.Views.PhotoTextFormView();
+                } else {
+                    console.log(xhr.statusText);
+                }
+
+            }
+        };
+        xhr.open('POST', 'https://aperturus.s3.amazonaws.com/', true);
+        xhr.send(fd);
+    },
+
+    loadPreviewImage: function(e) {
+        e.preventDefault();
+        //Get reference of FileUpload.
+        var fileUpload = this.$el.find("#file-input");
+        //Check whether the file is valid Image.
+        var regex = new RegExp("([a-zA-Z0-9\s_\\.\-:])+(.jpg|.png|.jpeg)$");
+        if (regex.test(fileUpload.val().toLowerCase())) {
+            //Check whether HTML5 is supported.
+            if (fileUpload.prop('files') != "undefined") {
+                App.Data.currentFile = e.target.files[0];
+                //Initiate the FileReader object.
+                var reader = new FileReader();
+                //Read the contents of Image File.
+                reader.readAsDataURL(fileUpload.prop('files')[0]);
+                var self = this;
+                reader.onload = function (e) {
+                    //Initiate the JavaScript Image object.
+                    var image = new Image();
+                    //Set the Base64 string return from FileReader as source.
+                    image.src = e.target.result;
+                    //Validate the File Height and Width.
+                    image.onload = function () {
+                        var height = this.height;
+                        var width = this.width;
+                        var size = App.Data.currentFile.size;
+                        if (width < 648 || height < 432) {
+                            alert("Images must be at least 648px in width and 432px in height");
+                            return false;
+                        } else {
+                            self.generateUploadFormThumb(self, App.Data.currentFile);
+                        }
+                        if (height > 4896 || width > 4896 || size > 2000000) {
+                            self.generateServerFile(App.Data.currentFile);
+                        }
+                    };
+                }
+            } else {
+                alert("This browser does not support HTML5.");
+                return false;
+            }
+        } else {
+            alert("Please select a jpeg or png image file.");
+            return false;
+        }
+    },
+
+    generateUploadFormThumb: function(self, nowCurrentFile){
+        loadImage(
+           nowCurrentFile,
+           function (img) {
+               if(img.type === "error") {
+                   alert("Error loading image " + nowCurrentFile);
+                   return false;
+               } else {
+                   self.replaceResults(img, nowCurrentFile);
+                   loadImage.parseMetaData(nowCurrentFile, function (data) {
+                       if (data.exif) {
+                           self.displayExifData(data.exif);
+                       }
+                   });
+               }
+           },
+           {maxWidth: 648}
+        );
+    },
+
+    generateServerFile: function(nowCurrentFile){
+        loadImage(
+            nowCurrentFile,
+            function (img) {
+                if(img.type === "error") {
+                    console.log("Error loading image " + nowCurrentFile);
+                } else {
+                    if (img.toBlob) {
+                        img.toBlob(
+                            function (blob) {
+                                App.Data.serverBlob = blob
+
+                            },
+                            'image/jpeg'
+                        );
+                    }
+                }
+            },
+            {maxWidth: 4896, canvas:true}
+        );
+    },
+
+    replaceResults: function (img) {
+        var content;
+        if (!(img.src || img instanceof HTMLCanvasElement)) {
+          content = $('<span>Loading image file failed</span>')
+        } else {
+          content = $(img);
+        }
+        $('#result').children().replaceWith(content.addClass('u-full-width').removeAttr('width').removeAttr('height').fadeIn());
+        $('#photo-submit').removeClass("hide");
+    },
+
+    displayExifData: function (exif) {  // Save Exif data to an entry model attribute to save on Flask model
+        var tags = exif.getAll(),
+            table = $('#exif').find('table').empty(),
+            row = $('<tr></tr>'),
+            cell = $('<td></td>'),
+            prop;
+        for (prop in tags) {
+            if (tags.hasOwnProperty(prop)) {
+                if(prop in {'Make':'', 'Model':'', 'DateTime':'', 'ShutterSpeedValue':'', 'FNumber':'',
+                        'ExposureProgram':'', 'PhotographicSensitivity':'', 'FocalLength':'',
+                        'FocalLengthIn35mmFilm':'', 'LensModel':'', 'Sharpness':'', 'PixelXDimension':'',
+                        'PixelYDimension':''}) {
+                        table.append(
+                            row.clone()
+                                .append(cell.clone().text(prop))
+                                .append(cell.clone().text(tags[prop]))
+                        );
+                }
+            }
+            //if (tags.hasOwnProperty(prop)) {
+            //    if(prop in {'Make':'', 'Model':'', 'DateTime':'', 'ExposureTime':'', 'ShutterSpeedValue':'',
+            //        'FNumber':'', 'ExposureProgram':'', 'MeteringMode':'', 'ExposureMode':'', 'WhiteBalance':'',
+            //        'PhotographicSensitivity':'', 'FocalLength':'', 'FocalLengthIn35mmFilm':'', 'LensModel':'',
+            //        'Sharpness':'', 'PixelXDimension':'', 'PixelYDimension':''}) {
+            //            table.append(
+            //                row.clone()
+            //                    .append(cell.clone().text(prop))
+            //                    .append(cell.clone().text(tags[prop]))
+            //            );
+            //    }
+            //}
+        }
+    },
+
+    render: function() {
+        this.$el.html(nunjucks.render('/assets/forms/S3_upload_form.html'));
+        return this;
+    }
+});
+
+App.Views.ImagePreviewView2 = Backbone.View.extend({
+    el: '#s3-form',
+    events: {
+        'change #file-input': 'validateanddisplaysample',
+        'click #click-span':   'testLink',
+        'submit': 'capturesubmit'
+    },
+
+    testLink: function() {
+        alert('link clicked');
+    },
+
+
 });
 
 
@@ -133,8 +343,9 @@ App.Views.PhotoListView = Backbone.View.extend({
     },
 
     events: {
-        'click a.link-button':   'memberLink',
-        'click a.detail-link':   'detailLink',
+        // 'click a.link-button':   'memberLink',
+        // 'click a.detail-link':   'detailLink',
+        'click .gallery':   'gallery',
         'click .edit':   'editPost',
         'click .edit-button':   'editPost',
         'click .submit-button':   'updatePost',
@@ -149,6 +360,17 @@ App.Views.PhotoListView = Backbone.View.extend({
     detailLink: function(e) {
         e.preventDefault();
         console.log('detail link clicked');
+    },
+
+    gallery: function(event) {
+        event.preventDefault()
+        var event = event || window.event;
+        var target = event.target || event.srcElement,
+            link = target.src ? target.parentNode : target,
+            options = {index: link, event: event},
+            links = window.document.getElementsByClassName('gallery-image');
+        blueimp.Gallery(links, options);
+        console.log('gallery clicked');
     },
 
     // savePost: function(){
