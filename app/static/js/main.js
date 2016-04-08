@@ -300,11 +300,8 @@ App.Models.Photo = Backbone.Model.extend( {
     },
 
     validate: function(attrs){
-        if (!attrs.header){
-            alert('Your post must have a title!');
-        }
         if (!attrs.body){
-            alert('Your post must have a story');
+            alert('Your forgot to say why this photo is great..');
         }
     }
 });
