@@ -134,7 +134,7 @@ class PhotoAPI(MethodView):
         if page.assets['body_form']:
             return page.render()
         else:
-            return redirect(url_for("photos"))
+            return redirect(url_for("photos", category="latest"))
 
     def get(self, post_id=None, category=None):
         if current_user.is_authenticated() or category != "upload":
