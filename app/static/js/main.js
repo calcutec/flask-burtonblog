@@ -8,22 +8,26 @@ window.App = {
 
 App.Router.MainRouter = Backbone.Router.extend({
     routes: { // sets the routes
-        '':     'home',
+        '':                 'home',
+        'home/':            'home',
         'photos/latest/':   'photos',
         'photos/upload/':   'upload',
+        'members/update/':   'updateprofileinfo',
+        'members/*username/':    'portfolio',
         // 'create':   'create',
         // 'edit/:id': 'edit', // http://netbard.com/edit/7
         // 'people':   'people'
     },
     home: function() {
-        console.log('now in view' + Backbone.history.location.href);
+        App.Collections.PhotoList.photoList = new App.Collections.PhotoList()
+        App.Views.MainView.mainView = new App.Views.MainView({collection: App.Collections.PhotoList.photoList, el: '#thisgreatpic'});
     },
     photos: function() {
         App.Collections.PhotoList.photoList = new App.Collections.PhotoList();
         App.Collections.PhotoList.photoList.refreshFromServer({
             success: function(freshData) {
                 App.Collections.PhotoList.photoList.set(freshData['collection']);
-                App.Views.MainView.mainView = new App.Views.MainView({collection: App.Collections.PhotoList.photoList, el: $('#thisgreatpic')});
+                App.Views.MainView.mainView = new App.Views.MainView({collection: App.Collections.PhotoList.photoList, el: '#thisgreatpic'});
                 App.Views.MainView.mainView.attachCollectionToViews();
                 //App.Views.mainView.attachToPhotoListView();
                 //App.Views.mainView.attachToPhotoMainView();
@@ -35,10 +39,20 @@ App.Router.MainRouter = Backbone.Router.extend({
         });
     },
     upload: function() {
-        console.log("upload requested");
-        // App.Views.ImagePreviewView.imagePreviewView = new App.Views.ImagePreviewView();
-        // var testload = "testload";
         App.Views.PreviewFormView.previewFormView = new App.Views.PreviewFormView({el: "#image-preview"});
+    },
+    portfolio: function() {
+        App.Collections.PhotoList.photoList = new App.Collections.PhotoList();
+        App.Collections.PhotoList.photoList.refreshFromServer({
+            success: function(freshData) {
+                App.Collections.PhotoList.photoList.set(freshData['collection']);
+                App.Views.MainView.mainView = new App.Views.MainView({collection: App.Collections.PhotoList.photoList, el: '#thisgreatpic'});
+                App.Views.MainView.mainView.attachToArchiveView();
+            },
+            fail: function(error) {
+                console.log(error);
+            }
+        });
     }
 });
 
@@ -301,8 +315,8 @@ App.Views.PhotoMainView = Backbone.View.extend({
     //},
 
     events: {
-        'click a.link-button':   'memberLink',
-        'click a.detail-link':   'detailLink'
+        // 'click a.link-button':   'memberLink',
+        // 'click a.detail-link':   'detailLink'
     },
 
     memberLink: function(e) {
@@ -463,6 +477,7 @@ App.Views.MainView = Backbone.View.extend({
     },
     events: {
         "click i.fa-upload":   "uploadLink",
+        "click .expand-one":   "expandInfoBox",
         "change #labeler" : "applyLabel",
         "click #markallread" : "markallread",
         "click #archive" : "archive",
@@ -470,6 +485,11 @@ App.Views.MainView = Backbone.View.extend({
         "click #inbox": "inbox",
         "click #starred": "starred",
         "keyup #search" : "search"
+    },
+
+    expandInfoBox: function(e) {
+        e.preventDefault();
+        $('.content-one').slideToggle('slow');
     },
 
     uploadLink: function(e) {

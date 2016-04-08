@@ -91,7 +91,8 @@ class UpdateFormProcessor(FormProcessor):
         if self.form.validate(current_user=current_user):
             g.user.nickname = self.form.nickname.data
             g.user.about_me = self.form.about_me.data
-            g.user.photo = self.form.photo.data
+            if self.form.photo.data != '':
+                g.user.photo = self.form.photo.data
             db.session.add(g.user)
             db.session.commit()
             if request.is_xhr:
