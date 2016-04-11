@@ -20,8 +20,8 @@
         <link rel="stylesheet" href="{{ static_url }}css/fonts.css">
         <link rel="stylesheet" href="{{ static_url }}css/fix.css">
         <link rel="stylesheet" href="{{ local_static_url }}css/custom.css">
-        <link rel="stylesheet" href="{{ static_url }}blueimp/css/blueimp-gallery.css">
-        <link rel="stylesheet" href="{{ static_url }}blueimp/css/blueimp-gallery-indicator.css">
+        <link rel="stylesheet" href="{{ local_static_url }}css/blueimp-gallery.min.css">
+        <link rel="stylesheet" href="{{ local_static_url }}css/blueimp-gallery-indicator.css">
 
         <script src="{{ static_url }}js/_libs/moment.min.js"></script>
 
@@ -35,27 +35,30 @@
             {% include 'nav.html' %}
         </nav>
         <header>
-            {% if assets.entity == "author" %}
-                {{ current_user.nickname }}'s Photos
-            {% elif request.endpoint == "login" %}
-                Login/Signup
-            {% elif request.endpoint == "home" %}
-                This Great Pic
-            {% elif assets.category == "upload"  %}
-                Upload Photo
-            {% elif assets.entity == "photo"  %}
-                Photo #{{ assets['photo_id'] }}
-            {% elif assets.entity == "photos"  %}
-                Photos
-            {% elif assets.entity == "member" %}
-                {{ assets['person'].nickname }}'s Photos
-            {% elif assets.entity == "members"  %}
-                Members
-            {% else %}
-                {{ request.endpoint }} - {{ assets.category }}
+            {% if assets %}
+                {% if assets.entity == "author" %}
+                    {{ current_user.nickname }}'s Photos
+                {% elif request.endpoint == "login" %}
+                    Login/Signup
+                {% elif request.endpoint == "home" %}
+                    This Great Pic
+                {% elif assets.category == "upload"  %}
+                    Upload Photo
+                {% elif assets.entity == "photo"  %}
+                    Photo #{{ assets['photo_id'] }}
+                {% elif assets.entity == "photos"  %}
+                    Photos
+                {% elif assets.entity == "member" %}
+                    {{ assets['person'].nickname }}'s Photos
+                {% elif assets.entity == "members"  %}
+                    Members
+                {% else %}
+                    {{ request.endpoint }} - {{ assets.category }}
+                {% endif %}
             {% endif %}
         </header>
         <main>
+        <div id="requiretest"></div>
         {% if assets %}
             <div id="photo-main">{{ assets.main_entry|safe if assets.main_entry != None }}</div>
             <ul class="img-list" id="links">{{ assets.archives|safe if assets.archives != None }}</ul>
@@ -72,28 +75,8 @@
             <ol class="indicator"></ol>
         </div>
         {% block scripts %}
-            <script src="{{ static_url }}js/_libs/jquery/jquery-2.2.2.js"></script>
-            <script src="{{ static_url }}blueimp/js/blueimp-helper.js"></script>
-            <script src="{{ static_url }}blueimp/js/blueimp-gallery.js"></script>
-            <script src="{{ static_url }}blueimp/js/blueimp-gallery-fullscreen.js"></script>
-            <script src="{{ static_url }}blueimp/js/blueimp-gallery-indicator.js"></script>
-            <script src="{{ static_url }}js/_libs/nunjucks.js"></script>
-            <script src="{{ static_url }}js/_libs/canvas-to-blob.min.js"></script>
-            <script src="{{ static_url }}js/_libs/load-image.all.min.js"></script>
-            <script src="{{ static_url }}js/_libs/backbone/underscore.js"></script>
-            <script src="{{ static_url }}js/_libs/backbone/backbone.js"></script>
-            <script src="{{ static_url }}js/_libs/backbone/backbone.localStorage-min.js"></script>
-            <script src="{{ static_url }}js/data.js"></script>
-            <script src="{{ local_static_url }}js/main.js"></script>
-
-{#            <script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>#}
-{#            {% assets "js_libs" %}#}
-{#                <script type="text/javascript" src="{{ static_url }}gen/libs.js"></script>#}
-{#            {% endassets %}#}
-{#            {% assets "js_app" %}#}
-{#                <script type="text/javascript" src="{{ static_url }}gen/app.js"></script>#}
-{#            {% endassets %}#}
-
+            <script src="{{ local_static_url }}js/libs/blueimp/blueimp-gallery.min.js"></script>
+            <script data-main="{{ local_static_url }}js/main" src="{{ local_static_url }}js/libs/require.js"></script>
         {% endblock %}
 	</body>
 </html>
