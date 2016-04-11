@@ -1,10 +1,17 @@
 <div id="image-preview">
     <div class="docs-example docs-example-forms">
+{#        <div id="result thumbnail" class="result">#}
+{#            <p></p>#}
+{#        </div>#}
+{#        <div id="exif" class="exif">#}
+{#            <table></table>#}
+{#        </div>#}
         <div id="result" class="result">
-            <p></p>
+            <p>This demo works only in browsers with support for the <a href="https://developer.mozilla.org/en/DOM/window.URL">URL</a> or <a href="https://developer.mozilla.org/en/DOM/FileReader">FileReader</a> API.</p>
         </div>
-        <span id="progress-bar"></span>
-        <div id="exif" class="exif">
+        <br>
+        <div id="exif" class="exif" style="display:none;">
+            <p id="thumbnail" class="thumbnail" style="display:none;"></p>
             <table></table>
         </div>
         <div id="photo-s3form-target"></div>

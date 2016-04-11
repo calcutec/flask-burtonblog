@@ -19,13 +19,12 @@ define(['jquery', 'backbone'],
         
             gallery: function(event) {
                 event.preventDefault();
-                var event = event || window.event;
                 var target = event.target || event.srcElement,
                     link = target.src ? target.parentNode : target,
                     options = {index: link, event: event},
                     links = window.document.getElementsByClassName('gallery-image');
                 var currentgallery = window.blueimp.Gallery(links, options);
-                currentgallery.slide(this.$el.index());
+                currentgallery.slide($(this.el).index());
             }
         });
     }

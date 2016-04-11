@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', "js/views/contentMainView", 'js/views/contentArchiveView'],
+define(['jquery', 'backbone', "views/contentMainView", 'views/contentArchiveView'],
     function($, Backbone, ContentMainView, ContentArchiveView){
         return Backbone.View.extend({
             el: "#thisgreatpic",

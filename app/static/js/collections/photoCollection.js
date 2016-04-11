@@ -1,4 +1,4 @@
-define(['backbone', 'localstorage', 'js/models/photoModel'],
+define(['backbone', 'localstorage', 'models/photoModel'],
     function(Backbone, Store, PhotoModel){
         return Backbone.Collection.extend({
             url: "/photos",

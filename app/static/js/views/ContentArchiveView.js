@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'js/views/contentThumbnailView'],
+define(['jquery', 'backbone', 'views/contentThumbnailView'],
     function($, Backbone, ContentThumbnailView){
         return Backbone.View.extend({ 
             attachToView: function() {
