@@ -7,7 +7,7 @@ require.config({
         backbone: 'libs/backbone/backbone.min',
         nunjucks: 'libs/nunjucks/nunjucks.min',
         underscore: 'libs/underscore/underscore.min',
-        blueimp: 'libs/blueimp/blueimp-gallery.min',
+        // blueimp: 'libs/blueimp/blueimp-gallery.min',
         localstorage: 'libs/localstorage/localstorage.min'
         // templates: "static/templates" Use with templates.js file for prerendered templates
     },

@@ -28,7 +28,6 @@ define(['jquery', 'backbone'],
                 e.preventDefault();
                 console.log('detail link clicked');
             },
-        
             gallery: function(event) {
                 event.preventDefault();
                 var target = event.target || event.srcElement,
