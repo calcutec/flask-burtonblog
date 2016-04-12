@@ -3,7 +3,6 @@ define(['jquery', 'backbone', "views/contentMainView", 'views/contentArchiveView
         return Backbone.View.extend({
             el: "#thisgreatpic",
             initialize: function(options){
-                // _.extend(this, _.pick(options, "page_mark"));
                 //this.collection.bind('change', this.renderSideMenu, this);
                 //this.renderSideMenu();
                 //this.render();
@@ -12,14 +11,7 @@ define(['jquery', 'backbone', "views/contentMainView", 'views/contentArchiveView
             },
             events: {
                 // "click i.fa-upload":   "uploadLink",
-                "click .expand-one":   "expandInfoBox",
-                "change #labeler" : "applyLabel",
-                "click #markallread" : "markallread",
-                "click #archive" : "archive",
-                "click #allmail" : "allmail",
-                "click #inbox": "inbox",
-                "click #starred": "starred",
-                "keyup #search" : "search"
+                "click .expand-one":   "expandInfoBox"
             },
         
             expandInfoBox: function(e) {
@@ -33,12 +25,12 @@ define(['jquery', 'backbone', "views/contentMainView", 'views/contentArchiveView
             },
             
             attachToContentMainView: function(){
-                var contentMainView = new ContentMainView({el: "#main-image", 'collection': this.collection});
+                var contentMainView = new ContentMainView({el: "#photo-main", 'collection': this.collection});
                 contentMainView.attachToView()
             },
             
             attachToContentArchiveView: function(){
-                var contentArchiveView = new ContentArchiveView({el: "#links", 'collection': this.collection})
+                var contentArchiveView = new ContentArchiveView({el: "#links", 'collection': this.collection});
                 contentArchiveView.attachToView()
             }
         });

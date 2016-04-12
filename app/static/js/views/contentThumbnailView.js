@@ -2,14 +2,26 @@ define(['jquery', 'backbone'],
     function($, Backbone){
         return Backbone.View.extend({
             events: {
-                // 'click a.link-button':   'memberLink',
-                // 'click a.detail-link':   'detailLink',
+                'click a.member-link':   'memberLink',
+                'click a.detail-link':   'detailLink',
+                'click a.follow':   'follow',
+                'click a.unfollow':   'unfollow',
                 'click .gallery':   'gallery'
             },
         
             memberLink: function(e) {
                 e.preventDefault();
                 console.log('member link clicked');
+            },
+
+            follow: function(e) {
+                e.preventDefault();
+                console.log('follow link clicked');
+            },
+
+            unfollow: function(e) {
+                e.preventDefault();
+                console.log('unfollow link clicked');
             },
         
             detailLink: function(e) {

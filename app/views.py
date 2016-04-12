@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, session, url_for, g, jsonify, request
+from flask import render_template, flash, redirect, url_for, g, jsonify, request
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from flask.ext.sqlalchemy import get_debug_queries
 from datetime import datetime
@@ -83,7 +83,7 @@ def logout():
 
 
 class MembersAPI(MethodView):
-    def post(self, nickname=None, category=None):
+    def post(self, category=None):
         page = MembersPage(form=EditForm(), category=category)
         if 'body_form' in page.assets and page.assets['body_form'] is not None:
             return page.render()

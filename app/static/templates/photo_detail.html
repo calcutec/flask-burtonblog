@@ -4,7 +4,7 @@
         <span onclick="" class="profile-content">
             <span>
                 <div class="details-well">
-                    <a class="link-button" href="{{ url_for('members', nickname=post.author.nickname) }}" rel="tag">{{ post.author.nickname }}</a><br>
+                    <a class="link-button" id="member-link" href="{{ url_for('members', nickname=post.author.nickname) }}" rel="tag">{{ post.author.nickname }}</a><br>
                     <b>{{ post.timestamp.strftime('%d %b %Y') }}</b><br>
                     {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
                     {% if post.comments.all()|length > 0 %}

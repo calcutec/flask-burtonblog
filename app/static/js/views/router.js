@@ -1,5 +1,6 @@
-define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/mainView", "views/previewFormView"],
-    function ($, Backbone, nunjucks, PhotoCollection, MainView, PreviewFormView) {
+define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/baseView", "views/previewFormView", 
+    "collections/memberCollection"],
+    function ($, Backbone, nunjucks, PhotoCollection, BaseView, PreviewFormView, MemberCollection) {
         return Backbone.Router.extend({
 
             initialize: function () {
@@ -10,14 +11,16 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
 
             routes: {
                 "": "home",
-                'photos/latest/':   'photos',
-                'photos/upload/':   'upload',
-                'members/update/':   'updateprofileinfo'
+                'photos/latest/':       'photos',
+                'photos/upload/':       'upload',
+                'members/':             'members',
+                'members/latest/':      'members',
+                'members/*username/':   'portfolio'
             },
 
             home: function () {
                 var photoCollection = new PhotoCollection();
-                new MainView({collection: photoCollection, el: '#thisgreatpic'});
+                new BaseView({collection: photoCollection, el: '#thisgreatpic'});
             },
 
             photos: function() {
@@ -25,8 +28,8 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
                 photoCollection.refreshFromServer({
                     success: function(freshData) {
                         photoCollection.set(freshData['collection']);
-                        var mainView = new MainView({collection: photoCollection, el: '#thisgreatpic'});
-                        mainView.attachCollectionToViews();
+                        var baseView = new BaseView({collection: photoCollection, el: '#thisgreatpic'});
+                        baseView.attachCollectionToViews();
                     },
                     fail: function(error) {
                         console.log(error);
@@ -36,6 +39,34 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
             
             upload: function() {
                 new PreviewFormView({el: "#image-preview"});
+            },
+            
+            members: function() {
+                var memberCollection = new MemberCollection();
+                memberCollection.refreshFromServer({
+                    success: function(freshData) {
+                        memberCollection.set(freshData['employees']);
+                        var baseView = new BaseView({collection: memberCollection, el: '#thisgreatpic'});
+                        baseView.attachToContentArchiveView();
+                    },
+                    fail: function(error) {
+                        console.log(error);
+                    }
+                });
+            },
+
+            portfolio: function() {
+                var photoCollection = new PhotoCollection();
+                photoCollection.refreshFromServer({
+                    success: function(freshData) {
+                        photoCollection.set(freshData['collection']);
+                        var baseView = new BaseView({collection: photoCollection, el: '#thisgreatpic'});
+                        baseView.attachCollectionToViews();
+                    },
+                    fail: function(error) {
+                        console.log(error);
+                    }
+                });
             }
             
         });

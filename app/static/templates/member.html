@@ -15,9 +15,9 @@
 {% endif %}
 <span onclick="" class="text-content">
     <span>
-        <div class="details-well">
+        <span class="details-well">
             {% if post.nickname %}
-                <a class="link-button" href="/members/{{ post.nickname }}">{{ post.nickname }}</a>
+                <a class="link-button member-link" href="/members/{{ post.nickname }}">{{ post.nickname }}</a>
             {% endif %}
 
             {% if post.last_seen %}
@@ -26,16 +26,16 @@
             {% if g.user.is_authenticated() %}
                 {% if post.nickname != g.user.nickname %}
                     {% if g.user.is_following(post) %}
-                        <a class="link-button" href="{{ url_for('members', category='unfollow', nickname=post.nickname) }}"><strong>Unfollow</strong></a>
+                        <a class="link-button unfollow" href="{{ url_for('members', category='unfollow', nickname=post.nickname) }}"><strong>Unfollow</strong></a>
                     {% else %}
-                        <a class="link-button" href="{{ url_for('members', category='follow', nickname=post.nickname) }}"><strong>Follow</strong></a>
+                        <a class="link-button follow" href="{{ url_for('members', category='follow', nickname=post.nickname) }}"><strong>Follow</strong></a>
                     {% endif %}
                 {% endif %}
             {% endif %}
-        </div>
+        </span>
     </span>
 </span>
-<a href="/members/{{ post.nickname }}">
+<a class="detail-link" href="/members/{{ post.nickname }}">
     <span class="rounded-icon">
         <svg width="22" height="22" viewBox="0 0 22 22">
             <path d="M3.4 20.2L9 14.5 7.5 13l-5.7 5.6L1 14H0v7.5l.5.5H8v-1l-4.6-.8M18.7 1.9L13 7.6 14.4 9l5.7-5.7.5 4.7h1.2V.6l-.5-.5H14v1.2l4.7.6">

@@ -2,8 +2,8 @@
 {#<span onclick="touchStart(event)" class="text-content">#}
 <span class="text-content">
     <span class="inner-span">
-        <div class="details-well">
-            <a class="link-button" href="{{ url_for('members', nickname=post.author.nickname) }}" rel="tag">{{ post.author.nickname }}</a><br>
+        <span class="details-well">
+            <a class="link-button member-link" href="{{ url_for('members', nickname=post.author.nickname) }}" rel="tag">{{ post.author.nickname }}</a><br>
             <b>{{ post.timestamp.strftime('%d %b %Y') }}</b><br>
             {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
             {% if post.comments.all()|length > 0 %}
@@ -14,7 +14,7 @@
                 </a>
             {% endif %}
             <a href="#" class="link-button gallery">Gallery</a>
-        </div>
+        </span>
     </span>
 </span>
 <a class="detail-link" href="/photos/{{ post.id }}">

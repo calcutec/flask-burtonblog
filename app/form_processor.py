@@ -18,7 +18,6 @@ class FormProcessor(object):
         self.template = template
 
     def get_form_template(self):
-        form_template = None
         if request.is_xhr:
             if self.template:
                 form_template = "/assets/forms/" + self.template
