@@ -152,6 +152,7 @@ class Post(db.Model):
     timestamp = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     writing_type = db.Column(db.String(32), default="writing-type")
+    category = db.Column(db.String(32))
     photo = db.Column(db.String(240))
     comments = db.relationship('Comment', backref='original_post', lazy='dynamic')
     slug = db.Column(db.String(255))

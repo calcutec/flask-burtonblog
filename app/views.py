@@ -174,7 +174,9 @@ photo_api_view = PhotoAPI.as_view('photos')
 app.add_url_rule('/photos/',
                  view_func=photo_api_view, methods=["GET", "POST"])
 # Get photos of a given category
-app.add_url_rule('/photos/<any("all", "latest", "favorite", "starred", "upload", "home"):category>/',
+app.add_url_rule('/photos/<any("all", "latest", "popular", "starred", "upload", "home", "architecture", "event",'
+                 '"family", "fantasy", "fashion", "landscape", "macro", "portrait", "street", "sport", "travel",'
+                 '"wildlife"):category>/',
                  view_func=photo_api_view, methods=["GET", "POST"])
 # Update or Delete a single post
 app.add_url_rule('/photos/<int:post_id>/',

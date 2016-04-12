@@ -1,6 +1,6 @@
-define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/baseView", "views/previewFormView", 
+define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/baseView", "views/uploadFormView",
     "collections/memberCollection"],
-    function ($, Backbone, nunjucks, PhotoCollection, BaseView, PreviewFormView, MemberCollection) {
+    function ($, Backbone, nunjucks, PhotoCollection, BaseView, UploadFormView, MemberCollection) {
         return Backbone.Router.extend({
 
             initialize: function () {
@@ -11,8 +11,11 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
 
             routes: {
                 "": "home",
+                'photos/':              'photos',
+                'photos/all/':       'photos',
                 'photos/latest/':       'photos',
                 'photos/upload/':       'upload',
+                'photos/*category/':   'portfolio',
                 'members/':             'members',
                 'members/latest/':      'members',
                 'members/*username/':   'portfolio'
@@ -38,7 +41,7 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
             },
             
             upload: function() {
-                new PreviewFormView({el: "#image-preview"});
+                new UploadFormView();
             },
             
             members: function() {

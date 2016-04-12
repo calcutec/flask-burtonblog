@@ -81,10 +81,17 @@ class BasePage(object):
         else:
             posts = Post.query.filter_by(**posts_dict['filter']).order_by(Post.timestamp.desc())
 
-        if self.assets['category'] == "latest":
+        if self.assets['category'] == "all" or self.assets['category'] is None:
+            self.posts = posts
+        elif self.assets['category'] == "latest":
             self.posts = posts[0:10]
         else:
-            self.posts = posts
+            self.posts = posts.filter_by(category=self.assets['category'])
+
+        category_counts = dict()
+        for value in db.session.query(Post.category).distinct():
+            category_counts[value[0]] = int(db.session.query(Post).filter(Post.category == value[0]).count())
+        self.assets['category_counts'] = category_counts
 
     def get_asset(self, template=None, context=None):
         if request.is_xhr:
@@ -139,10 +146,17 @@ class PhotoPage(BasePage):
                 # self.assets['collection'] = self.get_asset(context=[i.json_view() for i in self.posts])
                 self.assets['collection'] = [i.json_view() for i in self.posts]
             else:
-                main_photo_context = {'post': self.posts[0]}
-                archive_photos_context = {'posts': self.posts[1:]}
-                self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=main_photo_context)
-                self.assets['archives'] = self.get_asset(template="archives.html", context=archive_photos_context)
+                if type(self.posts) == list and len(self.posts) > 0:
+                    self.render_sections()
+                elif self.posts and self.posts.count() > 0:
+                    self.render_sections()
+
+
+    def render_sections(self):
+        main_photo_context = {'post': self.posts[0]}
+        archive_photos_context = {'posts': self.posts[1:]}
+        self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=main_photo_context)
+        self.assets['archives'] = self.get_asset(template="archives.html", context=archive_photos_context)
 
     def vote(self):
         post_id = self.post_id

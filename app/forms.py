@@ -82,10 +82,12 @@ class EditForm(Form):
 
 
 class PostForm(Form):
-    my_choices = [('entry', 'Entry'), ('op-ed', 'Op-ed'), ('featured', 'Featured')]
+    my_choices = [('architecture', 'Architecture'), ('event', 'Event'), ('family', 'Family'), ('fantasy', 'Fantasy'),
+                  ('fashion', 'Fashion'), ('landscape', 'Landscape'), ('macro', 'Macro'), ('portrait', 'Portrait'),
+                  ('sport', 'Sport'), ('street', 'Street'), ('travel', 'Travel'), ('wildlife', 'Wildlife')]
     body = TextAreaField('Post', validators=[DataRequired()])
     photo = StringField('Photo', validators=[DataRequired()])
-    writing_type = SelectField('Type', choices=my_choices, default='entry')
+    category = SelectField('Type', choices=my_choices, default='entry')
     submit = SubmitField("Send")
 
 

@@ -38,7 +38,7 @@ main {
     width: 93vw;
 }
 .hide {
-    display: none;
+    display: none !important;
 }
 .loginlogout {
     float: right;
@@ -619,7 +619,7 @@ input.button-primary {
 /* Select */
 #element-label {
     vertical-align: top;
-    width: 110px;
+    width: auto;
     display: inline-block;
     padding: 0;
     margin: .6rem 0 0 0;

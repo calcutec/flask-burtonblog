@@ -2,8 +2,16 @@
 <form id="poem-form" class="form-horizontal" action="/photos/" method="post" enctype="multipart/form-data" name="post">
     {{ form.csrf_token }}
     <div class="form-group{% if form.body.errors %} error{% endif %}">
-        <label>What makes this picture great?</label>
-        {{ form.body(type="text") }}
+        <label>What makes this photo great?</label>
+        {{ form.body(type="text", placeholder="What makes this photo great?") }}
+        {% for error in form.body.errors %}
+            <span class="help-inline" style="color:red">[{{ error }}]</span><br>
+        {% endfor %}
+        <span id="error_post" class="help-inline"></span><br>
+    </div>
+    <div class="form-group{% if form.body.errors %} error{% endif %}">
+        <label>What category best matches this photo?</label>
+        {{ form.category() }}
         {% for error in form.body.errors %}
             <span class="help-inline" style="color:red">[{{ error }}]</span><br>
         {% endfor %}

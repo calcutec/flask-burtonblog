@@ -41,21 +41,21 @@
         {% if assets.entity in ["photos", "members", "member"] and assets.category != "upload" %}
         <label id="element-label" for="element">
             <select name="element" id="element">
-                <option value="1">Latest</option>
-                <option value="2">All</option>
-                <option value="3">Starred</option>
-                <option value="4">Popular</option>
+                <option value="latest" {% if assets.category == "latest" %}selected{% endif %}>Latest</option>
+                <option value="all" {% if assets.category == "all" %}selected{% endif %}>All</option>
+                <option value="starred" {% if assets.category == "starred" %}selected{% endif %}>Starred</option>
+                <option value="popular" {% if assets.category == "popular" %}selected{% endif %}>Popular</option>
+                <option class="select-dash" disabled="disabled">----------</option>
                 {%  if assets.entity == "author" %}
-                    <option value="5">Published</option>
-                    <option value="6">Unpublished</option>
+                    <option value="published" {% if assets.category == "published" %}selected{% endif %}>Published</option>
+                    <option value="unpublished" {% if assets.category == "unpublished" %}selected{% endif %}>Unpublished</option>
                 {% elif assets.entity == "members" %}
-                    <option value="5">Followed</option>
-                    <option value="6">Followers</option>
+                    <option value="followed" {% if assets.category == "followed" %}selected{% endif %}>Followed</option>
+                    <option value="followers" {% if assets.category == "followers" %}selected{% endif %}>Followers</option>
                 {%  elif assets.entity == "photos" %}
-                    <option value="5">Landscape</option>
-                    <option value="6">Family</option>
-                    <option value="6">Portrait</option>
-                    <option value="6">Street</option>
+                    {% for key in assets.category_counts %}
+                         <option value={{ key }} {% if assets.category == key %}selected{% endif %}>{{ key }} ({{ assets.category_counts[key] }})</option>
+                    {% endfor %}
                 {% endif %}
             </select>
         </label>

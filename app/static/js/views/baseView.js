@@ -1,10 +1,11 @@
-define(['jquery', 'backbone', "views/contentMainView", 'views/contentArchiveView'],
-    function($, Backbone, ContentMainView, ContentArchiveView){
+define(['jquery', 'backbone', "views/contentMainView", 'views/contentArchiveView', 'views/navView'],
+    function($, Backbone, ContentMainView, ContentArchiveView, NavView){
         return Backbone.View.extend({
             el: "#thisgreatpic",
             initialize: function(options){
                 //this.collection.bind('change', this.renderSideMenu, this);
-                //this.renderSideMenu();
+
+                new NavView()
                 //this.render();
                 // this.listenTo(this.collection, 'add', this.render, this);
                 //this.listenTo(this.collection, 'change', this.render, this);

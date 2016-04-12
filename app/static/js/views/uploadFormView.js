@@ -1,6 +1,7 @@
 define(['jquery', 'backbone'],
     function($, Backbone){
         return Backbone.View.extend({
+            el: "#image-preview",
             result: $('#result'),
             exifNode: $('#exif'),
             thumbNode: $('#thumbnail'),
@@ -80,6 +81,7 @@ define(['jquery', 'backbone'],
           },
           replaceResults: function(img) {
             var content;
+            var self = this;
             if (!(img.src || img instanceof HTMLCanvasElement)) {
               content = $('<span>Loading image file failed</span>')
             } else {
@@ -88,6 +90,7 @@ define(['jquery', 'backbone'],
                 .attr('href', img.src || img.toDataURL())
             }
             $('#result').children().replaceWith(content);
+            $('#photo-submit').removeClass("hide");
           }
         });
     }
