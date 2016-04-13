@@ -241,7 +241,7 @@ class UploadFormProcessor(FormProcessor):
     def process_form(self):
         if self.form.validate_on_submit():
             photo_name = self.form.photo.data
-            post = Post(body=self.form.body.data, timestamp=datetime.utcnow(),
+            post = Post(body=self.form.body.data, timestamp=datetime.utcnow(), category=self.form.category.data,
                         author=g.user, photo=photo_name, writing_type="entry")
             db.session.add(post)
             db.session.commit()

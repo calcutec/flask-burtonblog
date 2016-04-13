@@ -87,7 +87,7 @@ class BasePage(object):
                                                 .filter(Post.category == value[0]).count())
             self.assets['category_counts'] = category_counts
 
-        if self.assets['category'] == "all" or self.assets['category'] is None:
+        if self.assets['category'] in ["all", "vote"] or self.assets['category'] is None:
             self.posts = posts
         elif self.assets['category'] == "latest":
             self.posts = posts[0:10]
@@ -151,7 +151,6 @@ class PhotoPage(BasePage):
                     self.render_sections()
                 elif self.posts and self.posts.count() > 0:
                     self.render_sections()
-
 
     def render_sections(self):
         main_photo_context = {'post': self.posts[0]}
