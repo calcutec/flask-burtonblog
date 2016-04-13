@@ -80,6 +80,12 @@ class BasePage(object):
             posts = User.query.all()
         else:
             posts = Post.query.filter_by(**posts_dict['filter']).order_by(Post.timestamp.desc())
+            # Get count of photos in each category owned by the above entities (author, member, photos, editor)
+            category_counts = dict()
+            for value in db.session.query(Post.category).filter_by(**posts_dict['filter']).distinct():
+                category_counts[value[0]] = int(db.session.query(Post).filter_by(**posts_dict['filter'])
+                                                .filter(Post.category == value[0]).count())
+            self.assets['category_counts'] = category_counts
 
         if self.assets['category'] == "all" or self.assets['category'] is None:
             self.posts = posts
@@ -87,11 +93,6 @@ class BasePage(object):
             self.posts = posts[0:10]
         else:
             self.posts = posts.filter_by(category=self.assets['category'])
-
-        category_counts = dict()
-        for value in db.session.query(Post.category).distinct():
-            category_counts[value[0]] = int(db.session.query(Post).filter(Post.category == value[0]).count())
-        self.assets['category_counts'] = category_counts
 
     def get_asset(self, template=None, context=None):
         if request.is_xhr:
