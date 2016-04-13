@@ -1,6 +1,6 @@
 define(['jquery', 'backbone', 'views/contentThumbnailView'],
     function($, Backbone, ContentThumbnailView){
-        return Backbone.View.extend({ 
+        return Backbone.View.extend({
             attachToView: function() {
                 var self = this;
                 $(this.el).children('li').each(function(){
