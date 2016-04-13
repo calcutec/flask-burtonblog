@@ -2,10 +2,10 @@ define(['jquery', 'backbone'],
     function($, Backbone){
         return Backbone.View.extend({
             events: {
-                'click a.member-link':   'memberLink',
-                'click a.detail-link':   'detailLink',
-                'click a.follow':   'follow',
-                'click a.unfollow':   'unfollow',
+                // 'click a.member-link':   'memberLink',
+                // 'click a.detail-link':   'detailLink',
+                // 'click a.follow':   'follow',
+                // 'click a.unfollow':   'unfollow',
                 'click .gallery':   'gallery'
             },
         

@@ -10,7 +10,8 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
             },
 
             routes: {
-                "": "home",
+                '':                     'home',
+                'home/':                'home',
                 'photos/':              'photos',
                 'photos/all/':          'photos',
                 'photos/latest/':       'photos',
