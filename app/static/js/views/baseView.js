@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 define(['jquery', 'backbone', "views/contentMainView", 'views/contentArchiveView', 'views/navView'],
+=======
+define(['jquery', 'backbone', "views/contentMainView", 'views/archiveView', 'views/navView'],
+>>>>>>> master
     function($, Backbone, ContentMainView, ContentArchiveView, NavView){
 =======
 define(['jquery', 'backbone', "views/contentMainView", 'views/archiveView', 'views/navView', 'views/dataStore',
