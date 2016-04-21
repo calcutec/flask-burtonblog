@@ -13,15 +13,14 @@ define(['jquery', 'backbone', 'views/contentThumbnailView'],
                 });
             },
             render: function() {
-                var self = this;
-                this.each( this.collection.models.slice(1,7), function(model) {
-                    //console.log(model.get("id"));
-                    self.addOneToList(model);
+                this.collection.each(function(model) {
+                    this.addOneToList(model);
                 }, this);
+                return this;
             },
-            addOneToList: function (photo) {
-                var contentThumbnailView = new ContentThumbnailView({ model: photo});
-                $('ul#img-list', this.el).append(contentThumbnailView.render().el);
+            addOneToList: function (model) {
+                var contentThumbnailView = new ContentThumbnailView({ model: model});
+                $(this.el).append(contentThumbnailView.render().el);
             }
         });
     }

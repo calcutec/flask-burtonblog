@@ -4,16 +4,9 @@
         <span onclick="" class="profile-content">
             <span>
                 <div class="details-well">
-                    <a class="link-button" id="member-link" href="{{ url_for('members', nickname=post.author.nickname) }}" rel="tag">{{ post.author.nickname }}</a><br>
-                    <b>{{ post.timestamp.strftime('%d %b %Y') }}</b><br>
+                        <a class="link-button member-link" href="/members/{{ post.author.nickname }}/" rel="tag">{{ post.author.nickname }}</a><br>
+                            <b>{{ momentjs(post.timestamp).calendar() }}</b><br>
                     {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
-                    {% if post.comments.all()|length > 0 %}
-                        <a href="{{ url_for('posts', id=post.id) }}">
-                            {% with total=post.comments.all()|length %}
-                                {{ total }} comment{% if total != 1 %}s{% endif %}
-                            {% endwith %}
-                        </a>
-                    {% endif %}
                     {% if g.user.is_authenticated() and post.author.id == g.user.id %}
     {#                    <a href="#">Edit</a><br>#}
                         <a class="link-button red" href="#">Delete</a>
@@ -26,7 +19,6 @@
                             <a data-voted="false" style="color:#000;" href="{{ url_for('photos', category='vote', post_id=post.id) }}" class="{{ post.id }} likeme"><i class="fa fa-meh-o fa-lg icon-white"></i></a>
                         {% endif %}
                             Like/Unlike <br>
-                            {{ post.body }}
     {#                        <a href="{{ url_for('photos', id=post.id) }}">Add Comment</a>#}
                     {% endif %}
                 </div>
@@ -36,4 +28,6 @@
 </ul>
 <div>
     {{ post.body }}
+    <h4>Comments</h4>
+    {% include "comments.html" %}
 </div>

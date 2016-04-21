@@ -38,12 +38,13 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
             },
 
             photos: function() {
-                var basePhotoCollection = new PhotoCollection();
-                basePhotoCollection.refreshFromServer({
+                DataStore.photoCollection = new PhotoCollection();
+                DataStore.photoCollection.refreshFromServer({
                     success: function(freshData) {
-                        basePhotoCollection.set(freshData['collection']);
-                        new BaseView({collection: basePhotoCollection, baseCollection: basePhotoCollection, 
-                            el: '#thisgreatpic'});
+                        DataStore.photoCollection.set(freshData['collection']);
+                        DataStore.filteredPhotoCollection = DataStore.photoCollection
+                        DataStore.baseView = new BaseView({collection: DataStore.filteredPhotoCollection, el: '#thisgreatpic'});
+                        DataStore.baseView.attachCollectionToViews();
                     },
                     fail: function(error) {
                         console.log(error);
@@ -51,14 +52,14 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
                 });
             },
             filteredphotos: function(category) {
-                var basePhotoCollection = new PhotoCollection();
-                basePhotoCollection.refreshFromServer({
+                DataStore.photoCollection = new PhotoCollection();
+                DataStore.photoCollection.refreshFromServer({
                     success: function(freshData) {
-                        basePhotoCollection.set(freshData['collection']);
-                        var filteredPhotos = basePhotoCollection.where({category: category});
-                        var filteredPhotoCollection = new PhotoCollection(filteredPhotos);
-                        new BaseView({collection: filteredPhotoCollection, baseCollection: basePhotoCollection,
-                            el: '#thisgreatpic'});
+                        DataStore.photoCollection.set(freshData['collection']);
+                        var filteredPhotos = DataStore.photoCollection.where({category: category});
+                        DataStore.filteredPhotoCollection = new PhotoCollection(filteredPhotos);
+                        DataStore.baseView = new BaseView({collection: DataStore.filteredPhotoCollection, el: '#thisgreatpic'});
+                        DataStore.baseView.attachCollectionToViews();
                     },
                     fail: function(error) {
                         console.log(error);
@@ -92,6 +93,7 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
                     success: function(freshData) {
                         photoCollection.set(freshData['collection']);
                         var baseView = new BaseView({collection: photoCollection, el: '#thisgreatpic'});
+                        baseView.attachCollectionToViews();
                     },
                     fail: function(error) {
                         console.log(error);

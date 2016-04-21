@@ -1,12 +1,23 @@
-define(['jquery', 'backbone'],
-    function($, Backbone){
+define(['jquery', 'backbone', 'nunjucks'],
+    function($, Backbone, nunjucks){
         return Backbone.View.extend({
+            tagName: "li",
             events: {
                 // 'click a.member-link':   'memberLink',
                 // 'click a.detail-link':   'detailLink',
                 // 'click a.follow':   'follow',
                 // 'click a.unfollow':   'unfollow',
                 'click .gallery':   'gallery'
+            },
+            render: function() {
+                var post = this.model.toJSON();
+                post['author'] = { "nickname": post.nickname };
+                var self = this;
+                post['comments'] = { "all": function(){
+                    return self.models.get('comments')
+                } };
+                this.$el.html(nunjucks.render("archive_entry.html", {'post': post, 'momentjs': moment}));
+                return this;
             },
         
             memberLink: function(e) {
@@ -17,11 +28,29 @@ define(['jquery', 'backbone'],
             follow: function(e) {
                 e.preventDefault();
                 console.log('follow link clicked');
+                this.model.set('followed', true);
+                this.model.save(null, {
+                    success: function (model, response) {
+                        console.log(response);
+                    },
+                    error: function (model, response) {
+                        console.log(response);
+                    }
+                });
             },
 
             unfollow: function(e) {
                 e.preventDefault();
                 console.log('unfollow link clicked');
+                this.model.set('followed', false);
+                this.model.save(null, {
+                    success: function (model, response) {
+                        console.log(response);
+                    },
+                    error: function (model, response) {
+                        console.log(response);
+                    }
+                });
             },
         
             detailLink: function(e) {

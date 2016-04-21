@@ -36,7 +36,10 @@ class FormProcessor(object):
             if self.form_template == '/assets/forms/post_form.html' \
                     or self.form_template == '/assets/forms/update_photo.html':
                 post = dict()
-                post['photo'] = self.page.assets['new_photo']
+                if 'new_photo' in self.page.assets:
+                    post['photo'] = self.page.assets['new_photo']
+                else:
+                    post['phto']
                 context = {'form': self.form, 'post': post}
                 rendered_form = render_template(self.form_template, **context)
             else:

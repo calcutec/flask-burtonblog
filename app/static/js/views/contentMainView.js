@@ -1,6 +1,6 @@
 define(['jquery', 'backbone', 'nunjucks'],
     function($, Backbone, nunjucks){
-        return Backbone.View.extend({ 
+        return Backbone.View.extend({
             events: {
                 // 'click a.detail-link':   'detailLink'
             },
@@ -16,8 +16,8 @@ define(['jquery', 'backbone', 'nunjucks'],
             },
         
             render: function() {
-                var post = this.model.toJSON();
-                $(this.el).html(nunjucks.render("main_entry.html", {'post': post }));
+                var post = this.collection.models[0].toJSON();
+                this.$el.html(nunjucks.render("main_entry.html", {'post': post }));
                 return this;
             }
         });

@@ -30,7 +30,7 @@ class BasePage(object):
 
         self.get_entity()
 
-        if self.assets['category'] in ["login", "upload", "update", "signup"]:
+        if self.assets['category'] in ["login", "upload", "update", "signup", "follow", "unfollow"]:
             self.get_rendered_form()
         else:
             self.get_posts()
@@ -230,6 +230,18 @@ class MembersPage(BasePage):
         db.session.add(u)
         db.session.commit()
         flash('You have stopped following %s.' % self.nickname)
+
+    def __str__(self):
+        return "This is the %s page" % self.assets['title']
+
+
+class MembersPageXHR(BasePage):
+    def __init__(self, *args, **kwargs):
+        super(MembersPageXHR, self).__init__(*args, **kwargs)
+        self.update_member()
+
+    def update_member(self):
+            pass
 
     def __str__(self):
         return "This is the %s page" % self.assets['title']

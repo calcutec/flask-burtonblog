@@ -1,5 +1,5 @@
 define(['backbone', 'localstorage', 'models/photoModel'],
-    function(Backbone, Store, PhotoModel){
+    function(Backbone, LocalStorage, PhotoModel){
         return Backbone.Collection.extend({
             url: "/photos",
             model: PhotoModel,
@@ -16,7 +16,7 @@ define(['backbone', 'localstorage', 'models/photoModel'],
             parse: function(response){
                 return response.myPhotos
             },
-
+            
             comparator: function(photo){
                 return photo.get('timestamp');
             }

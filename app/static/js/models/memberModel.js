@@ -1,14 +1,17 @@
 define(['backbone'], function(Backbone) {
     return Backbone.Model.extend({
-        url: "/members/",
+        urlRoot: "/members/",
+
         defaults: {
-            memberid: '',
+            memberid: '', 
+            id: '',
             type: '',
             firstName: '',
             lastName: '',
             nickname: '',
             photo: '',
-            lastseen: ''
+            lastseen: '',
+            followed: ''
         }
     });
 });

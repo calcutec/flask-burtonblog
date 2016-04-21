@@ -1,20 +1,14 @@
-define(['backbone', 'localstorage', 'models/memberModel'],
-    function(Backbone, LocalStorage, MemberModel){
+define(['backbone', 'models/memberModel'],
+    function(Backbone, MemberModel){
         return Backbone.Collection.extend({
             url: "/members",
             model: MemberModel,
 
-            localStorage: new LocalStorage("members"),
-
-            refreshFromServer: function(options) {
-                return Backbone.ajaxSync('read', this, options);
-            },
-
             /**
-             * @param {{Members:string}} response
+             * @param {{collection:string}} response
              */
             parse: function(response){
-                return response.Members
+                return response.collection
             },
 
             comparator: function(member){

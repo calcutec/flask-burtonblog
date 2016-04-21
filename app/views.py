@@ -1,15 +1,17 @@
-from flask import render_template, flash, redirect, url_for, g, jsonify, request
+from flask import render_template, flash, redirect, url_for, g, jsonify, request, make_response, abort
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from flask.ext.sqlalchemy import get_debug_queries
 from datetime import datetime
 from app import app, db, lm
 from config import DATABASE_QUERY_TIMEOUT
+from .decorators import auth_required
 from .forms import SignupForm, LoginForm, EditForm, PostForm
 from .models import User, Post
 from .utils import OAuthSignIn, PhotoPage, MembersPage, SignupPage, LoginPage
 from flask.views import MethodView
 import os
 import json
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -93,8 +95,8 @@ class MembersAPI(MethodView):
     def get(self, nickname=None, category="latest"):
         if nickname is None:  # Display all members
             if request.is_xhr:
-                employee_dict = User.query.all()
-                return jsonify(employees=[i.json_view() for i in employee_dict])
+                member_dict = User.query.all()
+                return jsonify(collection=[i.json_view() for i in member_dict])
             else:
                 page = MembersPage(category=category).render()
                 return page
@@ -110,6 +112,11 @@ class MembersAPI(MethodView):
             else:
                 return MembersPage(nickname=nickname, category=category).render()
 
+    def put(self, member_id=None):
+        user = User.query.get(member_id)
+
+        # MembersPage(nickname=nickname, category="update")
+
     @login_required
     def delete(self, nickname):
         pass
@@ -117,14 +124,14 @@ class MembersAPI(MethodView):
 members_api_view = MembersAPI.as_view('members')  # URLS for MEMBER API
 app.add_url_rule('/members/',  # Read all members
                  view_func=members_api_view, methods=["GET"])
+app.add_url_rule('/members/<int:member_id>',
+                 view_func=members_api_view, methods=['PUT'])
 app.add_url_rule("/members/<any('all', 'latest', 'follow', 'unfollow', 'update', 'upload'):category>/",
                  view_func=members_api_view, methods=["GET", "POST"])
 app.add_url_rule('/members/<nickname>/',  # Read, Update and Destroy a single member
-                 view_func=members_api_view, methods=["GET", "POST", "PUT", "DELETE"])
+                 view_func=members_api_view, methods=["GET", "POST"])# Update or Delete a single post
 app.add_url_rule('/members/<nickname>/<category>/',  # Get photos of a given category for a given member
                  view_func=members_api_view, methods=["GET"])
-# Update a member when JS is turned off)
-# app.add_url_rule('/people/<action>/<nickname>', view_func=people_api_view, methods=["GET"])
 
 
 class PhotoAPI(MethodView):
@@ -242,3 +249,86 @@ def redirect_url(default='photos'):
     return request.args.get('next') or \
            request.referrer or \
            url_for(default)
+
+
+def make_public_picture(picture):
+    new_picture = {}
+    for field in picture:
+        if field == 'id':
+            new_picture['uri'] = url_for('picture_api', picture_id=picture['id'], _external=True)
+        else:
+            new_picture[field] = picture[field]
+    return new_picture
+
+
+pictures = [
+    {
+        'id': 1,
+        'owner': u'Bill',
+        'description': u'Taken in the city'
+    },
+    {
+        'id': 2,
+        'owner': u'Bill',
+        'description': u'Taken in the country'
+    }
+]
+
+
+class PictureAPI(MethodView):
+    def get(self, picture_id):
+        if picture_id is None:
+            return jsonify({'pictures': [make_public_picture(picture) for picture in pictures]})
+        else:
+            picture = [picture for picture in pictures if picture['id'] == picture_id]
+            if len(picture) == 0:
+                abort(404)
+            return jsonify({'picture': make_public_picture(picture[0])})
+
+    @auth_required
+    def post(self):
+        if not request.json or 'owner' not in request.json:
+            abort(400)
+        picture = {
+            'id': pictures[-1]['id'] + 1,
+            'owner': request.json['owner'],
+            'description': request.json.get('description', ""),
+        }
+        pictures.append(picture)
+        return jsonify({'picture': picture}), 201
+
+    @auth_required
+    def delete(self, picture_id):
+        picture = [picture for picture in pictures if picture['id'] == picture_id]
+        if len(picture) == 0:
+            abort(404)
+        pictures.remove(picture[0])
+        return jsonify({'result': True})
+
+    @auth_required
+    def put(self, picture_id):
+        picture = [picture for picture in pictures if picture['id'] == picture_id]
+        if len(picture) == 0:
+            abort(404)
+        if not request.json:
+            abort(400)
+        if 'owner' in request.json and type(request.json['owner']) != unicode:
+            abort(400)
+        if 'description' in request.json and type(request.json['description']) is not unicode:
+            abort(400)
+
+        picture[0]['owner'] = request.json.get('owner', picture[0]['owner'])
+        picture[0]['description'] = request.json.get('description', picture[0]['description'])
+        return jsonify({'picture': make_public_picture(picture[0])})
+
+user_view = PictureAPI.as_view('picture_api')
+app.add_url_rule('/pictures/', defaults={'picture_id': None}, view_func=user_view, methods=['GET'])
+app.add_url_rule('/pictures/', view_func=user_view, methods=['POST'])
+app.add_url_rule('/pictures/<int:picture_id>', view_func=user_view, methods=['GET', 'PUT', 'DELETE'])
+
+# curl -i http://localhost:8000/pictures/
+# curl -i http://localhost:8000/pictures/2
+# curl -i -H "Content-Type: application/json" -X POST -d '{"owner":"John","description":"Taken at the seashore"}'
+# http://localhost:8000/pictures/
+# curl -i -H "Content-Type: application/json" -X PUT -d '{"description":"eating out"}' http://localhost:8000/pictures/2
+# curl -i -H "Content-Type: application/json" -X DELETE http://localhost:8000/pictures/2

@@ -15,6 +15,11 @@
 {#                    </a>#}
 {#                {% endif %}#}
                 {{ post.body }}
+                {% for comment in post.comments.all() %}
+                    <p>{% if comment.created_at %}<small>On {{ comment.created_at.strftime('%H:%M %Y-%m-%d') }}, </small>{% endif %}
+                        {{ comment.author.nickname }} commented:</p>
+                    <p>{{ comment.body }}</p>
+                {% endfor %}
             </div>
         </span>
     </span>

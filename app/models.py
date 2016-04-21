@@ -42,6 +42,7 @@ class User(UserMixin, db.Model):
         self.nickname = self.make_unique_nickname(self.make_valid_nickname(nickname))
         self.email = email.lower()
         self.photo = photo
+        self.followers = followers
         if password is not None:
             self.set_password(password)
         if firstname is not None:
@@ -158,8 +159,14 @@ class Post(db.Model):
     slug = db.Column(db.String(255))
     votes = db.Column(db.Integer, default=1)
 
-    def __init__(self, **kwargs):
+    def __init__(self, comments, **kwargs):
         super(Post, self).__init__(**kwargs)
+        self.comments = comments
+
+    @property
+    def all_comments(self):
+        return self.comments.all()
+
 
     def get_voter_ids(self):
         """
@@ -219,7 +226,8 @@ class Post(db.Model):
 
     def json_view(self):
         return {'id': self.id, 'author': self.user_id, 'header': self.header, 'body': self.body, 'photo': self.photo,
-                'timestamp': json.dumps(self.timestamp)}
+                'category': self.category, 'nickname': self.author.nickname, 'timestamp': self.timestamp,
+                'all_comments': [i.json_view() for i in self.comments.all()]}
 
     def get_absolute_url(self):
         return url_for('post', kwargs={"slug": self.slug})
@@ -238,3 +246,7 @@ class Comment(db.Model):
 
     def __repr__(self):  # pragma: no cover
         return '<Comment %r>' % self.body
+
+    def json_view(self):
+        return {'id': self.id, 'body': self.body, 'post_id': self.post_id, 'user_id': self.user_id,
+                'created_at': self.created_at}
