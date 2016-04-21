@@ -1,15 +1,6 @@
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-define(['jquery', 'backbone', "views/contentMainView", 'views/contentArchiveView', 'views/navView'],
-=======
-define(['jquery', 'backbone', "views/contentMainView", 'views/archiveView', 'views/navView'],
->>>>>>> master
-    function($, Backbone, ContentMainView, ContentArchiveView, NavView){
-=======
 define(['jquery', 'backbone', "views/contentMainView", 'views/archiveView', 'views/navView', 'views/dataStore',
     'views/contentThumbnailView'],
     function($, Backbone, ContentMainView, ArchiveView, NavView, DataStore, ContentThumbnailView){
->>>>>>> Stashed changes
         return Backbone.View.extend({
             el: "#thisgreatpic",
             initialize: function(options){
