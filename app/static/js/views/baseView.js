@@ -11,7 +11,8 @@ define(['jquery', 'backbone', "views/contentMainView", 'views/archiveView', 'vie
 
             events: {
                 // "click i.fa-upload":   "uploadLink",
-                "click .expand-one":   "expandInfoBox",
+                'click i.fa-users':   'membersLink',
+                'click .expand-one':   'expandInfoBox',
                 'change #element': 'filterOnSelect'
             },
 
@@ -38,6 +39,10 @@ define(['jquery', 'backbone', "views/contentMainView", 'views/archiveView', 'vie
             filter: function(category){
                 this.render(this.baseCollection.where({category: category}));
             },
+            
+            memberfilter: function(category){
+                this.render(this.memberCollection.where({category: category}));
+            },
 
 
             render: function(filteredcollection){
@@ -53,6 +58,14 @@ define(['jquery', 'backbone', "views/contentMainView", 'views/archiveView', 'vie
             expandInfoBox: function(e) {
                 e.preventDefault();
                 $('.content-one').slideToggle('slow');
+            },
+            
+            membersLink: function(e) {
+                e.preventDefault();
+                    var category = "all"
+                    route = '/members/' + category;
+                    Backbone.history.navigate(route, {trigger: true});
+                    this.memberfilter(category)
             },
             
             attachCollectionToViews: function(){

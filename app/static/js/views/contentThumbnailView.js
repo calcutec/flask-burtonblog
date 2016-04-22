@@ -3,8 +3,8 @@ define(['jquery', 'backbone', 'nunjucks'],
         return Backbone.View.extend({
             tagName: "li",
             events: {
-                // 'click a.member-link':   'memberLink',
-                // 'click a.detail-link':   'detailLink',
+                'click a.member-link':   'memberLink',
+                'click a.detail-link':   'detailLink',
                 // 'click a.follow':   'follow',
                 // 'click a.unfollow':   'unfollow',
                 'click .gallery':   'gallery'

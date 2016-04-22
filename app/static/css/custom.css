@@ -429,6 +429,7 @@ span.rounded-icon svg {
 #title {
     display: inline-block;
     vertical-align: top;
+    padding-top: 2px;
 }
 #subtitle {
     font-size: 3rem;
@@ -622,7 +623,7 @@ input.button-primary {
     width: auto;
     display: inline-block;
     padding: 0;
-    margin: .6rem 0 0 0;
+    margin: 3px 0 0 0;
 }
 
 #element-label select {

@@ -2,7 +2,7 @@ define(['jquery', 'backbone', 'nunjucks'],
     function($, Backbone, nunjucks){
         return Backbone.View.extend({
             events: {
-                // 'click a.detail-link':   'detailLink'
+                'click a.detail-link':   'detailLink'
             },
         
             detailLink: function(e) {

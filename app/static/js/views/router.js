@@ -1,6 +1,6 @@
 define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/baseView", "views/uploadFormView",
-    "collections/memberCollection", "views/dataStore"],
-    function ($, Backbone, nunjucks, PhotoCollection, BaseView, UploadFormView, MemberCollection, DataStore) {
+    "collections/memberCollection"],
+    function ($, Backbone, nunjucks, PhotoCollection, BaseView, UploadFormView, MemberCollection) {
         return Backbone.Router.extend({
 
             initialize: function () {
@@ -17,6 +17,7 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
                 var env = nunjucks.configure("../static/templates");
                 env.addGlobal("static_url", 'https://s3.amazonaws.com/aperturus/');
                 Backbone.history.start({pushState: true});
+
             },
 
             routes: {
@@ -29,76 +30,58 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
                 'photos/:category/':    'filteredphotos',
                 'members/':             'members',
                 'members/latest/':      'members',
-                'members/:username/':   'portfolio'
+                'members/:username/':   'portfolio',
+                'members/:username/:category':   'membersfilteredphotos'
             },
 
             home: function () {
-                var photoCollection = new PhotoCollection();
-                new BaseView({collection: photoCollection, el: '#thisgreatpic'});
+                var basePhotoCollection = new PhotoCollection();
+                new BaseView({collection: basePhotoCollection, el: '#thisgreatpic'});
             },
 
             photos: function() {
-                var basePhotoCollection = new PhotoCollection();
-                basePhotoCollection.refreshFromServer({
-                    success: function(freshData) {
-                        basePhotoCollection.set(freshData['collection']);
-                        new BaseView({collection: basePhotoCollection, baseCollection: basePhotoCollection, 
-                            el: '#thisgreatpic'});
-                    },
-                    fail: function(error) {
-                        console.log(error);
-                    }
-                });
+                this.refreshdata(PhotoCollection);
             },
+
             filteredphotos: function(category) {
-                var basePhotoCollection = new PhotoCollection();
-                basePhotoCollection.refreshFromServer({
-                    success: function(freshData) {
-                        basePhotoCollection.set(freshData['collection']);
-                        var filteredPhotos = basePhotoCollection.where({category: category});
-                        var filteredPhotoCollection = new PhotoCollection(filteredPhotos);
-                        new BaseView({collection: filteredPhotoCollection, baseCollection: basePhotoCollection,
-                            el: '#thisgreatpic'});
-                    },
-                    fail: function(error) {
-                        console.log(error);
-                    }
-                });
+                this.refreshdata(PhotoCollection, category)
             },
 
-
+            membersfilteredphotos: function(category) {
+                this.refreshdata(PhotoCollection, category)
+            },
 
             upload: function() {
                 new UploadFormView();
             },
             
             members: function() {
-                var memberCollection = new MemberCollection();
-                memberCollection.fetch({
-                    success: function() {
-                        var baseView = new BaseView({collection: memberCollection, el: '#thisgreatpic'});
-                        baseView.attachToContentArchiveView();
-                        var test = "test";
-                    },
-                    fail: function(error) {
-                        console.log(error);
-                    }
-                });
+                this.refreshdata(MemberCollection)
             },
 
             portfolio: function(username) {
-                var photoCollection = new PhotoCollection();
-                photoCollection.refreshFromServer({
+                this.refreshdata(PhotoCollection, null, username)
+            },
+
+            refreshdata: function(BaseCollection, category, user) {
+                var baseCollection = new BaseCollection();
+                baseCollection.refreshFromServer({
                     success: function(freshData) {
-                        photoCollection.set(freshData['collection']);
-                        var baseView = new BaseView({collection: photoCollection, el: '#thisgreatpic'});
+                        if (category) {
+                            var filteredItems = baseCollection.where({category: category});
+                            var filteredCollection = new BaseCollection(filteredItems);
+                            new BaseView({collection: filteredCollection, baseCollection: baseCollection, el: '#thisgreatpic'});
+
+                        } else {
+                            baseCollection.set(freshData['collection']);
+                            new BaseView({collection: baseCollection, baseCollection: baseCollection, el: '#thisgreatpic'});
+                        }
                     },
                     fail: function(error) {
                         console.log(error);
                     }
                 });
             }
-            
         });
     }
 );
