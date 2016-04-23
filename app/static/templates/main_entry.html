@@ -3,12 +3,12 @@
     {% include "full_image.html" %}
     <span onclick="" class="profile-content">
         <span>
-            <div class="details-well">
+            <span class="details-well">
                 <a class="link-button" href="/members/{{ post.author.nickname }}/" rel="tag">{{ post.author.nickname }}</a><br>
                 <b>{{ momentjs(post.timestamp).calendar() }}</b><br>
                 {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
                 {{ post.body }}
-            </div>
+            </span>
         </span>
     </span>
     <a class="detail-link" href="/photos/{{ post.id }}">

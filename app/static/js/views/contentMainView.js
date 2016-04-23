@@ -16,6 +16,8 @@ define(['jquery', 'backbone', 'nunjucks'],
             },
         
             render: function() {
+                $('#main-image', this.el).html('');
+                $('#home-page', this.el).remove();
                 var post = this.collection[0].toJSON();
                 post['author'] = { "nickname": post.nickname };
                 $(this.el).html(nunjucks.render("main_entry.html", {'post': post, 'momentjs': moment }));

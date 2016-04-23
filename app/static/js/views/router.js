@@ -36,11 +36,11 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
             },
             
             home: function() {
-                this.refreshdata(PhotoCollection, "Home");
+                this.refreshdata(PhotoCollection, "home");
             },
 
             photos: function() {
-                this.refreshdata(PhotoCollection, "Photos");
+                this.refreshdata(PhotoCollection, "photos");
             },
 
             upload: function() {
@@ -48,7 +48,7 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
             },
             
             members: function() {
-                this.refreshdata(MemberCollection, "Members")
+                this.refreshdata(MemberCollection, "members")
             },
 
             refreshdata: function(BaseCollection, PageType) {
@@ -56,7 +56,11 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
                 baseCollection.fetch({
                     success: function(freshData) {
                         baseCollection.set(freshData['collection']);
-                        new BaseView({collection: baseCollection, el: '#thisgreatpic', pageType: PageType});
+                        if (PageType == "photos" || PageType == "home"){
+                            new BaseView({photoCollection: baseCollection, el: '#thisgreatpic', pageType: PageType});
+                        } else if (PageType == "members"){
+                            new BaseView({memberCollection: baseCollection, el: '#thisgreatpic', pageType: PageType});
+                        }
                     },
                     fail: function(error) {
                         console.log(error);
