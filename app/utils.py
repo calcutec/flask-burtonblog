@@ -195,7 +195,7 @@ class MembersPage(BasePage):
             if request.is_xhr:
                 self.assets['collection'] = [i.json_view() for i in self.posts]
             else:
-                members_context = {'posts': self.posts}
+                members_context = {'posts': self.posts[1:], 'post': self.posts[0]}
                 self.assets['archives'] = self.get_asset(template="members.html", context=members_context)
 
     def follow(self):

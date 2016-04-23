@@ -1,14 +1,14 @@
 define(['jquery', 'backbone', 'nunjucks'],
     function($, Backbone, nunjucks){
         return Backbone.View.extend({
-            el: '#nav',
+            el: 'header',
             render: function(){
                 var assets = {};
                 assets['entity'] = "members";
                 assets['category'] = "latest";
                 var request = {};
                 request['endpoint'] = "members";
-                $(this.el).html(nunjucks.render("nav_js.html",
+                $(this.el).html(nunjucks.render("header.html",
                     {'assets': assets, 'request': request }));
             }
         });

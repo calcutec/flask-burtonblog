@@ -27,28 +27,20 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
                 'photos/all/':          'photos',
                 'photos/latest/':       'photos',
                 'photos/upload/':       'upload',
-                'photos/:category/':    'filteredphotos',
+                'photos/:category/':    'photos',
                 'members/':             'members',
+                'members/all/':         'members',
                 'members/latest/':      'members',
-                'members/:username/':   'portfolio',
-                'members/:username/:category':   'membersfilteredphotos'
+                'members/:username/':   'photos',
+                'members/:username/:category':   'photos'
             },
-
-            home: function () {
-                var basePhotoCollection = new PhotoCollection();
-                new BaseView({collection: basePhotoCollection, el: '#thisgreatpic'});
+            
+            home: function() {
+                this.refreshdata(PhotoCollection, "Home");
             },
 
             photos: function() {
-                this.refreshdata(PhotoCollection);
-            },
-
-            filteredphotos: function(category) {
-                this.refreshdata(PhotoCollection, category)
-            },
-
-            membersfilteredphotos: function(category) {
-                this.refreshdata(PhotoCollection, category)
+                this.refreshdata(PhotoCollection, "Photos");
             },
 
             upload: function() {
@@ -56,26 +48,15 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
             },
             
             members: function() {
-                this.refreshdata(MemberCollection)
+                this.refreshdata(MemberCollection, "Members")
             },
 
-            portfolio: function(username) {
-                this.refreshdata(PhotoCollection, null, username)
-            },
-
-            refreshdata: function(BaseCollection, category, user) {
+            refreshdata: function(BaseCollection, PageType) {
                 var baseCollection = new BaseCollection();
-                baseCollection.refreshFromServer({
+                baseCollection.fetch({
                     success: function(freshData) {
-                        if (category) {
-                            var filteredItems = baseCollection.where({category: category});
-                            var filteredCollection = new BaseCollection(filteredItems);
-                            new BaseView({collection: filteredCollection, baseCollection: baseCollection, el: '#thisgreatpic'});
-
-                        } else {
-                            baseCollection.set(freshData['collection']);
-                            new BaseView({collection: baseCollection, baseCollection: baseCollection, el: '#thisgreatpic'});
-                        }
+                        baseCollection.set(freshData['collection']);
+                        new BaseView({collection: baseCollection, el: '#thisgreatpic', pageType: PageType});
                     },
                     fail: function(error) {
                         console.log(error);

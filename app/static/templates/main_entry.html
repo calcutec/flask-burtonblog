@@ -4,22 +4,10 @@
     <span onclick="" class="profile-content">
         <span>
             <div class="details-well">
-{#                <a class="link-button" href="/members/{{ post.author.nickname }}/" rel="tag">{{ post.author.nickname }}</a><br>#}
-{#                <b>{{ post.timestamp.strftime('%d %b %Y') }}</b><br>#}
+                <a class="link-button" href="/members/{{ post.author.nickname }}/" rel="tag">{{ post.author.nickname }}</a><br>
+                <b>{{ momentjs(post.timestamp).calendar() }}</b><br>
                 {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
-{#                {% if post.comments.all()|length > 0 %}#}
-{#                    <a href="{{ url_for('posts', slug=post.slug) }}">#}
-{#                        {% with total=post.comments.all()|length %}#}
-{#                            {{ total }} comment{% if total != 1 %}s{% endif %}#}
-{#                        {% endwith %}#}
-{#                    </a>#}
-{#                {% endif %}#}
                 {{ post.body }}
-                {% for comment in post.comments.all() %}
-                    <p>{% if comment.created_at %}<small>On {{ comment.created_at.strftime('%H:%M %Y-%m-%d') }}, </small>{% endif %}
-                        {{ comment.author.nickname }} commented:</p>
-                    <p>{{ comment.body }}</p>
-                {% endfor %}
             </div>
         </span>
     </span>

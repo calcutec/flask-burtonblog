@@ -1,20 +1,14 @@
-define(['backbone', 'localstorage', 'models/photoModel'],
-    function(Backbone, LocalStorage, PhotoModel){
+define(['backbone', 'models/photoModel'],
+    function(Backbone, PhotoModel){
         return Backbone.Collection.extend({
             url: "/photos",
             model: PhotoModel,
 
-            localStorage: new Backbone.LocalStorage("photos"),
-
-            refreshFromServer : function(options) {
-                return Backbone.ajaxSync('read', this, options);
-            },
-
             /**
-             * @param {{myPhotos:string}} response
+             * @param {{collection:string}} response
              */
             parse: function(response){
-                return response.myPhotos
+                return response.collection
             },
             
             comparator: function(photo){

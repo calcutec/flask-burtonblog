@@ -1,12 +1,38 @@
-define(['jquery', 'backbone', "views/contentMainView", 'views/archiveView', 'views/navView', 'views/dataStore',
-    'views/contentThumbnailView'],
-    function($, Backbone, ContentMainView, ArchiveView, NavView, DataStore, ContentThumbnailView){
+define(['jquery', 'backbone', "views/contentMainView", 'views/archiveView', 'views/navView', 'views/headerView', 'views/dataStore',
+    'views/contentThumbnailView', "collections/memberCollection"],
+    function($, Backbone, ContentMainView, ArchiveView, NavView, HeaderView, DataStore, ContentThumbnailView, MemberCollection){
         return Backbone.View.extend({
             el: "#thisgreatpic",
             initialize: function(options){
-                // this.listenTo(this.collection, "reset", this.renderViews());
-                this.attachCollectionToViews();
-                this.baseCollection = options.baseCollection;
+                if (options.pageType == "Members") {
+                    this.attachToContentMainView();
+                    this.attachToArchiveView();
+                    this.memberCollection = this.collection;
+                } else if(options.pageType == "Photos") {
+                    this.attachToContentMainView();
+                    this.attachToArchiveView();
+                    this.memberCollection = new MemberCollection();
+                    var self = this;
+                    this.memberCollection.fetch({
+                        success: function(freshData) {
+                            self.memberCollection.set(freshData['collection']);
+                        },
+                        fail: function(error) {
+                            console.log(error);
+                        }
+                    });
+                } else if(options.pageType == "Home") {
+                    this.memberCollection = new MemberCollection();
+                    var self = this;
+                    this.memberCollection.fetch({
+                        success: function(freshData) {
+                            self.memberCollection.set(freshData['collection']);
+                        },
+                        fail: function(error) {
+                            console.log(error);
+                        }
+                    });
+                }
             },
 
             events: {
@@ -23,7 +49,7 @@ define(['jquery', 'backbone', "views/contentMainView", 'views/archiveView', 'vie
                 if (window.location.pathname.split("/")[1] == "photos"){
                     route = '/photos/' + category;
                     Backbone.history.navigate(route, {trigger: true});
-                    this.filter(category)
+                    this.filter(this.collection, category)
                 } else if (window.location.pathname.split("/")[1] == "members"){
                     if (window.location.pathname.split("/")[2].match("all|latest") ||
                         window.location.pathname.split("/")[2] == ""){
@@ -32,22 +58,55 @@ define(['jquery', 'backbone', "views/contentMainView", 'views/archiveView', 'vie
                         route = '/members/' + window.location.pathname.split("/")[2] + "/" + category;
                     }
                     console.log(route);
-                    window.location.href = route;
+                    this.filter(this.memberCollection, category)
                 }
             },
 
-            filter: function(category){
-                this.render(this.baseCollection.where({category: category}));
-            },
-            
-            memberfilter: function(category){
-                this.render(this.memberCollection.where({category: category}));
+            filter: function(collection, category){
+                if (category == "all") {
+                    this.render(collection.first(100));
+                } else if (category == "latest"){
+                    this.render(collection.first(10));
+                } else {
+                    this.render(collection.where({category: category}));
+                }
+
             },
 
+
+            renderMember: function(filteredcollection){
+                $('#nav', this.el).html('');
+                this.renderNav();
+                $('header', this.el).html('');
+                this.renderHeader();
+                $('ul#links', this.el).html('');
+                $('#main-image', this.el).html('');
+                $('#home-page', this.el).remove();
+                var contentMainView = new ContentMainView({el: '#photo-main', 'collection': filteredcollection});
+                contentMainView.render();
+                filteredcollection.splice(1).forEach(this.addOne, this);
+            },
 
             render: function(filteredcollection){
                 $('ul#links', this.el).html('');
-                filteredcollection.forEach(this.addOne, this);
+                $('#main-image', this.el).html('');
+                $('#home-page', this.el).remove();
+                var contentMainView = new ContentMainView({el: '#photo-main', 'collection': filteredcollection});
+                contentMainView.render();
+                filteredcollection.splice(1).forEach(this.addOne, this);
+            },
+
+
+            renderNav: function(){
+                $('nav', this.el).html('');
+                var navView = new NavView({el: 'nav'});
+                navView.render();
+            },
+
+            renderHeader: function(){
+                $('header', this.el).html('');
+                var headerView = new HeaderView({el: 'header'});
+                headerView.render();
             },
 
             addOne: function (photo) {
@@ -62,16 +121,10 @@ define(['jquery', 'backbone', "views/contentMainView", 'views/archiveView', 'vie
             
             membersLink: function(e) {
                 e.preventDefault();
-                    var category = "all"
-                    route = '/members/' + category;
+                    var category = "latest";
+                    var route = '/members/' + category;
                     Backbone.history.navigate(route, {trigger: true});
-                    this.memberfilter(category)
-            },
-            
-            attachCollectionToViews: function(){
-                // DataStore.navView = new NavView();
-                this.attachToContentMainView();
-                this.attachToArchiveView();
+                    this.filter(this.memberCollection, category)
             },
             
             attachToContentMainView: function(){

@@ -13,6 +13,7 @@
         <span onclick="" class="profile-content">
             <span>
                 <div class="details-well">
+                    <a class="link-button" href="/members/{{ post.nickname }}/" rel="tag">{{ post.nickname }}</a><br>
                     {% if post.last_seen %}
                         <p><em>Last seen:{{ momentjs(post.last_seen).calendar() }}</em></p>
                     {% endif %}
