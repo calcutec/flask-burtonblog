@@ -58,13 +58,13 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
             filterOnSelect: function(e) {
                 e.preventDefault();
                 var category = $( "#element" ).val();
-                var type = window.location.pathname.split("/")[1];
+                var entity = window.location.pathname.split("/")[1];
                 var route;
-                if (type == "photos"){
+                if (entity == "photos"){
                     route = '/photos/' + category;
                     Backbone.history.navigate(route, {trigger: true});
-                    this.filter(this.photoCollection, category, type)
-                } else if (type == "members"){
+                    this.filter(this.photoCollection, category, entity)
+                } else if (entity == "members"){
                     if (window.location.pathname.split("/")[2].match("all|latest") ||
                         window.location.pathname.split("/")[2] == ""){
                         route = '/members/' + category;
@@ -72,7 +72,7 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                         route = '/members/' + window.location.pathname.split("/")[2] + "/" + category;
                     }
                     Backbone.history.navigate(route, {trigger: true});
-                    this.filter(this.memberCollection, category, type)
+                    this.filter(this.memberCollection, category, entity)
                 }
             },
             
@@ -98,23 +98,23 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
 
             memberLink: function(e){
                 e.preventDefault();
-                var nickname = e.target.href.split('/members/')[1].replace('/', '');
-                this.render(this.photoCollection.where({nickname: nickname}), null, "photos");
+                var category = e.target.href.split('/members/')[1].replace('/', '');
+                this.render(this.photoCollection.where({nickname: category}), category, "member");
             },
 
-            filter: function(collection, category, type){
+            filter: function(collection, category, entity){
                 if (category == "all") {
-                    this.render(collection.first(100),  category, type);
+                    this.render(collection.first(100),  category, entity);
                 } else if (category == "latest"){
-                    this.render(collection.first(10), category, type);
+                    this.render(collection.first(10), category, entity);
                 } else {
-                    this.render(collection.where({category: category}), category, type);
+                    this.render(collection.where({category: category}), category, entity);
                 }
             },
 
-            render: function(filteredcollection, category, type){
-                new HeaderView({el: 'header'}).render(category, type);
-                new NavView({el: 'nav'}).render(category, type);
+            render: function(filteredcollection, category, entity){
+                new HeaderView({el: 'header'}).render(category, entity);
+                new NavView({el: 'nav'}).render(category, entity);
                 new ContentMainView({el: '#photo-main', 'collection': filteredcollection}).render();
                 $('ul#links', this.el).html('');
                 filteredcollection.splice(1).forEach(this.addOne, this);

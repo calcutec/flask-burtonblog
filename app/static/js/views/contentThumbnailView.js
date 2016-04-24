@@ -3,7 +3,6 @@ define(['jquery', 'backbone', 'nunjucks'],
         return Backbone.View.extend({
             tagName: "li",
             events: {
-                'click a.member-link':   'memberLink',
                 'click a.detail-link':   'detailLink',
                 // 'click a.follow':   'follow',
                 // 'click a.unfollow':   'unfollow',
@@ -16,13 +15,8 @@ define(['jquery', 'backbone', 'nunjucks'],
                 post['comments'] = { "all": function(){
                     return self.models.get('comments')
                 } };
-                this.$el.html(nunjucks.render("archive_entry.html", {'post': post, 'momentjs': moment}));
+                this.$el.html(window.env.render("archive_entry.html", {'post': post, 'momentjs': moment}));
                 return this;
-            },
-        
-            memberLink: function(e) {
-                e.preventDefault();
-                console.log('member link clicked');
             },
 
             follow: function(e) {

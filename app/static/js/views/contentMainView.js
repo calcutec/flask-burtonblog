@@ -20,7 +20,7 @@ define(['jquery', 'backbone', 'nunjucks'],
                 $('#home-page', this.el).remove();
                 var post = this.collection[0].toJSON();
                 post['author'] = { "nickname": post.nickname };
-                $(this.el).html(nunjucks.render("main_entry.html", {'post': post, 'momentjs': moment }));
+                $(this.el).html(window.env.render("main_entry.html", {'post': post, 'momentjs': moment }));
                 return this;
             }
         });

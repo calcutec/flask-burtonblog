@@ -14,7 +14,7 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
                         }
                     })
                 });
-                var env = nunjucks.configure("../static/templates");
+                window.env = nunjucks.configure("http://localhost:8000/static/templates");
                 env.addGlobal("static_url", 'https://s3.amazonaws.com/aperturus/');
                 Backbone.history.start({pushState: true});
 

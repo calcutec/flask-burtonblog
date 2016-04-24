@@ -1,9 +1,9 @@
 {% if assets %}
     {% if assets.entity == "author" %}
         {{ current_user.nickname }}'s Photos
-    {% elif request.endpoint == "login" %}
+    {% elif assets.entity == "login" %}
         Login/Signup
-    {% elif request.endpoint == "home" %}
+    {% elif assets.entity == "home" %}
         This Great Pic
     {% elif assets.category == "upload"  %}
         Upload Photo
@@ -16,6 +16,6 @@
     {% elif assets.entity == "members"  %}
         Members
     {% else %}
-        {{ request.endpoint }} - {{ assets.category }}
+        {{ assets.entity }} - {{ assets.category }}
     {% endif %}
 {% endif %}
