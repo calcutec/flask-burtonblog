@@ -58,7 +58,7 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
                         baseCollection.set(freshData['collection']);
                         if (PageType == "photos" || PageType == "home"){
                             new BaseView({photoCollection: baseCollection, el: '#thisgreatpic', pageType: PageType});
-                        } else if (PageType == "members"){
+                        } else if (PageType == "Members"){
                             new BaseView({memberCollection: baseCollection, el: '#thisgreatpic', pageType: PageType});
                         }
                     },

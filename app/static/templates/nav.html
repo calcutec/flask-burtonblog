@@ -54,7 +54,7 @@
     <div id="nav" class="navigation">
         <ul>
         {% if not current_user.is_authenticated() %}
-            <li class="{% if assets.entity == "editor"  %}current{% endif %}"><a href="/home"><i class="fa fa-home"></i></a></li>
+            <li class="{% if assets.entity == "home"  %}current{% endif %}"><a href="/home"><i class="fa fa-home"></i></a></li>
         {% endif %}
             <li class="{% if assets.entity == "photos" and assets.category != "upload"  %}current{% endif %}"><a href="/photos/latest"><i class="fa fa-picture-o"></i></a></li>
             <li class="{% if assets.entity == "members" %}current{% endif %}"><a href="/members/latest"><i class="fa fa-users"></i></a></li>

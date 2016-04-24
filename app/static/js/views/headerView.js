@@ -9,6 +9,7 @@ define(['jquery', 'backbone', 'nunjucks'],
                 assets['category'] = category;
                 var request = {};
                 request['endpoint'] = type;
+                nunjucks.configure("../static/templates");
                 $(this.el).html(nunjucks.render("header.html",
                     {'assets': assets, 'request': request }));
             }

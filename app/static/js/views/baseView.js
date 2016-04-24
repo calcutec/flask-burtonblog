@@ -47,6 +47,7 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
             },
 
             events: {
+                'click a.member-link':   'memberLink',
                 'change #element': 'filterOnSelect',
                 'click .expand-one':   'expandInfoBox',
                 'click i.fa-picture-o':   'iconLink',
@@ -57,7 +58,7 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
             filterOnSelect: function(e) {
                 e.preventDefault();
                 var category = $( "#element" ).val();
-                var type = window.location.pathname.split("/")[1]
+                var type = window.location.pathname.split("/")[1];
                 var route;
                 if (type == "photos"){
                     route = '/photos/' + category;
@@ -93,6 +94,12 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                         Backbone.history.navigate(route, {trigger: true});
                         this.filter(this.photoCollection, category, "photos")
                     }
+            },
+
+            memberLink: function(e){
+                e.preventDefault();
+                var nickname = e.target.href.split('/members/')[1].replace('/', '');
+                this.render(this.photoCollection.where({nickname: nickname}), null, "photos");
             },
 
             filter: function(collection, category, type){

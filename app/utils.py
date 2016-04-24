@@ -38,7 +38,7 @@ class BasePage(object):
     def get_entity(self):
         entity = None
         if request.endpoint == 'home':
-            entity = 'editor'
+            entity = 'home'
         elif request.endpoint == 'photos':
             if self.post_id:
                 entity = "photo"
@@ -64,7 +64,7 @@ class BasePage(object):
 
     def get_posts(self):
         posts_dict = {
-            "editor": {'obj': "post", 'filter': {'writing_type': 'op-ed'}},
+            "home": {'obj': "post", 'filter': {'writing_type': 'op-ed'}},
             "photo": {'obj': "post", 'filter': {'id': self.post_id}},
             "photos": {'obj': "post", 'filter': {'writing_type': 'entry'}},
             "author": {'obj': "post", 'filter': {'author': current_user}},
@@ -80,7 +80,7 @@ class BasePage(object):
             posts = User.query.all()
         else:
             posts = Post.query.filter_by(**posts_dict['filter']).order_by(Post.timestamp.desc())
-            # Get count of photos in each category owned by the above entities (author, member, photos, editor)
+            # Get count of photos in each category owned by the above entities (author, member, photos, home)
             category_counts = dict()
             for value in db.session.query(Post.category).filter_by(**posts_dict['filter']).distinct():
                 category_counts[value[0]] = int(db.session.query(Post).filter_by(**posts_dict['filter'])
@@ -129,7 +129,7 @@ class PhotoPage(BasePage):
             self.get_page_assets()
 
     def get_page_assets(self):
-        if self.assets['entity'] == "editor":
+        if self.assets['entity'] == "home":
             if request.is_xhr:
                 pass
             else:
