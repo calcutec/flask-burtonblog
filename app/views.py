@@ -94,12 +94,8 @@ class MembersAPI(MethodView):
 
     def get(self, nickname=None, category="latest"):
         if nickname is None:  # Display all members
-            if request.is_xhr:
-                member_dict = User.query.all()
-                return jsonify(collection=[i.json_view() for i in member_dict])
-            else:
-                page = MembersPage(category=category).render()
-                return page
+            page = MembersPage(category=category).render()
+            return page
         else:  # Display a single member
             if "key" in request.args:
                 g.user.photo = request.args['key']
@@ -146,7 +142,8 @@ class PhotoAPI(MethodView):
     def get(self, post_id=None, category=None):
         if current_user.is_authenticated() or category != "upload":
             if post_id is None:
-                return PhotoPage(category=category).render()
+                page = PhotoPage(category=category).render()
+                return page
             else:
                 return PhotoPage(post_id=post_id, category=category).render()
         else:

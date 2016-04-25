@@ -11,7 +11,8 @@ define(['backbone'], function(Backbone) {
             nickname: '',
             photo: '',
             lastseen: '',
-            followed: ''
+            followed: '',
+            authenticated: '',
         }
     });
 });

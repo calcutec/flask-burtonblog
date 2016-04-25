@@ -108,6 +108,7 @@ class BasePage(object):
         if request.is_xhr:
             response = dict()
             response['success'] = True
+            response['authenticated'] = g.user.is_authenticated()
             if 'collection' in self.assets:
                 response['collection'] = self.assets['collection']
             elif 'body_form' in self.assets:

@@ -54,11 +54,10 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
             refreshdata: function(BaseCollection, PageType) {
                 var baseCollection = new BaseCollection();
                 baseCollection.fetch({
-                    success: function(freshData) {
-                        baseCollection.set(freshData['collection']);
+                    success: function() {
                         if (PageType == "photos" || PageType == "home"){
                             new BaseView({photoCollection: baseCollection, el: '#thisgreatpic', pageType: PageType});
-                        } else if (PageType == "Members"){
+                        } else if (PageType == "members"){
                             new BaseView({memberCollection: baseCollection, el: '#thisgreatpic', pageType: PageType});
                         }
                     },

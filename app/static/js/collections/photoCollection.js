@@ -5,9 +5,10 @@ define(['backbone', 'models/photoModel'],
             model: PhotoModel,
 
             /**
-             * @param {{collection:string}} response
+             * @param {{collection:string, authenticated:string}} response
              */
             parse: function(response){
+                this.authenticated = response.authenticated;
                 return response.collection
             },
             

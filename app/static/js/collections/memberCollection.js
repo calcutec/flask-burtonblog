@@ -3,12 +3,14 @@ define(['backbone', 'models/memberModel'],
         return Backbone.Collection.extend({
             url: "/members",
             model: MemberModel,
+            authenticated: null,
 
             /**
-             * @param {{collection:string}} response
+             * @param {{collection:string, authenticated:string}} response
              */
             parse: function(response){
-                return response.collection
+                this.authenticated = response.authenticated;
+                return response.collection;
             },
 
             comparator: function(member){
