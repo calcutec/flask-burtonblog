@@ -28,7 +28,7 @@
                                      <option value={{ key }} {% if assets.category == key %}selected{% endif %}>{{ key }} ({{ value }})</option>
                                 {% endfor %}
                             {%  elif assets.entity == "photos" %}
-                                {% for key in assets.category_counts|dictsort %}
+                                {% for key, value in assets.category_counts|dictsort %}
                                      <option value={{ key }} {% if assets.category == key %}selected{% endif %}>{{ key }} ({{ value }})</option>
                                 {% endfor %}
                             {% endif %}

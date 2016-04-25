@@ -57,26 +57,28 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
 
             filterOnSelect: function(e) {
                 e.preventDefault();
-                var category = $( "#element" ).val();
-                var entity = window.location.pathname.split("/")[1];
+                var pathArray = window.location.pathname.split( '/' );
+                var category = $( '#element' ).val();
+                var entity;
                 var route;
                 var authenticated;
                 var nickname = null;
-                if (entity == "photos"){
+                if ($.inArray("photos", pathArray) == 1){
+                    entity = pathArray[1];
                     route = '/photos/' + category;
                     Backbone.history.navigate(route, {trigger: true});
                     authenticated = this.photoCollection.authenticated;
                     this.filter(this.photoCollection, category, entity, null, authenticated)
-                } else if (entity == "members"){
-                    if (window.location.pathname.split("/")[2].match("all|latest") ||
-                        window.location.pathname.split("/")[2] == ""){
+                } else if ($.inArray("members", pathArray) == 1){
+                    entity = pathArray[1];
+                    if (pathArray[2].match("all|latest") || pathArray[2] == ""){
                         route = '/members/' + category;
                         Backbone.history.navigate(route, {trigger: true});
                         authenticated = this.memberCollection.authenticated;
                         this.filter(this.memberCollection, category, entity, nickname, authenticated)
                     } else {
-                        nickname = window.location.pathname.split('/members/')[1].replace('/', '');
-                        route = '/members/' + window.location.pathname.split("/")[2] + "/" + category;
+                        nickname = pathArray[2];
+                        route = '/members/' + nickname + "/" + category;
                         Backbone.history.navigate(route, {trigger: true});
                         authenticated = this.photoCollection.authenticated;
                         entity = "member";
@@ -114,12 +116,12 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                         route = '/members/' + category;
                         Backbone.history.navigate(route, {trigger: true});
                         authenticated = this.memberCollection.authenticated;
-                        this.filter(this.memberCollection, category, "members", authenticated)
+                        this.filter(this.memberCollection, category, "members", null, authenticated)
                     } else if (e.currentTarget.classList[1] == "fa-picture-o"){
                         route = '/photos/' + category;
                         Backbone.history.navigate(route, {trigger: true});
                         authenticated = this.photoCollection.authenticated;
-                        this.filter(this.photoCollection, category, "photos", authenticated)
+                        this.filter(this.photoCollection, category, "photos", null, authenticated)
                     }
             },
 
@@ -136,13 +138,22 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
 
             filter: function(collection, category, entity, nickname, authenticated, counts){
                 if (category == "all" || category == "latest"){
-                    counts = this.getCounts(collection);
-                    if (category == "all") {
-                        this.render(collection.first(100),  category, entity, nickname, authenticated, counts);
-                    } else if (category == "latest"){
-                        this.render(collection.first(10), category, entity, nickname, authenticated, counts);
+                    if (nickname){
+                        collection = collection.where({nickname: nickname});
+                        counts = this.getCounts(collection);
+                        if (category == "all") {
+                            this.render(collection.splice(0,100),  category, entity, nickname, authenticated, counts);
+                        } else if (category == "latest"){
+                            this.render(collection.splice(0,10), category, entity, nickname, authenticated, counts);
+                        }
+                    } else {
+                        counts = this.getCounts(collection);
+                        if (category == "all") {
+                            this.render(collection.first(100),  category, entity, nickname, authenticated, counts);
+                        } else if (category == "latest"){
+                            this.render(collection.first(10), category, entity, nickname, authenticated, counts);
+                        }
                     }
-
                 } else {
                     if (nickname && category ){
                         counts = this.getCounts(collection.where({nickname: nickname}));

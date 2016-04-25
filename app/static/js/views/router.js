@@ -21,25 +21,43 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
             },
 
             routes: {
-                '':                     'home',
-                'home/':                'home',
-                'photos/':              'photos',
-                'photos/all/':          'photos',
-                'photos/latest/':       'photos',
-                'photos/upload/':       'upload',
-                'photos/:category/':    'photos',
-                'members/':             'members',
-                'members/all/':         'members',
-                'members/latest/':      'members',
-                'members/:username/':   'photos',
-                'members/:username/:category':   'photos'
+                '':                             'home',
+                'home/':                        'home',
+                'photos/':                      'photos',
+                'photos/all/':                  'photos',
+                'photos/latest/':               'photos',
+                'photos/upload/':               'upload',
+                'photos/:category/':            'photos',
+                'members/':                     'members',
+                'members/all/':                 'members',
+                'members/latest/':              'members',
+                'members/:username/':           'photos1',
+                'members/:username/all/':        'photos2',
+                'members/:username/latest/':     'photos3',
+                'members/:username/:category/':  'photos4'
             },
-            
+
             home: function() {
                 this.refreshdata(PhotoCollection, "home");
             },
 
             photos: function() {
+                this.refreshdata(PhotoCollection, "photos");
+            },
+
+            photos1: function() {
+                this.refreshdata(PhotoCollection, "photos");
+            },
+
+            photos2: function() {
+                this.refreshdata(PhotoCollection, "photos");
+            },
+
+            photos3: function() {
+                this.refreshdata(PhotoCollection, "photos");
+            },
+
+            photos4: function() {
                 this.refreshdata(PhotoCollection, "photos");
             },
 
