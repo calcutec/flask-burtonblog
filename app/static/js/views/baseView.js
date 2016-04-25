@@ -60,20 +60,44 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                 var category = $( "#element" ).val();
                 var entity = window.location.pathname.split("/")[1];
                 var route;
+                var authenticated;
+                var nickname = null;
                 if (entity == "photos"){
                     route = '/photos/' + category;
                     Backbone.history.navigate(route, {trigger: true});
-                    this.filter(this.photoCollection, category, entity)
+                    authenticated = this.photoCollection.authenticated;
+                    this.filter(this.photoCollection, category, entity, null, authenticated)
                 } else if (entity == "members"){
                     if (window.location.pathname.split("/")[2].match("all|latest") ||
                         window.location.pathname.split("/")[2] == ""){
                         route = '/members/' + category;
+                        Backbone.history.navigate(route, {trigger: true});
+                        authenticated = this.memberCollection.authenticated;
+                        this.filter(this.memberCollection, category, entity, nickname, authenticated)
                     } else {
+                        nickname = window.location.pathname.split('/members/')[1].replace('/', '');
                         route = '/members/' + window.location.pathname.split("/")[2] + "/" + category;
+                        Backbone.history.navigate(route, {trigger: true});
+                        authenticated = this.photoCollection.authenticated;
+                        entity = "member";
+                        this.filter(this.photoCollection, category, entity, nickname, authenticated)
                     }
-                    Backbone.history.navigate(route, {trigger: true});
-                    this.filter(this.memberCollection, category, entity)
                 }
+            },
+            
+            getCounts: function(collection){
+                var categoryarray = [];
+                collection.forEach(function(model){
+                    categoryarray.push(model.get('category'))
+                });
+
+                var counts = {};
+                for(var i = 0; i < categoryarray.length; ++i) {
+                    if(!counts[categoryarray[i]])
+                        counts[categoryarray[i]] = 0;
+                    ++counts[categoryarray[i]];
+                }
+                return counts;
             },
             
             expandInfoBox: function(e) {
@@ -101,26 +125,44 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
 
             memberLink: function(e){
                 e.preventDefault();
-                var category = e.target.href.split('/members/')[1].replace('/', '');
-                var route = '/members/' + category;
+                var nickname = e.target.href.split('/members/')[1].replace('/', '');
+                var route = '/members/' + nickname;
                 Backbone.history.navigate(route, {trigger: true});
                 var authenticated = this.photoCollection.authenticated;
-                this.render(this.photoCollection.where({nickname: category}), category, "member", authenticated);
+                var membersCollection = this.photoCollection.where({nickname: nickname});
+                var counts = this.getCounts(membersCollection);
+                this.render(membersCollection, null, "member", nickname, authenticated, counts);
             },
 
-            filter: function(collection, category, entity, authenticated){
-                if (category == "all") {
-                    this.render(collection.first(100),  category, entity, authenticated);
-                } else if (category == "latest"){
-                    this.render(collection.first(10), category, entity, authenticated);
+            filter: function(collection, category, entity, nickname, authenticated, counts){
+                if (category == "all" || category == "latest"){
+                    counts = this.getCounts(collection);
+                    if (category == "all") {
+                        this.render(collection.first(100),  category, entity, nickname, authenticated, counts);
+                    } else if (category == "latest"){
+                        this.render(collection.first(10), category, entity, nickname, authenticated, counts);
+                    }
+
                 } else {
-                    this.render(collection.where({category: category}), category, entity, authenticated);
+                    if (nickname && category ){
+                        counts = this.getCounts(collection.where({nickname: nickname}));
+                        collection = collection.where({nickname: nickname, category: category });
+
+                    } else if (category){
+                        counts = this.getCounts(collection);
+                        collection = collection.where({category: category});
+                    } else if (nickname){
+                        collection = collection.where({nickname: nickname});
+                        counts = this.getCounts(collection);
+                    }
+                    this.render(collection, category, entity, nickname, authenticated, counts);
+
                 }
             },
 
-            render: function(filteredcollection, category, entity, authenticated){
-                new HeaderView({el: 'header'}).render(category, entity, authenticated);
-                new NavView({el: 'nav'}).render(category, entity, authenticated);
+            render: function(filteredcollection, category, entity, nickname, authenticated, counts){
+                new HeaderView({el: 'header'}).render(category, entity, nickname);
+                new NavView({el: 'nav'}).render(filteredcollection, category, entity, authenticated, counts);
                 new ContentMainView({el: '#photo-main', 'collection': filteredcollection}).render();
                 $('ul#links', this.el).html('');
                 filteredcollection.splice(1).forEach(this.addOne, this);
