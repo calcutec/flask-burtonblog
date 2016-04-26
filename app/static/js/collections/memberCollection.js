@@ -6,10 +6,11 @@ define(['backbone', 'models/memberModel'],
             authenticated: null,
 
             /**
-             * @param {{collection:string, authenticated:string}} response
+             * @param {{collection:string, authenticated:string, usernickname:string}} response
              */
             parse: function(response){
                 this.authenticated = response.authenticated;
+                this.usernickname = response.usernickname;
                 return response.collection;
             },
 

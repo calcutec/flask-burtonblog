@@ -109,6 +109,8 @@ class BasePage(object):
             response = dict()
             response['success'] = True
             response['authenticated'] = g.user.is_authenticated()
+            if g.user.is_authenticated():
+                response['usernickname'] = g.user.nickname
             if 'collection' in self.assets:
                 response['collection'] = self.assets['collection']
             elif 'body_form' in self.assets:

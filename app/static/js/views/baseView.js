@@ -51,7 +51,8 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                 'change #element': 'filterOnSelect',
                 'click .expand-one':   'expandInfoBox',
                 'click i.fa-picture-o':   'iconLink',
-                'click i.fa-users':   'iconLink'
+                'click i.fa-users':   'iconLink',
+                'click i.fa-briefcase':   'iconLink'
                 // "click i.fa-upload":   "uploadLink",
             },
 
@@ -111,32 +112,48 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                 e.preventDefault();
                     var category = "latest";
                     var route;
+                    var entity;
+                    var nickname;
                     var authenticated;
                     if (e.currentTarget.classList[1] == "fa-users"){
                         route = '/members/' + category;
                         Backbone.history.navigate(route, {trigger: true});
+                        entity = "members";
+                        nickname = null;
                         authenticated = this.memberCollection.authenticated;
-                        this.filter(this.memberCollection, category, "members", null, authenticated)
+                        this.filter(this.memberCollection, category, entity, nickname, authenticated)
                     } else if (e.currentTarget.classList[1] == "fa-picture-o"){
                         route = '/photos/' + category;
                         Backbone.history.navigate(route, {trigger: true});
+                        entity = "photos";
+                        nickname = null;
                         authenticated = this.photoCollection.authenticated;
-                        this.filter(this.photoCollection, category, "photos", null, authenticated)
+                        this.filter(this.photoCollection, category, entity, nickname, authenticated)
+                    } else if (e.currentTarget.classList[1] == "fa-briefcase"){
+                        nickname = this.memberCollection.usernickname;
+                        route = '/members/' + nickname;
+                        Backbone.history.navigate(route, {trigger: true});
+                        entity = 'author';
+                        authenticated = this.photoCollection.authenticated;
+                        this.filter(this.photoCollection, category, entity, nickname, authenticated)
                     }
             },
 
             memberLink: function(e){
                 e.preventDefault();
+                var category = null;
+                var entity = "member";
                 var nickname = e.target.href.split('/members/')[1].replace('/', '');
                 var route = '/members/' + nickname;
                 Backbone.history.navigate(route, {trigger: true});
                 var authenticated = this.photoCollection.authenticated;
                 var membersCollection = this.photoCollection.where({nickname: nickname});
                 var counts = this.getCounts(membersCollection);
-                this.render(membersCollection, null, "member", nickname, authenticated, counts);
+                this.render(membersCollection, category, entity, nickname, authenticated, counts);
             },
 
-            filter: function(collection, category, entity, nickname, authenticated, counts){
+            filter: function(collection, category, entity, nickname, authenticated){
+                var counts;
                 if (category == "all" || category == "latest"){
                     if (nickname){
                         collection = collection.where({nickname: nickname});
@@ -173,7 +190,7 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
 
             render: function(filteredcollection, category, entity, nickname, authenticated, counts){
                 new HeaderView({el: 'header'}).render(category, entity, nickname);
-                new NavView({el: 'nav'}).render(filteredcollection, category, entity, authenticated, counts);
+                new NavView({el: 'nav'}).render(filteredcollection, category, entity, nickname, authenticated, counts);
                 new ContentMainView({el: '#photo-main', 'collection': filteredcollection}).render();
                 $('ul#links', this.el).html('');
                 filteredcollection.splice(1).forEach(this.addOne, this);
