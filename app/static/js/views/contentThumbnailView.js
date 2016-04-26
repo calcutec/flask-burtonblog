@@ -1,9 +1,8 @@
-define(['jquery', 'backbone', 'nunjucks'],
-    function($, Backbone, nunjucks){
+define(['jquery', 'backbone'],
+    function($, Backbone){
         return Backbone.View.extend({
             tagName: "li",
             events: {
-                'click a.detail-link':   'detailLink',
                 // 'click a.follow':   'follow',
                 // 'click a.unfollow':   'unfollow',
                 'click .gallery':   'gallery'
@@ -15,7 +14,7 @@ define(['jquery', 'backbone', 'nunjucks'],
                 post['comments'] = { "all": function(){
                     return self.models.get('comments')
                 } };
-                this.$el.html(window.env.render("archive_entry.html", {'post': post, 'momentjs': moment}));
+                $(this.el).html(window.env.render("archive_entry.html", {'post': post, 'momentjs': moment}));
                 return this;
             },
 
@@ -46,11 +45,7 @@ define(['jquery', 'backbone', 'nunjucks'],
                     }
                 });
             },
-        
-            detailLink: function(e) {
-                e.preventDefault();
-                console.log('detail link clicked');
-            },
+            
             gallery: function(event) {
                 event.preventDefault();
                 var target = event.target || event.srcElement,

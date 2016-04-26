@@ -37,7 +37,7 @@
             {% endif %}
             {% if request.endpoint == "login" %}
                 <div id="title"><i class="current fa fa-sign-in"></i></div>
-            {% elif request.endpoint == "home" %}
+            {% elif assets.entity == "home" %}
                 <div id="title"><i class="current fa fa-home"></i></div>
             {% elif assets.category == "upload"  %}
                 <div id="title"><i class="current fa fa-upload"></i><span id="subtitle">{{ assets.category }}</span></div>

@@ -3,7 +3,7 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
     function ($, Backbone, nunjucks, PhotoCollection, BaseView, UploadFormView, MemberCollection) {
         return Backbone.Router.extend({
 
-            initialize: function () {
+            initialize: function (options) {
                 var csrftoken = $('meta[name=csrf-token]').attr('content');
                 $(function(){
                     $.ajaxSetup({
@@ -16,6 +16,7 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
                 });
                 window.env = nunjucks.configure("http://localhost:8000/static/templates");
                 env.addGlobal("static_url", 'https://s3.amazonaws.com/aperturus/');
+
                 Backbone.history.start({pushState: true});
 
             },
@@ -31,34 +32,29 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
                 'members/':                     'members',
                 'members/all/':                 'members',
                 'members/latest/':              'members',
-                'members/:username/':           'photos1',
-                'members/:username/all/':        'photos2',
-                'members/:username/latest/':     'photos3',
-                'members/:username/:category/':  'photos4'
+                'members/:username/':           'photos',
+                'members/:username/all/':        'photos',
+                'members/:username/latest/':     'photos',
+                'members/:username/:category/':  'photos'
+            },
+
+
+            photo: function (id) {
+                console.log(id);
             },
 
             home: function() {
                 this.refreshdata(PhotoCollection, "home");
             },
 
-            photos: function() {
-                this.refreshdata(PhotoCollection, "photos");
-            },
+            photos: function(category) {
+                if (category && category.match(/^\d+$/)) { // if category is a number
+                    this.refreshdata(PhotoCollection, "photo");
+                }
+                else {
+                    this.refreshdata(PhotoCollection, "photos");
+                }
 
-            photos1: function() {
-                this.refreshdata(PhotoCollection, "photos");
-            },
-
-            photos2: function() {
-                this.refreshdata(PhotoCollection, "photos");
-            },
-
-            photos3: function() {
-                this.refreshdata(PhotoCollection, "photos");
-            },
-
-            photos4: function() {
-                this.refreshdata(PhotoCollection, "photos");
             },
 
             upload: function() {
@@ -73,7 +69,7 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
                 var baseCollection = new BaseCollection();
                 baseCollection.fetch({
                     success: function() {
-                        if (PageType == "photos" || PageType == "home"){
+                        if (PageType == "photos" || PageType == "home" || PageType == "photo"){
                             new BaseView({photoCollection: baseCollection, el: '#thisgreatpic', pageType: PageType});
                         } else if (PageType == "members"){
                             new BaseView({memberCollection: baseCollection, el: '#thisgreatpic', pageType: PageType});

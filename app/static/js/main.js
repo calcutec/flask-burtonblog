@@ -19,7 +19,7 @@ require.config({
     }
 });
 
-require(['views/router'],
+define(['views/router'],
     function (Router) {
         new Router();
     }

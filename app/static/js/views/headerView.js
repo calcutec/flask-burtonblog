@@ -2,20 +2,21 @@ define(['jquery', 'backbone'],
     function($, Backbone){
         return Backbone.View.extend({
             el: 'header',
-            render: function(category, entity, nickname){
+            render: function(itemDict){
                 $('header', this.el).html('');
                 var assets = {};
-                assets['entity'] = entity;
-                assets['category'] = category;
-                if (entity == "member"){
+                assets['entity'] = itemDict.entity;
+                assets['photo_id'] = itemDict.postId;
+                assets['category'] = itemDict.category;
+                if (itemDict.entity == "member"){
                     assets['person'] = {};
-                    assets.person['nickname'] = nickname;
-                } else if (entity == "author"){
-                    assets['current_user'] = {};
-                    assets.current_user['nickname'] = nickname;
+                    assets.person['nickname'] = itemDict.nickname;
+                } else if (itemDict.entity == "author"){
+                    var current_user = {};
+                    current_user['nickname'] = itemDict.nickname;
                 }
                 $(this.el).html(window.env.render("header.html",
-                    {'assets': assets }));
+                    {'assets': assets, 'current_user': current_user }));
             }
         });
     }

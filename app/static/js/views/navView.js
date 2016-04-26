@@ -2,21 +2,20 @@ define(['jquery', 'backbone'],
     function($, Backbone){
         return Backbone.View.extend({
             el: '#nav',
-            render: function(filteredcollection, category, entity, nickname, authenticated, counts){
+            render: function(itemDict){
                 $('nav', this.el).html('');
                 var assets = {};
-                assets['category_counts'] = counts;
-                assets['entity'] = entity;
-                assets['category'] = category;
-                var request = {};
-                request['endpoint'] = entity;
+                assets['category_counts'] = itemDict.counts;
+                assets['category'] = itemDict.category;
+                assets['photo_id'] = itemDict.postId;
+                assets['entity'] = itemDict.entity;
                 var current_user = {};
+                current_user['nickname'] = itemDict.nickname;
                 current_user['is_authenticated'] = function(){
-                    return authenticated;
+                    return itemDict.authenticated;
                 };
-                current_user['nickname'] = nickname
                 $(this.el).html(window.env.render("nav.html",
-                    {'assets': assets, 'request': request, 'current_user': current_user }));
+                    {'assets': assets, 'current_user': current_user }));
             }
         });
     }
