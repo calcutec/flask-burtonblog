@@ -4,7 +4,7 @@
     <span onclick="" class="profile-content">
         <span>
             <span class="details-well">
-                <a class="link-button" href="/members/{{ post.author.nickname }}/" rel="tag">{{ post.author.nickname }}</a><br>
+                <a class="link-button member-link" href="/members/{{ post.author.nickname }}/" rel="tag">{{ post.author.nickname }}</a><br>
                 <b>{{ momentjs(post.timestamp).calendar() }}</b><br>
                 {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
                 {{ post.body }}

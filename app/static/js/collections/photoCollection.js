@@ -13,7 +13,7 @@ define(['backbone', 'models/photoModel'],
             },
             
             comparator: function(photo){
-                return photo.get('timestamp');
+                return -photo.get('timestamp');
             }
         });
     }

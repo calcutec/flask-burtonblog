@@ -12,7 +12,7 @@ define(['backbone'], function(Backbone) {
             photo: '',
             lastseen: '',
             followed: '',
-            authenticated: '',
+            is_following: ''
         }
     });
 });

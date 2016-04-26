@@ -3,7 +3,13 @@
     <span class="inner-span">
         <span class="details-well">
             <a class="link-button member-link" href="/members/{{ post.author.nickname }}/" rel="tag">{{ post.author.nickname }}</a><br>
+
+            {% if post.last_seen %}
+                <p><em>Last seen:{{ momentjs(post.last_seen).calendar() }}</em></p>
+            {% else %}
                 <b>{{ momentjs(post.timestamp).calendar() }}</b><br>
+            {% endif %}
+
             {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
             {% if post.all_comments|length > 0 %}
                 <a href="/photos/{{ post.id }}">

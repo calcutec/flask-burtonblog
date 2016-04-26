@@ -13,21 +13,21 @@
         <span onclick="" class="profile-content">
             <span>
                 <div class="details-well">
-                    <a class="link-button" href="/members/{{ post.nickname }}/" rel="tag">{{ post.nickname }}</a><br>
+                    <a class="link-button member-link" href="/members/{{ post.nickname }}/" rel="tag">{{ post.nickname }}</a><br>
                     {% if post.last_seen %}
                         <p><em>Last seen:{{ momentjs(post.last_seen).calendar() }}</em></p>
                     {% endif %}
-                    {% if g.user.is_authenticated() %}
+                    {% if current_user.is_authenticated() %}
                         <p>Followers: {{ post.followers.count() }} | Following: {{ post.followed.count() }}</p>
-                        {% if post.nickname == g.user.nickname %}
+                        {% if post.nickname == current_user.nickname %}
                             <a class="button button-primary" href="/members/update" >Update Info</a>
                             <a class="button button-primary" href="/members/upload" >Change Image</a>
                         {% endif %}
-                        {% if post.nickname != g.user.nickname %}
-                            {% if g.user.is_following(post) %}
-                                <a class="link-button" href="{{ url_for('members', category='unfollow', nickname=post.nickname) }}"><strong>Unfollow</strong></a>
+                        {% if post.nickname != current_user.nickname %}
+                            {% if current_user.is_following(post) %}
+                                <a class="link-button" href="/members/unfollow/{{ post.nickname }}"><strong>Unfollow</strong></a>
                             {% else %}
-                                <a class="link-button" href="{{ url_for('members', category='follow', nickname=post.nickname) }}"><strong>Follow</strong></a>
+                                <a class="link-button" href="/members/follow/{{ post.nickname }}"><strong>Follow</strong></a>
                             {% endif %}
                         {% endif %}
                     {% endif %}
