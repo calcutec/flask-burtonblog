@@ -4,7 +4,7 @@ define(['jquery', 'backbone'],
             events: {
                 'click a.detail-link':   'detailLink'
             },
-        
+            
             detailLink: function(e) {
                 e.preventDefault();
                 console.log('detail link clicked');
@@ -16,12 +16,11 @@ define(['jquery', 'backbone'],
             },
         
             render: function(itemDict) {
-                $('#main-image', this.el).html('');
-                $('#home-page', this.el).remove();
+                var post;
                 if (itemDict.entity == "member" || itemDict.entity == "author"){
-                    var post = itemDict.target_user[0].toJSON();
+                    post = itemDict.target_user[0].toJSON();
                 } else {
-                    var post = itemDict.collection[0].toJSON();
+                    post = itemDict.collection[0].toJSON();
                 }
                 post['author'] = { "nickname": post.nickname };
                 post['followers'] = { "count": function(){ return 8 } };
@@ -35,6 +34,7 @@ define(['jquery', 'backbone'],
                 };
                 $(this.el).html(window.env.render(itemDict.template, {'post': post, 'current_user': current_user,
                     'momentjs': moment }));
+
                 return this;
             }
         });

@@ -1,9 +1,9 @@
 define(['jquery', 'backbone'],
     function($, Backbone){
         return Backbone.View.extend({
-            el: 'header',
+            el: '#header',
+
             render: function(itemDict){
-                $('header', this.el).html('');
                 var assets = {};
                 assets['entity'] = itemDict.entity;
                 assets['photo_id'] = itemDict.postId;

@@ -20,7 +20,7 @@ require.config({
 });
 
 define(['views/router'],
-    function (Router) {
+    function (Backbone, Router) {
         new Router();
     }
 );
