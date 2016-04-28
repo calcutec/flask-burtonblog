@@ -157,7 +157,7 @@ table {
     input[type="button"] {
         display: inline-block;
         height: 2.5rem;
-        padding: 0 1.9rem;
+        padding: 0 1.5rem;
         color: #555;
         text-align: center;
         font-size: 1.2rem;
@@ -349,12 +349,6 @@ label > .label-body {
 ul.img-list li:hover span.text-content {
     opacity: 1;
 }
-ul.img-list li:hover span.profile-content {
-    opacity: 1;
-}
-figure.photo-detail:hover span.profile-content{
-    opacity: 1;
-}
 ul.img-list li:hover span.rounded-icon {
     opacity: 1;
 }
@@ -380,23 +374,6 @@ span.text-content {
     transition: opacity 500ms;
 }
 span.text-content span {
-    display: table-cell;
-    padding: 1rem;
-    line-height: 1.5;
-    vertical-align: bottom;
-}
-span.profile-content {
-    position: absolute;
-    color: white;
-    display: table;
-    height: 62vw;
-    left: 0;
-    bottom: 0;
-    width: 92.5vw;
-    opacity: 0;
-    transition: opacity 500ms;
-}
-span.profile-content span {
     display: table-cell;
     padding: 1rem;
     line-height: 1.5;
@@ -673,3 +650,39 @@ input, textarea, select {
     ul.img-list li:not(:nth-child(4n)) { padding-right: 6px; }
     .bodycontainer { margin-left: calc((100vw - 1280px)/2); }
 }
+
+
+/* |||| PAGES |||| */
+
+/* Profile Page */
+
+
+
+.profile-content {
+    padding: 1rem;
+    margin: 0 .5vw 1vw 0;
+    line-height: 1.5;
+    box-shadow: 0 0 5px #888;
+    border-radius: 5px;
+    height: auto;
+}
+
+.profile-details {
+    width: 65%;
+    display: inline-block;
+    margin-bottom: .5rem;
+}
+
+.profile-img {
+    width: 35%;
+    min-width: 9rem;
+    max-width: 12rem;
+    display: inline-block;
+    float:right;
+}
+
+.clear {
+    clear: both;
+}
+
+

@@ -32,7 +32,9 @@ define(['jquery', 'backbone'],
                 current_user['is_following'] = function(){
                     return post.is_following;
                 };
-                $(this.el).html(window.env.render(itemDict.template, {'post': post, 'current_user': current_user,
+                current_user['nickname'] = itemDict.usernickname;
+
+                $('#photo-main').html(window.env.render(itemDict.template, {'post': post, 'current_user': current_user,
                     'momentjs': moment }));
 
                 return this;

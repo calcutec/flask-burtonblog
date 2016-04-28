@@ -11,6 +11,7 @@ define(['backbone'], function(Backbone) {
             nickname: '',
             photo: '',
             lastseen: '',
+            about_me: '',
             followed: '',
             is_following: ''
         }

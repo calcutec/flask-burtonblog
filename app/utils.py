@@ -37,7 +37,9 @@ class BasePage(object):
 
     def get_entity(self):
         entity = None
-        if request.endpoint == 'home':
+        if self.assets['category'] == "login":
+            entity = "login"
+        elif request.endpoint == 'home':
             entity = 'home'
         elif request.endpoint == 'photos':
             if self.post_id:

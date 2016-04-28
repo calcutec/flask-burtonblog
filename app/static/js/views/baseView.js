@@ -1,8 +1,8 @@
 define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'views/navView', 'views/headerView',
-    'views/contentThumbnailView', 'views/detailView', 'views/appView', 'collections/memberCollection', 
+    'views/contentThumbnailView', 'views/detailView', 'views/appView', 'views/homeView', 'collections/memberCollection',
     'collections/photoCollection'],
     function($, Backbone, ContentMainView, ArchiveView, NavView, HeaderView, ContentThumbnailView, DetailView, AppView,
-             MemberCollection, PhotoCollection){
+             HomeView, MemberCollection, PhotoCollection){
         return Backbone.View.extend({
             el: '#thisgreatpic',
             initialize: function(options){
@@ -20,6 +20,8 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
 
                 if(options.pageType == 'photo') {
                     AppView(new DetailView({el: '#main-image', 'collection': this.currentView}));
+                } else if (options.pageType == 'home') {
+                    AppView(new HomeView({el: '#home-page'}));
                 } else {
                     AppView(new NavView({el: '#navbar'}));
                     AppView(new HeaderView({el: '#header'}));
@@ -32,7 +34,6 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                 'click a.member-link':   'memberLink',
                 'click a.detail-link':   'detailLink',
                 'change #element': 'filterOnSelect',
-                'click .expand-one':   'expandInfoBox',
                 'click i.fa-picture-o':   'iconLink',
                 'click i.fa-users':   'iconLink',
                 'click i.fa-briefcase':   'iconLink'
@@ -50,6 +51,7 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                 itemDict.authenticated = this.memberCollection.authenticated;
                 itemDict.category = $( '#element' ).val();
                 itemDict.render = true;
+                itemDict.usernickname = this.memberCollection.usernickname;
                 var pathArray = window.location.pathname.split( '/' );
                 if (pathArray[1] == 'photos'){
                     itemDict.collection = this.photoCollection;
@@ -91,11 +93,6 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                 }
                 return counts;
             },
-            
-            expandInfoBox: function(e) {
-                e.preventDefault();
-                $('.content-one').slideToggle('slow');
-            },
 
             iconLink: function(e) {
                 e.preventDefault();
@@ -103,6 +100,7 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                     itemDict.authenticated = this.memberCollection.authenticated;
                     itemDict.category = 'latest';
                     itemDict.render = 'true';
+                    itemDict.usernickname = this.memberCollection.usernickname;
                     if (e.currentTarget.classList[1] == 'fa-users'){
                         itemDict.collection = this.memberCollection;
                         itemDict.entity = 'members';
@@ -119,8 +117,7 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                         itemDict.collection = this.photoCollection;
                         itemDict.entity = 'author';
                         itemDict.template = 'person.html';
-                        itemDict.nickname = this.memberCollection.usernickname;
-                        itemDict.target_user = this.memberCollection.where({nickname: itemDict.nickname});
+                        itemDict.target_user = this.memberCollection.where({nickname: itemDict.usernickname});
                         itemDict.route = '/members/' + itemDict.nickname;
                         Backbone.history.navigate(itemDict.route, {trigger: true});
                     }
@@ -133,6 +130,7 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                 itemDict.authenticated = this.memberCollection.authenticated;
                 itemDict.entity = 'member';
                 itemDict.nickname = e.target.href.split('/')[4];
+                itemDict.usernickname = this.memberCollection.usernickname;
                 itemDict.target_user = this.memberCollection.where({nickname: itemDict.nickname});
                 itemDict.route = '/members/' + itemDict.nickname;
                 Backbone.history.navigate(itemDict.route, {trigger: true});
@@ -151,6 +149,7 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                 itemDict.entity = 'photo';
                 itemDict.postId = e.target.parentNode.dataset.id;
                 itemDict.route = '/photos/' + itemDict.postId;
+                itemDict.usernickname = this.memberCollection.usernickname;
                 Backbone.history.navigate(itemDict.route, {trigger: true});
                 itemDict.render = true;
                 AppView(new HeaderView({el: '#header'}), itemDict);
@@ -198,6 +197,9 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
             render: function(itemDict){
                 AppView(new HeaderView({el: '#header'}), itemDict);
                 AppView(new NavView({el: '#navbar'}), itemDict);
+                if ( !$('#main-image').length ) {
+                    $('#photo-main').prepend("<ul id='main-image' class='img-list'></ul>")
+                };
                 AppView(new ContentMainView({el: '#main-image'}), itemDict);
                 if (itemDict.entity == 'photos' || itemDict.entity == 'members'){
                     AppView(new ArchiveView({el: '#links', 'collection': itemDict.collection.splice(1)}), itemDict);

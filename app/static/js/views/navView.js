@@ -12,7 +12,7 @@ define(['jquery', 'backbone'],
                 current_user['is_authenticated'] = function(){
                     return itemDict.authenticated;
                 };
-                $(this.el).html(window.env.render("nav.html", {'assets': assets, 'current_user': current_user }));
+                $('nav').html(window.env.render("nav.html", { 'assets': assets, 'current_user': current_user }));
                 return this;
             }
         });
