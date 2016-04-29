@@ -104,7 +104,7 @@ class MembersAPI(MethodView):
                 return redirect(url_for("members", nickname=nickname))
             elif category in ["follow", "unfollow"]:
                 MembersPage(nickname=nickname, category=category)
-                return redirect(redirect_url())
+                return redirect(url_for('members', nickname=nickname))
             else:
                 return MembersPage(nickname=nickname, category=category).render()
 
@@ -122,7 +122,7 @@ app.add_url_rule('/members/',  # Read all members
                  view_func=members_api_view, methods=["GET"])
 app.add_url_rule('/members/<int:member_id>',
                  view_func=members_api_view, methods=['PUT'])
-app.add_url_rule("/members/<any('all', 'latest', 'follow', 'unfollow', 'update', 'upload'):category>/",
+app.add_url_rule("/members/<any('all', 'latest', 'update', 'upload'):category>/",
                  view_func=members_api_view, methods=["GET", "POST"])
 app.add_url_rule('/members/<nickname>/',  # Read, Update and Destroy a single member
                  view_func=members_api_view, methods=["GET", "POST"])# Update or Delete a single post

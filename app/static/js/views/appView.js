@@ -50,6 +50,14 @@ define(['jquery'],
                 }
                 this.archiveView = view;
                 if (options.render) {
+                    if (options.entity == "members") {
+                        if (this.mainView) {
+                            this.mainView.close();
+                        }
+                    }
+                    if (this.homeView) {
+                        this.homeView.close();
+                    }
                     this.archiveView.render(options);
                     $('#photo-archives').html(this.archiveView.el);
                 } else {

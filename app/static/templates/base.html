@@ -39,6 +39,8 @@
         <main>
         {% if assets %}
             <div id="photo-main">{{ assets.main_entry|safe if assets.main_entry != None }}</div>
+            <div id="profile-main">{{ assets.profile_entry|safe if assets.profile_entry != None }}</div>
+            <div id="home-main">{{ assets.home_entry|safe if assets.home_entry != None }}</div>
             <div id="photo-archives">
                 <ul class="img-list" id="links">{{ assets.archives|safe if assets.archives != None }}</ul>
             </div>

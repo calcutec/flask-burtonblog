@@ -19,9 +19,10 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
                 Backbone.history.start({pushState: true});
                 Backbone.View.prototype.close = function() {
                     this.remove();
-                    $(this.el).empty();
-                    this.unbind();
-                    this.undelegateEvents();
+                    // $(this.el).empty();
+                    // this.unbind();
+                    // this.undelegateEvents();
+                    // delete(this);
                 };
 
 

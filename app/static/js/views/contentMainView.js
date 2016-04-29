@@ -2,7 +2,30 @@ define(['jquery', 'backbone'],
     function($, Backbone){
         return Backbone.View.extend({
             events: {
-                'click a.detail-link':   'detailLink'
+                'click .follow':   'follow',
+                'click .unfollow':   'unfollow'
+            },
+
+            follow: function(e) {
+                e.preventDefault();
+                console.log('follow button clicked');
+            },
+
+            unfollow: function(e) {
+                e.preventDefault();
+                console.log('unfollow button clicked');
+
+                $.ajax({
+                    type: 'POST',
+                    url: window.location + "Home/InsertRecord",
+                    data: {user:"Bill"} ,  // use the same paramtre name as in Controller
+                    success: function(data) {
+                        console.log(data);
+                    },
+                    error: function(){
+                        console.log("error");
+                    }
+                });
             },
             
             detailLink: function(e) {

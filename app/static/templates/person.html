@@ -4,39 +4,32 @@
                 <h3>{{ post.nickname }}</h3>
                 <h5>Followers: {{ post.followers.count() }}</h5>
                 <h5>Following: {{ post.followed.count() }}</h5>
-                {% if post.last_seen %}
-                    <h5>Last seen:</h5>
-                    <p><em>{{ momentjs(post.last_seen).calendar() }}</em></p>
-                {% endif %}
         </div>
         {% if post.photo %}
-            <img class="profile-img" data-id="{{ post.id }}" sizes="92.5vw" src="https://aperturus.imgix.net/{{ post.photo }}?w=300&mask=ellipse&h=300&fit=crop&q=85&auto=format&sharp=10"
-            srcset="https://aperturus.imgix.net/{{ post.photo }}?w=300&mask=ellipse&h=300&fit=crop&q=85&sharp=10 300w,
-            https://aperturus.imgix.net/{{ post.photo }}?w=600&mask=ellipse&h=600&fit=crop&q=85&sharp=10 600w"
+            <img class="profile-img" data-id="{{ post.id }}" src="https://aperturus.imgix.net/{{ post.photo }}?usm=20&border=3%2CAAA&facepad=2.5&faceindex=1&fit=facearea&fm=png&mask=ellipse&h=120&w=120"
             alt="{{ post.photo }}">
         {% else %}
-            <img class="profile-img" sizes="92.5vw" src="https://aperturus.imgix.net/img/profile.jpg?w=300&mask=ellipse&h=300&fit=crop&q=85&auto=format&sharp=10"
-            srcset="https://aperturus.imgix.net/img/profile.jpg?w=300&mask=ellipse&h=300&fit=crop&q=85&sharp=10 300w,
-            https://aperturus.imgix.net/img/profile.jpg?w=600&mask=ellipse&h=600&fit=crop&q=85&sharp=10 600w"
+            <img class="profile-img" src="https://aperturus.imgix.net/img/profile.jpg?usm=20&border=3%2CAAA&facepad=2.5&faceindex=1&fit=facearea&fm=png&mask=ellipse&h=120&w=120"
             alt="{{ post.photo }}">
         {% endif %}
         <div>
+            {% if post.last_seen %}
+                <h5>Last seen: <em>{{ momentjs(post.last_seen).calendar() }}</em></h5>
+            {% endif %}
             {% if current_user.is_authenticated() %}
-                {% if post.nickname != current_user.nickname %}
-                    {% if current_user.is_following(post) %}
-                        <a class="link-button" href="/members/unfollow/{{ post.nickname }}"><strong>Unfollow</strong></a>
-                    {% else %}
-                        <a class="link-button" href="/members/follow/{{ post.nickname }}"><strong>Follow</strong></a>
-                    {% endif %}
-                {% endif %}
                 {% if post.nickname == current_user.nickname %}
-                    <a class="button button-primary" href="/members/update" >Update Info</a>
-                    <a class="button button-primary" href="/members/upload" >Change Image</a>
+                    <a class="button button-primary" href="/members/update/" >Update Info</a>
+                    <a class="button button-primary" href="/members/upload/" >Change Image</a>
+                {% else %}
+                    {% if current_user.is_following(post) %}
+                        <a class="link-button unfollow" href="/members/{{ post.nickname }}/unfollow/"><strong>Unfollow</strong></a>
+                    {% else %}
+                        <a class="link-button follow" href="/members/{{ post.nickname }}/follow/"><strong>Follow</strong></a>
+                    {% endif %}
                 {% endif %}
             {% endif %}
             {% if post.about_me %}
-                <h5>About:</h5>
-                <p>{{ post.about_me }}</p>
+                <h6>{{ post.about_me }}</h6>
             {% endif %}
         </div>
     </div>

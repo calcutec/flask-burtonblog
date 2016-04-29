@@ -8,25 +8,29 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
             initialize: function(options){
                 if (options.photoCollection) {
                     this.photoCollection = options.photoCollection;
-                    this.currentView = this.photoCollection;
+                    this.currentCollection = this.photoCollection;
                     this.memberCollection = new MemberCollection();
                     this.memberCollection.fetch();
                 } else {
                     this.memberCollection = options.memberCollection;
-                    this.currentView = this.memberCollection;
+                    this.currentCollection = this.memberCollection;
                     this.photoCollection = new PhotoCollection();
                     this.photoCollection.fetch();
                 }
 
                 if(options.pageType == 'photo') {
-                    AppView(new DetailView({el: '#main-image', 'collection': this.currentView}));
+                    AppView(new DetailView({el: '#main-image', 'collection': this.currentCollection}));
                 } else if (options.pageType == 'home') {
                     AppView(new HomeView({el: '#home-page'}));
-                } else {
+                } else if (options.pageType == 'photos'){
                     AppView(new NavView({el: '#navbar'}));
                     AppView(new HeaderView({el: '#header'}));
-                    AppView(new ContentMainView({el: '#main-image', 'collection': this.currentView}));
-                    AppView(new ArchiveView({el: '#links', 'collection': this.currentView}));
+                    AppView(new ContentMainView({el: '#main-image', 'collection': this.currentCollection}));
+                    AppView(new ArchiveView({el: '#links', 'collection': this.currentCollection}));
+                } else if (options.pageType == 'members'){
+                    AppView(new NavView({el: '#navbar'}));
+                    AppView(new HeaderView({el: '#header'}));
+                    AppView(new ArchiveView({el: '#links', 'collection': this.currentCollection}));
                 }
             },
 
@@ -104,7 +108,6 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                     if (e.currentTarget.classList[1] == 'fa-users'){
                         itemDict.collection = this.memberCollection;
                         itemDict.entity = 'members';
-                        itemDict.template = 'person.html';
                         itemDict.route = '/members/' + itemDict.category;
                         Backbone.history.navigate(itemDict.route, {trigger: true});
                     } else if (e.currentTarget.classList[1] == 'fa-picture-o'){
@@ -117,8 +120,10 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                         itemDict.collection = this.photoCollection;
                         itemDict.entity = 'author';
                         itemDict.template = 'person.html';
+                        itemDict.nickname = this.memberCollection.usernickname;
+                        itemDict.usernickname = this.memberCollection.usernickname;
                         itemDict.target_user = this.memberCollection.where({nickname: itemDict.usernickname});
-                        itemDict.route = '/members/' + itemDict.nickname;
+                        itemDict.route = '/members/' + itemDict.usernickname;
                         Backbone.history.navigate(itemDict.route, {trigger: true});
                     }
                     this.filter(itemDict);
@@ -199,9 +204,11 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                 AppView(new NavView({el: '#navbar'}), itemDict);
                 if ( !$('#main-image').length ) {
                     $('#photo-main').prepend("<ul id='main-image' class='img-list'></ul>")
-                };
-                AppView(new ContentMainView({el: '#main-image'}), itemDict);
-                if (itemDict.entity == 'photos' || itemDict.entity == 'members'){
+                }
+                if (itemDict.entity != 'members') {
+                    AppView(new ContentMainView({el: '#main-image'}), itemDict);
+                }
+                if (itemDict.entity == 'photos'){
                     AppView(new ArchiveView({el: '#links', 'collection': itemDict.collection.splice(1)}), itemDict);
                 } else {
                     AppView(new ArchiveView({el: '#links', 'collection': itemDict.collection}), itemDict);

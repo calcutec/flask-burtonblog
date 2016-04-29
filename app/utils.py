@@ -30,7 +30,7 @@ class BasePage(object):
 
         self.get_entity()
 
-        if self.assets['category'] in ["login", "upload", "update", "signup", "follow", "unfollow"]:
+        if self.assets['category'] in ["login", "upload", "update", "signup"]:
             self.get_rendered_form()
         else:
             self.get_posts()
@@ -60,7 +60,7 @@ class BasePage(object):
             "signup": SignupFormProcessor,
             "photo":  PhotosFormProcessor,
             "update": UpdateFormProcessor,
-            "login": LoginFormProcessor
+            "login": LoginFormProcessor,
         }
         self.assets['body_form'] = processor_dict[self.assets['category']](page=self).rendered_form
 
@@ -89,7 +89,7 @@ class BasePage(object):
                                                 .filter(Post.category == value[0]).count())
             self.assets['category_counts'] = category_counts
 
-        if self.assets['category'] in ["all", "vote"] or self.assets['category'] is None:
+        if self.assets['category'] in ["all", "vote", "follow", "unfollow"] or self.assets['category'] is None:
             self.posts = posts
         elif self.assets['category'] == "latest":
             self.posts = posts[0:10]
@@ -200,7 +200,7 @@ class MembersPage(BasePage):
             if request.is_xhr:
                 self.assets['collection'] = [i.json_view() for i in self.posts]
             else:
-                members_context = {'posts': self.posts[1:], 'post': self.posts[0]}
+                members_context = {'posts': self.posts}
                 self.assets['archives'] = self.get_asset(template="members.html", context=members_context)
 
     def follow(self):
@@ -235,18 +235,6 @@ class MembersPage(BasePage):
         db.session.add(u)
         db.session.commit()
         flash('You have stopped following %s.' % self.nickname)
-
-    def __str__(self):
-        return "This is the %s page" % self.assets['title']
-
-
-class MembersPageXHR(BasePage):
-    def __init__(self, *args, **kwargs):
-        super(MembersPageXHR, self).__init__(*args, **kwargs)
-        self.update_member()
-
-    def update_member(self):
-            pass
 
     def __str__(self):
         return "This is the %s page" % self.assets['title']
