@@ -2,37 +2,24 @@ define(['jquery'],
     function($){
         return function(view, options) {
             options = options || {};
-            if (view.el.id == 'home-page') {
-                if (this.homeView) {
-                    this.homeView.close();
-                }
-                this.homeView = view;
-                if (options.render) {
-                    if (this.headerView) {
-                        this.headerView.close();
-                    }
-                    if (this.navView) {
-                        this.navView.close();
-                    }
-                    if (this.mainView) {
-                        this.mainView.close();
-                    }
-                    if (this.archiveView) {
-                        this.archiveView.unrender();
-                        this.archiveView.close();
-                    }
-                    this.homeView.render();
-                    $('#photo-main').html(this.homeView.el);
-                }
-            } else if (view.el.id == 'main-image') {
+            if (view.el.id == 'main-view') {
                 if (this.mainView) {
                     this.mainView.close();
                 }
-                if (this.homeView) {
-                    this.homeView.close();
-                }
                 this.mainView = view;
                 if (options.render) {
+                    if (options.entity == 'home'){
+                        if (this.headerView) {
+                            this.headerView.close();
+                        }
+                        if (this.navView) {
+                            this.navView.close();
+                        }
+                        if (this.archiveView) {
+                            this.archiveView.unrender();
+                            this.archiveView.close();
+                        }
+                    }
                     if (options.entity == 'photo'){
                         if (this.archiveView) {
                             this.archiveView.unrender();
@@ -40,6 +27,7 @@ define(['jquery'],
                         }
                     }
                     this.mainView.render(options);
+                    $('#photo-main').html(this.mainView.el)
                 } else {
                     this.mainView.attachToView();               
                 }
@@ -54,9 +42,6 @@ define(['jquery'],
                         if (this.mainView) {
                             this.mainView.close();
                         }
-                    }
-                    if (this.homeView) {
-                        this.homeView.close();
                     }
                     this.archiveView.render(options);
                     $('#photo-archives').html(this.archiveView.el);

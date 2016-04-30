@@ -1,7 +1,7 @@
 define(['backbone', 'models/memberModel'],
     function(Backbone, MemberModel){
         return Backbone.Collection.extend({
-            url: "/members",
+            url: "/members/",
             model: MemberModel,
             authenticated: null,
 

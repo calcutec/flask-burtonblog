@@ -1,7 +1,7 @@
 define(['backbone', 'models/photoModel'],
     function(Backbone, PhotoModel){
         return Backbone.Collection.extend({
-            url: "/photos",
+            url: "/photos/",
             model: PhotoModel,
 
             /**

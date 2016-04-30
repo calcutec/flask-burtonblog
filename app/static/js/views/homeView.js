@@ -10,9 +10,13 @@ define(['jquery', 'backbone'],
                 e.preventDefault();
                 $('.content-one').slideToggle('slow');
             },
+
+            attachToView: function() {
+                var tbd = null
+            },
             
             render: function() {
-                $(this.el).html(window.env.render("home_page.html"));
+                this.$el.html(window.env.render("home_page.html"));
                 return this;
             }
         });

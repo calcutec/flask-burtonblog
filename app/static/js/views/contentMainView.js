@@ -57,7 +57,7 @@ define(['jquery', 'backbone'],
                 };
                 current_user['nickname'] = itemDict.usernickname;
 
-                $('#photo-main').html(window.env.render(itemDict.template, {'post': post, 'current_user': current_user,
+                this.$el.html(window.env.render(itemDict.template, {'post': post, 'current_user': current_user,
                     'momentjs': moment }));
 
                 return this;

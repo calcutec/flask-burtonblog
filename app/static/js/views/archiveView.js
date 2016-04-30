@@ -7,7 +7,7 @@ define(['jquery', 'backbone', 'views/contentThumbnailView'],
             
             attachToView: function() {
                 var self = this;
-                $(this.el).children('li').each(function(){
+                this.$el.children('li').each(function(){
                     var photoEl = $(this);
                     var id = photoEl.data().id;
                     var thumbnailView = new ContentThumbnailView({
@@ -27,7 +27,7 @@ define(['jquery', 'backbone', 'views/contentThumbnailView'],
             addOneToList: function (model) {
                 var thumbnailView = new ContentThumbnailView({ model: model});
                 this.subViews.push(thumbnailView);
-                $(this.el).append(thumbnailView.render().el);
+                this.$el.append(thumbnailView.render().el);
             },
             
             unrender: function() {

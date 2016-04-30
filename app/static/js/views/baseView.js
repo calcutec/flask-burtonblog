@@ -18,19 +18,24 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                     this.photoCollection.fetch();
                 }
 
+                var itemDict = this.getItemDict();
                 if(options.pageType == 'photo') {
-                    AppView(new DetailView({el: '#main-image', 'collection': this.currentCollection}));
+                    itemDict.entity = 'photo';
+                    AppView(new DetailView({el: '#main-view', 'collection': this.currentCollection}), itemDict);
                 } else if (options.pageType == 'home') {
-                    AppView(new HomeView({el: '#home-page'}));
+                    itemDict.entity = 'home';
+                    AppView(new HomeView({el: '#main-view'}), itemDict);
                 } else if (options.pageType == 'photos'){
+                    itemDict.entity = 'photos';
                     AppView(new NavView({el: '#navbar'}));
                     AppView(new HeaderView({el: '#header'}));
-                    AppView(new ContentMainView({el: '#main-image', 'collection': this.currentCollection}));
+                    AppView(new ContentMainView({el: '#main-view', 'collection': this.currentCollection}), itemDict);
                     AppView(new ArchiveView({el: '#links', 'collection': this.currentCollection}));
                 } else if (options.pageType == 'members'){
+                    itemDict.entity = 'members';
                     AppView(new NavView({el: '#navbar'}));
                     AppView(new HeaderView({el: '#header'}));
-                    AppView(new ArchiveView({el: '#links', 'collection': this.currentCollection}));
+                    AppView(new ArchiveView({el: '#links', 'collection': this.currentCollection}), itemDict);
                 }
             },
 
@@ -46,7 +51,11 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
 
             getItemDict: function(){
                 return {'route': null, 'collection': null, 'category': null, 'entity': null, 'nickname': null,
-                    'authenticated': null, 'count': null, 'postId': null, 'template': null };
+                    'authenticated': null, 'count': null, 'postId': null, 'template': null, 'render': null };
+            },
+            
+            sendAlert: function() {
+                alert("im here");
             },
 
             filterOnSelect: function(e) {
@@ -60,24 +69,24 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                 if (pathArray[1] == 'photos'){
                     itemDict.collection = this.photoCollection;
                     itemDict.entity = 'photos';
-                    itemDict.route = '/photos/' + itemDict.category;
+                    itemDict.route = '/photos/' + itemDict.category + '/';
                     itemDict.template = 'main_entry.html';
-                    Backbone.history.navigate(itemDict.route, {trigger: true});
+                    Backbone.history.navigate(itemDict.route, {trigger: false});
                 } else if (pathArray[1] == 'members'){
                     if (pathArray[2].match('all|latest') || pathArray[2] == ''){
                         itemDict.collection = this.memberCollection;
                         itemDict.entity = 'members';
-                        itemDict.route = '/members/' + itemDict.category;
+                        itemDict.route = '/members/' + itemDict.category + '/' ;
                         itemDict.template = 'person.html';
-                        Backbone.history.navigate(itemDict.route, {trigger: true});
+                        Backbone.history.navigate(itemDict.route, {trigger: false});
                     } else {
                         itemDict.collection = this.photoCollection;
                         itemDict.entity = 'member';
                         itemDict.nickname = pathArray[2];
                         itemDict.target_user = this.memberCollection.where({nickname: itemDict.nickname});
-                        itemDict.route = '/members/' + itemDict.nickname + '/' + itemDict.category;
+                        itemDict.route = '/members/' + itemDict.nickname + '/' + itemDict.category + '/';
                         itemDict.template = 'person.html';
-                        Backbone.history.navigate(itemDict.route, {trigger: true});
+                        Backbone.history.navigate(itemDict.route, {trigger: false});
                     }
                 }
                 this.filter(itemDict);
@@ -108,14 +117,14 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                     if (e.currentTarget.classList[1] == 'fa-users'){
                         itemDict.collection = this.memberCollection;
                         itemDict.entity = 'members';
-                        itemDict.route = '/members/' + itemDict.category;
-                        Backbone.history.navigate(itemDict.route, {trigger: true});
+                        itemDict.route = '/members/' + itemDict.category + '/';
+                        Backbone.history.navigate(itemDict.route, {trigger: false});
                     } else if (e.currentTarget.classList[1] == 'fa-picture-o'){
                         itemDict.collection = this.photoCollection;
                         itemDict.entity = 'photos';
                         itemDict.template = 'main_entry.html';
-                        itemDict.route = '/photos/' + itemDict.category;
-                        Backbone.history.navigate(itemDict.route, {trigger: true});
+                        itemDict.route = '/photos/' + itemDict.category + '/';
+                        Backbone.history.navigate(itemDict.route, {trigger: false});
                     } else if (e.currentTarget.classList[1] == 'fa-briefcase'){
                         itemDict.collection = this.photoCollection;
                         itemDict.entity = 'author';
@@ -123,8 +132,8 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                         itemDict.nickname = this.memberCollection.usernickname;
                         itemDict.usernickname = this.memberCollection.usernickname;
                         itemDict.target_user = this.memberCollection.where({nickname: itemDict.usernickname});
-                        itemDict.route = '/members/' + itemDict.usernickname;
-                        Backbone.history.navigate(itemDict.route, {trigger: true});
+                        itemDict.route = '/members/' + itemDict.usernickname + '/';
+                        Backbone.history.navigate(itemDict.route, {trigger: false});
                     }
                     this.filter(itemDict);
             },
@@ -137,8 +146,8 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                 itemDict.nickname = e.target.href.split('/')[4];
                 itemDict.usernickname = this.memberCollection.usernickname;
                 itemDict.target_user = this.memberCollection.where({nickname: itemDict.nickname});
-                itemDict.route = '/members/' + itemDict.nickname;
-                Backbone.history.navigate(itemDict.route, {trigger: true});
+                itemDict.route = '/members/' + itemDict.nickname + '/';
+                Backbone.history.navigate(itemDict.route, {trigger: false});
                 itemDict.collection = this.photoCollection.where({nickname: itemDict.nickname});
                 itemDict.counts = this.getCounts(itemDict.collection);
                 itemDict.template = 'person.html';
@@ -153,13 +162,13 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                 itemDict.authenticated = this.memberCollection.authenticated;
                 itemDict.entity = 'photo';
                 itemDict.postId = e.target.parentNode.dataset.id;
-                itemDict.route = '/photos/' + itemDict.postId;
+                itemDict.route = '/photos/' + itemDict.postId + '/';
                 itemDict.usernickname = this.memberCollection.usernickname;
-                Backbone.history.navigate(itemDict.route, {trigger: true});
+                Backbone.history.navigate(itemDict.route, {trigger: false});
                 itemDict.render = true;
                 AppView(new HeaderView({el: '#header'}), itemDict);
                 AppView(new NavView({el: '#navbar'}), itemDict);
-                AppView(new DetailView({el: '#main-image'}), itemDict);
+                AppView(new DetailView({id: 'main-view'}), itemDict);
             },
 
             filter: function(itemDict){
@@ -202,16 +211,13 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
             render: function(itemDict){
                 AppView(new HeaderView({el: '#header'}), itemDict);
                 AppView(new NavView({el: '#navbar'}), itemDict);
-                if ( !$('#main-image').length ) {
-                    $('#photo-main').prepend("<ul id='main-image' class='img-list'></ul>")
-                }
                 if (itemDict.entity != 'members') {
-                    AppView(new ContentMainView({el: '#main-image'}), itemDict);
+                    AppView(new ContentMainView({id: 'main-view'}), itemDict);
                 }
                 if (itemDict.entity == 'photos'){
-                    AppView(new ArchiveView({el: '#links', 'collection': itemDict.collection.splice(1)}), itemDict);
+                    AppView(new ArchiveView({id: 'links', tagName: 'ul', className: 'img-list', 'collection': itemDict.collection.splice(1)}), itemDict);
                 } else {
-                    AppView(new ArchiveView({el: '#links', 'collection': itemDict.collection}), itemDict);
+                    AppView(new ArchiveView({id: 'links', tagName: 'ul', className: 'img-list', 'collection': itemDict.collection}), itemDict);
                 }
             }
         });

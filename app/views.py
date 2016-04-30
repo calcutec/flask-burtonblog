@@ -108,8 +108,8 @@ class MembersAPI(MethodView):
             else:
                 return MembersPage(nickname=nickname, category=category).render()
 
-    def put(self, member_id=None):
-        user = User.query.get(member_id)
+    # def put(self, member_id=None):
+    #     user = User.query.get(member_id)
 
         # MembersPage(nickname=nickname, category="update")
 
@@ -125,7 +125,7 @@ app.add_url_rule('/members/<int:member_id>',
 app.add_url_rule("/members/<any('all', 'latest', 'update', 'upload'):category>/",
                  view_func=members_api_view, methods=["GET", "POST"])
 app.add_url_rule('/members/<nickname>/',  # Read, Update and Destroy a single member
-                 view_func=members_api_view, methods=["GET", "POST"])# Update or Delete a single post
+                 view_func=members_api_view, methods=["GET", "POST"])  # Update or Delete a single post
 app.add_url_rule('/members/<nickname>/<category>/',  # Get photos of a given category for a given member
                  view_func=members_api_view, methods=["GET"])
 
