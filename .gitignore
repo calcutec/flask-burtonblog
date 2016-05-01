@@ -6,10 +6,7 @@ test.db
 search.db
 flask
 venvburtonblog
-app/static/PhoneGap/hooks
-app/static/PhoneGap/platforms
-app/static/PhoneGap/plugins
-app/static/PhoneGap/config.xml
+app/static/.webassets-cache/
 *.mo
 *.DS_Store
 

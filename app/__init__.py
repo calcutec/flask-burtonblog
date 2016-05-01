@@ -5,6 +5,7 @@ from jinja2 import FileSystemLoader
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
 from flask.ext.mail import Mail
+from flask.ext.assets import Environment, Bundle
 from config import ADMINS, MAIL_SERVER, MAIL_PORT, MAIL_USERNAME, \
     MAIL_PASSWORD, SQLALCHEMY_DATABASE_URI
 from flask_wtf.csrf import CsrfProtect
@@ -15,6 +16,7 @@ app.jinja_loader = FileSystemLoader(os.path.join(base_dir, 'static', 'templates'
 app.jinja_env.globals['momentjs'] = momentjs
 app.config.from_object('config')
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+assets = Environment(app)
 db = SQLAlchemy(app)
 lm = LoginManager()
 lm.init_app(app)
@@ -22,6 +24,10 @@ lm.login_view = 'login'
 lm.login_message = 'Please log in to access this page.'
 mail = Mail(app)
 CsrfProtect(app)
+
+js_nunjucks = Bundle('templates/archive_entry.js', 'templates/header.js', 'templates/nav.js', 'templates/main_entry.js',
+                     'templates/person.js', 'templates/photo_detail.js', output='templates/nunjucks.js')
+assets.register('js_nunjucks', js_nunjucks)
 
 
 app.config['OAUTH_CREDENTIALS'] = {
