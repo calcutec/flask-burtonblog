@@ -158,8 +158,8 @@ class PhotoPage(BasePage):
                     self.render_sections()
 
     def render_sections(self):
-        main_photo_context = {'post': self.posts[0]}
-        archive_photos_context = {'posts': self.posts[1:]}
+        main_photo_context = {'post': self.posts[0], 'assets': self.assets}
+        archive_photos_context = {'posts': self.posts[1:], 'assets': self.assets}
         self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=main_photo_context)
         self.assets['archives'] = self.get_asset(template="archives.html", context=archive_photos_context)
 
@@ -189,7 +189,7 @@ class MembersPage(BasePage):
                 user_context = {'post': self.assets['person']}
                 self.assets['main_entry'] = self.get_asset(template='person.html', context=user_context)
 
-                archive_photos_context = {'posts': self.posts}
+                archive_photos_context = {'posts': self.posts, 'assets': self.assets}
                 self.assets['archives'] = self.get_asset(template="archives.html", context=archive_photos_context)
             if self.assets['category'] == "follow":
                 self.follow()
@@ -200,7 +200,7 @@ class MembersPage(BasePage):
             if request.is_xhr:
                 self.assets['collection'] = [i.json_view() for i in self.posts]
             else:
-                members_context = {'posts': self.posts}
+                members_context = {'posts': self.posts, 'assets': self.assets}
                 self.assets['archives'] = self.get_asset(template="members.html", context=members_context)
 
     def follow(self):

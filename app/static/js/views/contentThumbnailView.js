@@ -7,14 +7,16 @@ define(['jquery', 'backbone'],
                 // 'click a.unfollow':   'unfollow',
                 'click .gallery':   'gallery'
             },
-            render: function() {
+            render: function(options) {
                 var post = this.model.toJSON();
                 post['author'] = { "nickname": post.nickname };
+                var assets = {};
+                assets['entity'] = options['entity'];
                 var self = this;
                 post['comments'] = { "all": function(){
                     return self.models.get('comments')
                 } };
-                $(this.el).html(window.env.render("archive_entry.html", {'post': post, 'momentjs': moment}));
+                $(this.el).html(window.env.render("archive_entry.html", {'post': post, 'momentjs': moment, 'assets': assets}));
                 return this;
             },
 

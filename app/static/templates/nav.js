@@ -11,22 +11,22 @@ output += "\n    <input class=\"burger-check\" id=\"burger-check\" type=\"checkb
 if(runtime.inOperator(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity"),["author","photos","member","members"]) && runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"category") != "upload") {
 output += "\n\n                    ";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity") == "author") {
-output += "\n                        <div id=\"title\"><i class=\"current fa fa-briefcase\"></i></div>\n                    ";
+output += "\n                        <div id=\"title\"><i class=\"current fa-briefcase fa\"></i></div>\n                    ";
 ;
 }
 else {
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity") == "photos") {
-output += "\n                        <div id=\"title\"><i class=\"current fa fa-picture-o\"></i></div>\n                    ";
+output += "\n                        <div id=\"title\"><i class=\"current fa-picture-o fa\"></i></div>\n                    ";
 ;
 }
 else {
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity") == "member") {
-output += "\n                        <div id=\"title\"><i class=\"current fa fa-user\"></i></div>\n                    ";
+output += "\n                        <div id=\"title\"><i class=\"current fa-user fa\"></i></div>\n                    ";
 ;
 }
 else {
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity") == "members") {
-output += "\n                        <div id=\"title\"><i class=\"current fa fa-users\"></i></div>\n                    ";
+output += "\n                        <div id=\"title\"><i class=\"current fa-users fa\"></i></div>\n                    ";
 ;
 }
 ;
@@ -281,7 +281,7 @@ output += "</span></div>\n            ";
 }
 else {
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity") == "photo") {
-output += "\n                <div id=\"title\"><i class=\"current fa fa-picture-o\"></i><span id=\"subtitle\">#";
+output += "\n                <div id=\"title\"><i class=\"current fa-picture-o fa\"></i><span id=\"subtitle\">#";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"photo_id"), env.opts.autoescape);
 output += "</span></div>\n            ";
 ;

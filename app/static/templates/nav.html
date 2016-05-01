@@ -4,13 +4,13 @@
                 {% if assets.entity in ["author", "photos", "member", "members"] and assets.category != "upload" %}
 
                     {% if assets.entity == "author" %}
-                        <div id="title"><i class="current fa fa-briefcase"></i></div>
+                        <div id="title"><i class="current fa-briefcase fa"></i></div>
                     {% elif assets.entity == "photos"  %}
-                        <div id="title"><i class="current fa fa-picture-o"></i></div>
+                        <div id="title"><i class="current fa-picture-o fa"></i></div>
                     {% elif assets.entity == "member" %}
-                        <div id="title"><i class="current fa fa-user"></i></div>
+                        <div id="title"><i class="current fa-user fa"></i></div>
                     {% elif assets.entity == "members"  %}
-                        <div id="title"><i class="current fa fa-users"></i></div>
+                        <div id="title"><i class="current fa-users fa"></i></div>
                     {% endif %}
                     <label id="element-label" for="element">
                         <select name="element" id="element">
@@ -43,7 +43,7 @@
             {% elif assets.category == "upload"  %}
                 <div id="title"><i class="current fa fa-upload"></i><span id="subtitle">{{ assets.category }}</span></div>
             {% elif assets.entity == "photo"  %}
-                <div id="title"><i class="current fa fa-picture-o"></i><span id="subtitle">#{{ assets['photo_id'] }}</span></div>
+                <div id="title"><i class="current fa-picture-o fa"></i><span id="subtitle">#{{ assets['photo_id'] }}</span></div>
             {% endif %}
     <span class="loginlogout">
         {% if current_user.is_authenticated() %}

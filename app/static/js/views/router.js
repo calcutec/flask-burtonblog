@@ -40,7 +40,7 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
                 'photos/:category(/)':            'photos',
                 'members(/)':                     'members',
                 'members/all(/)':                 'members',
-                'members/latest':                 'members',
+                'members/latest(/)':              'members',
                 'members/:username(/)':           'photos',
                 'members/:username/all(/)':       'photos',
                 'members/:username/latest(/)':    'photos',
