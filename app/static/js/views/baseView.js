@@ -161,7 +161,7 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/archiveView', 'vie
                 itemDict.collection = this.photoCollection;
                 itemDict.authenticated = this.memberCollection.authenticated;
                 itemDict.entity = 'photo';
-                itemDict.postId = e.target.parentNode.dataset.id;
+                itemDict.postId = e.target.closest('a').dataset.id;
                 itemDict.route = '/photos/' + itemDict.postId + '/';
                 itemDict.usernickname = this.memberCollection.usernickname;
                 Backbone.history.navigate(itemDict.route, {trigger: false});
