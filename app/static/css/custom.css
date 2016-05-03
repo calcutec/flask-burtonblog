@@ -687,4 +687,8 @@ input, textarea, select {
     float:right;
 }
 
+.follow, .unfollow {
+    margin-top: .5rem;
+}
+
 

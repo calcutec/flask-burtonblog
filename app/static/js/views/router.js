@@ -41,10 +41,10 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
                 'members(/)':                     'members',
                 'members/all(/)':                 'members',
                 'members/latest(/)':              'members',
-                'members/:username(/)':           'photos',
-                'members/:username/all(/)':       'photos',
-                'members/:username/latest(/)':    'photos',
-                'members/:username/:category(/)': 'photos'
+                'members/:username(/)':           'member',
+                'members/:username/all(/)':       'member',
+                'members/:username/latest(/)':    'member',
+                'members/:username/:category(/)': 'member'
             },
 
 
@@ -60,7 +60,7 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
             home: function() {
                 if (this.initial) {
                     this.initial = false;
-                    this.refreshdata(PhotoCollection, "home");
+                    this.refreshdata("home");
                 } else {
                     console.log("home rerouting");
                     window.location = Backbone.history.location.href;
@@ -70,17 +70,16 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
                     // itemDict['render'] = "true";
                     // AppView(new HomeView({id: 'main-view'}), itemDict);
                 }
-    
             },
 
             photos: function(category) {
                 if (this.initial) {
                     this.initial = false;
                     if (category && category.match(/^\d+$/)) { // if category is a number
-                        this.refreshdata(PhotoCollection, "photo");
+                        this.refreshdata("photo");
                     }
                     else {
-                        this.refreshdata(PhotoCollection, "photos");
+                        this.refreshdata("photos");
                     }
                 } else {
                     console.log("photos rerouting");
@@ -95,22 +94,34 @@ define(["jquery", "backbone", "nunjucks", "collections/photoCollection", "views/
             members: function() {
                 if (this.initial) {
                     this.initial = false;
-                    this.refreshdata(MemberCollection, "members")
+                    this.refreshdata("members")
                 } else {
-                    console.log("members rerouting")
+                    console.log("members rerouting");
+                    window.location = Backbone.history.location.href;
+                }
+            },
+            
+            member: function(username) {
+                if (this.initial) {
+                    this.initial = false;
+                    this.refreshdata("member", username)
+                } else {
+                    console.log("members rerouting");
                     window.location = Backbone.history.location.href;
                 }
             },
 
-            refreshdata: function(BaseCollection, PageType) {
-                var baseCollection = new BaseCollection();
-                baseCollection.fetch({
-                    success: function() {
-                        if (PageType == "photos" || PageType == "home" || PageType == "photo"){
-                            AppView(new BaseView({photoCollection: baseCollection, el: '#thisgreatpic', pageType: PageType}));
-                        } else if (PageType == "members"){
-                            AppView(new BaseView({memberCollection: baseCollection, el: '#thisgreatpic', pageType: PageType}));
-                        }
+            refreshdata: function(PageType, username) {
+                        var photoCollection = new PhotoCollection;
+                        photoCollection.fetch({
+                            success: function() {
+                                var current_user = {};
+                                window.env.addGlobal("current_user", current_user);
+                                current_user['is_authenticated'] = function(){
+                                    return photoCollection.authenticated;
+                                };
+                                current_user['nickname']= photoCollection.usernickname;
+                                new BaseView({photoCollection: photoCollection, el: '#thisgreatpic', pageType: PageType, username});
                     },
                     fail: function(error) {
                         console.log(error);

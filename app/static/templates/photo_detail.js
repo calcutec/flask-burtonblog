@@ -37,7 +37,7 @@ output += "<br>";
 ;
 }
 output += "\n                    ";
-if((lineno = 14, colno = 53, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"is_authenticated"), "current_user[\"is_authenticated\"]", context, [])) && runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"author")),"id") == runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"id")) {
+if((lineno = 14, colno = 53, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"is_authenticated"), "current_user[\"is_authenticated\"]", context, [])) && runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"author")),"nickname") == runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"nickname")) {
 output += "\n                        <a href=\"#\">Edit</a><br>\n                        <a class=\"link-button red\" href=\"#\">Delete</a>\n                    ";
 ;
 }

@@ -2,7 +2,7 @@ from hashlib import md5
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
 from app import db
-from flask import url_for
+from flask import url_for, g
 from flask.ext.login import UserMixin
 
 import json
@@ -51,8 +51,13 @@ class User(UserMixin, db.Model):
             self.lastname = lastname.title()
 
     def json_view(self):
+        if g.user.is_authenticated():
+            is_following = g.user.is_following(self)
+        else:
+            is_following = None
         return {'id': self.id, 'type': self.type, 'firstName': self.firstname, 'lastName': self.lastname,
-                'nickname': self.nickname, 'about_me': self.about_me, 'last_seen': self.last_seen, 'photo': self.photo}
+                'nickname': self.nickname, 'about_me': self.about_me, 'last_seen': self.last_seen, 'photo': self.photo,
+                'followers': self.followers.count(), 'followed': self.followed.count(), 'is_following': is_following}
 
     def set_password(self, password):
         self.pwdhash = generate_password_hash(password)

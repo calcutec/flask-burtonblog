@@ -14,7 +14,7 @@ define(['jquery', 'backbone'],
                 post['comments'] = { "all": function(){
                     return self.models.get('comments')
                 } };
-                $(this.el).html(window.env.render("archive_entry.html", {'post': post, 'momentjs': moment, 'assets': assets}));
+                $(this.el).html(window.env.render("member.html", {'post': post, 'momentjs': moment, 'assets': assets}));
                 return this;
             },
             

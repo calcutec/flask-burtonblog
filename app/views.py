@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, g, jsonify, request, make_response, abort
+from flask import render_template, flash, redirect, url_for, g, jsonify, request, abort
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from flask.ext.sqlalchemy import get_debug_queries
 from datetime import datetime
@@ -85,12 +85,16 @@ def logout():
 
 
 class MembersAPI(MethodView):
-    def post(self, category=None):
-        page = MembersPage(form=EditForm(), category=category)
-        if 'body_form' in page.assets and page.assets['body_form'] is not None:
+    def post(self, category=None, nickname=None):
+        if category in ["follow", "unfollow"]:
+            page = MembersPage(nickname=nickname, category=category)
             return page.render()
         else:
-            return redirect(url_for("members", nickname=g.user.nickname))
+            page = MembersPage(form=EditForm(), category=category)
+            if 'body_form' in page.assets and page.assets['body_form'] is not None:
+                return page.render()
+            else:
+                return redirect(url_for("members", nickname=g.user.nickname))
 
     def get(self, nickname=None, category="latest"):
         if nickname is None:  # Display all members
@@ -108,10 +112,21 @@ class MembersAPI(MethodView):
             else:
                 return MembersPage(nickname=nickname, category=category).render()
 
-    # def put(self, member_id=None):
-    #     user = User.query.get(member_id)
+    @login_required
+    def put(self, member_id):
+        user = User.query.get(member_id)
+        MembersPage(user, category="update")
 
-        # MembersPage(nickname=nickname, category="update")
+    @login_required
+    def patch(self, member_id):
+        person = User.query.get(member_id)
+        if request.json['is_following']:
+            category = "follow"
+        else:
+            category = "unfollow"
+
+        page = MembersPage(person=person, category=category)
+        return page.render()
 
     @login_required
     def delete(self, nickname):
@@ -122,12 +137,14 @@ app.add_url_rule('/members/',  # Read all members
                  view_func=members_api_view, methods=["GET"])
 app.add_url_rule('/members/<int:member_id>',
                  view_func=members_api_view, methods=['PUT'])
+app.add_url_rule('/members/<int:member_id>',
+                 view_func=members_api_view, methods=['PATCH'])
 app.add_url_rule("/members/<any('all', 'latest', 'update', 'upload'):category>/",
                  view_func=members_api_view, methods=["GET", "POST"])
 app.add_url_rule('/members/<nickname>/',  # Read, Update and Destroy a single member
                  view_func=members_api_view, methods=["GET", "POST"])  # Update or Delete a single post
 app.add_url_rule('/members/<nickname>/<category>/',  # Get photos of a given category for a given member
-                 view_func=members_api_view, methods=["GET"])
+                 view_func=members_api_view, methods=["GET", "POST"])
 
 
 class PhotoAPI(MethodView):
@@ -150,7 +167,7 @@ class PhotoAPI(MethodView):
             return LoginPage(title="login").render()
 
     # Update Post
-    @login_required
+    @auth_required
     def put(self, post_id):
         form = PostForm()
         if form.validate_on_submit():

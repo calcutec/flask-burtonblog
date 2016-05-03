@@ -13,15 +13,12 @@
     <span class="inner-span">
         <span class="details-well">
             {% if assets %}
-                {% if assets.entity not in ['member'] %}
+                {% if assets.entity not in ['member', 'author'] %}
                     <a class="link-button member-link" href="/members/{{ post.author.nickname }}/" rel="tag">{{ post.author.nickname }}</a><br>
                 {% endif %}
             {% endif %}
-            {% if post.last_seen %}
-                <p><em>Last seen:{{ momentjs(post.last_seen).calendar() }}</em></p>
-            {% else %}
-                <b>{{ momentjs(post.timestamp).calendar() }}</b><br>
-            {% endif %}
+            <b>{{ momentjs(post.timestamp).calendar() }}</b><br>
+
 
             {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
             {% if post.all_comments|length > 0 %}
@@ -30,15 +27,12 @@
                 </a><br>
             {% endif %}
             {% if assets %}
-                {% if assets.entity in ['member', 'photos'] %}
-                    <a href="#" class="link-button gallery">Gallery</a>
-                {% endif %}
+                <a href="#" class="link-button gallery">Gallery</a>
             {% endif %}
         </span>
     </span>
 </span>
 {% if assets %}
-{% if assets.entity in ['member', 'photos'] %}
         <a class="detail-link" data-id="{{ post.id }}" href="/photos/{{ post.id }}">
         <span class="rounded-icon">
             <svg version="1.1" width="22" height="22" viewBox="0 0 22 22">
@@ -47,5 +41,4 @@
             </svg>
         </span>
         </a>
-{% endif %}
 {% endif %}

@@ -9,6 +9,7 @@ define(['backbone', 'models/photoModel'],
              */
             parse: function(response){
                 this.authenticated = response.authenticated;
+                this.usernickname = response.usernickname;
                 return response.collection
             },
             

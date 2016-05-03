@@ -30,12 +30,8 @@
         <link rel="icon" type="image/png" href="{{ local_static_url }}img/favicon-32x32.png" sizes="32x32" />
     </head>
 	<body id="thisgreatpic">
-        <nav>
-            {% include 'nav.html' %}
-        </nav>
-        <header>
-            {% include 'header.html' %}
-        </header>
+        <nav><div id="navbar">{% include 'nav.html' %}</div></nav>
+        <header><div id="header">{% include 'header.html' %}</div></header>
         <main>
         {% if assets %}
             <div id="photo-main"><div id="main-view">{{ assets.main_entry|safe if assets.main_entry != None }}</div></div>

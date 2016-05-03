@@ -13,7 +13,7 @@ from .form_processor import UploadFormProcessor, LoginFormProcessor, PhotosFormP
 
 
 class BasePage(object):
-    def __init__(self, title=None, nickname=None, category="latest", post_id=None, form=None):
+    def __init__(self, title=None, nickname=None, category="latest", post_id=None, form=None, person=None):
         self.posts = None
         self.form = form
         self.nickname = nickname
@@ -27,11 +27,15 @@ class BasePage(object):
 
         if self.nickname is not None:
             self.assets['person'] = User.query.filter_by(nickname=self.nickname).first()
+        elif person is not None:
+            self.assets['person'] = person
 
         self.get_entity()
 
         if self.assets['category'] in ["login", "upload", "update", "signup"]:
             self.get_rendered_form()
+        elif self.assets['category'] in ["follow", "unfollow"]:
+            pass
         else:
             self.get_posts()
 
@@ -70,7 +74,7 @@ class BasePage(object):
             "photo": {'obj': "post", 'filter': {'id': self.post_id}},
             "photos": {'obj': "post", 'filter': {'writing_type': 'entry'}},
             "author": {'obj': "post", 'filter': {'author': current_user}},
-            "members": {'obj': "user"}
+            "members": {'obj': "user"},
         }
 
         if 'person' in self.assets:
@@ -111,10 +115,14 @@ class BasePage(object):
             response = dict()
             response['success'] = True
             response['authenticated'] = g.user.is_authenticated()
+            if 'category' in self.assets:
+                response['category'] = self.assets['category']
             if g.user.is_authenticated():
                 response['usernickname'] = g.user.nickname
             if 'collection' in self.assets:
                 response['collection'] = self.assets['collection']
+            elif 'category' in self.assets and self.assets['category'] in ["follow", "unfollow"]:
+                response['user'] = self.assets['person'].json_view()
             elif 'body_form' in self.assets:
                 response['uploadForm'] = self.assets['body_form']
             return json.dumps(response)
@@ -184,7 +192,14 @@ class MembersPage(BasePage):
     def get_page_assets(self):
         if self.assets['entity'] == "author" or self.assets['entity'] == "member":
             if request.is_xhr:
-                pass
+                if self.assets['category'] == "follow":
+                    self.follow()
+                    self.assets['followers'] = self.assets['person'].followed.count()
+                    self.assets['followed'] = self.assets['person'].followers.count()
+                if self.assets['category'] == "unfollow":
+                    self.unfollow()
+                    self.assets['followers'] = self.assets['person'].followed.count()
+                    self.assets['followed'] = self.assets['person'].followers.count()
             else:
                 user_context = {'post': self.assets['person']}
                 self.assets['main_entry'] = self.get_asset(template='person.html', context=user_context)

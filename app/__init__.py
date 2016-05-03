@@ -26,7 +26,8 @@ mail = Mail(app)
 CsrfProtect(app)
 
 js_nunjucks = Bundle('templates/archive_entry.js', 'templates/header.js', 'templates/nav.js', 'templates/main_entry.js',
-                     'templates/person.js', 'templates/photo_detail.js', output='templates/nunjucks.js')
+                     'templates/person.js', 'templates/photo_detail.js', 'templates/home_page.js',
+                     output='templates/nunjucks.js')
 assets.register('js_nunjucks', js_nunjucks)
 
 

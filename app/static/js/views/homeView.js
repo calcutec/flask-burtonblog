@@ -1,7 +1,6 @@
 define(['jquery', 'backbone'],
     function($, Backbone){
         return Backbone.View.extend({
-            
             events: {
                 'click .expand-one':   'expandInfoBox',
             },
@@ -9,10 +8,6 @@ define(['jquery', 'backbone'],
             expandInfoBox: function(e) {
                 e.preventDefault();
                 $('.content-one').slideToggle('slow');
-            },
-
-            attachToView: function() {
-                var tbd = null
             },
             
             render: function() {

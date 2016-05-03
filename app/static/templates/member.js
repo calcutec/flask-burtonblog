@@ -38,34 +38,11 @@ output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLook
 output += "</a>\n            ";
 ;
 }
-output += "\n\n            ";
+output += "\n            ";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"last_seen")) {
-output += "\n                <p><em>Last seen: ";
-output += runtime.suppressValue((lineno = 29, colno = 68, runtime.callWrap(runtime.memberLookup(((lineno = 29, colno = 43, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"last_seen")]))),"calendar"), "the return value of (momentjs)[\"calendar\"]", context, [])), env.opts.autoescape);
+output += "\n                <p><em>Last seen:</em></p>\n                <p><em>";
+output += runtime.suppressValue((lineno = 29, colno = 57, runtime.callWrap(runtime.memberLookup(((lineno = 29, colno = 32, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"last_seen")]))),"calendar"), "the return value of (momentjs)[\"calendar\"]", context, [])), env.opts.autoescape);
 output += "</em></p>\n            ";
-;
-}
-output += "\n            ";
-if((lineno = 31, colno = 39, runtime.callWrap(runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "g")),"user")),"is_authenticated"), "g[\"user\"][\"is_authenticated\"]", context, []))) {
-output += "\n                ";
-if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"nickname") != runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "g")),"user")),"nickname")) {
-output += "\n                    ";
-if((lineno = 33, colno = 43, runtime.callWrap(runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "g")),"user")),"is_following"), "g[\"user\"][\"is_following\"]", context, [runtime.contextOrFrameLookup(context, frame, "post")]))) {
-output += "\n                        <a class=\"link-button unfollow\" href=\"";
-output += runtime.suppressValue((lineno = 34, colno = 70, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "url_for"), "url_for", context, ["members",runtime.makeKeywordArgs({"category": "unfollow","nickname": runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"nickname")})])), env.opts.autoescape);
-output += "\"><strong>Unfollow</strong></a>\n                    ";
-;
-}
-else {
-output += "\n                        <a class=\"link-button follow\" href=\"";
-output += runtime.suppressValue((lineno = 36, colno = 68, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "url_for"), "url_for", context, ["members",runtime.makeKeywordArgs({"category": "follow","nickname": runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"nickname")})])), env.opts.autoescape);
-output += "\"><strong>Follow</strong></a>\n                    ";
-;
-}
-output += "\n                ";
-;
-}
-output += "\n            ";
 ;
 }
 output += "\n        </span>\n    </span>\n</span>";

@@ -28,7 +28,7 @@ output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLook
 output += "\">\n</a>\n<span class=\"text-content\">\n    <span class=\"inner-span\">\n        <span class=\"details-well\">\n            ";
 if(runtime.contextOrFrameLookup(context, frame, "assets")) {
 output += "\n                ";
-if(!runtime.inOperator(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity"),["member"])) {
+if(!runtime.inOperator(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity"),["member","author"])) {
 output += "\n                    <a class=\"link-button member-link\" href=\"/members/";
 output += runtime.suppressValue(runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"author")),"nickname"), env.opts.autoescape);
 output += "/\" rel=\"tag\">";
@@ -39,20 +39,9 @@ output += "</a><br>\n                ";
 output += "\n            ";
 ;
 }
-output += "\n            ";
-if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"last_seen")) {
-output += "\n                <p><em>Last seen:";
-output += runtime.suppressValue((lineno = 20, colno = 67, runtime.callWrap(runtime.memberLookup(((lineno = 20, colno = 42, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"last_seen")]))),"calendar"), "the return value of (momentjs)[\"calendar\"]", context, [])), env.opts.autoescape);
-output += "</em></p>\n            ";
-;
-}
-else {
-output += "\n                <b>";
-output += runtime.suppressValue((lineno = 22, colno = 53, runtime.callWrap(runtime.memberLookup(((lineno = 22, colno = 28, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"timestamp")]))),"calendar"), "the return value of (momentjs)[\"calendar\"]", context, [])), env.opts.autoescape);
-output += "</b><br>\n            ";
-;
-}
-output += "\n\n            ";
+output += "\n            <b>";
+output += runtime.suppressValue((lineno = 19, colno = 49, runtime.callWrap(runtime.memberLookup(((lineno = 19, colno = 24, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"timestamp")]))),"calendar"), "the return value of (momentjs)[\"calendar\"]", context, [])), env.opts.autoescape);
+output += "</b><br>\n\n\n            ";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"votes") > 0) {
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"votes"), env.opts.autoescape);
 output += " like";
@@ -79,26 +68,16 @@ output += "\n                </a><br>\n            ";
 }
 output += "\n            ";
 if(runtime.contextOrFrameLookup(context, frame, "assets")) {
-output += "\n                ";
-if(runtime.inOperator(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity"),["member","photos"])) {
-output += "\n                    <a href=\"#\" class=\"link-button gallery\">Gallery</a>\n                ";
-;
-}
-output += "\n            ";
+output += "\n                <a href=\"#\" class=\"link-button gallery\">Gallery</a>\n            ";
 ;
 }
 output += "\n        </span>\n    </span>\n</span>\n";
 if(runtime.contextOrFrameLookup(context, frame, "assets")) {
-output += "\n";
-if(runtime.inOperator(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity"),["member","photos"])) {
 output += "\n        <a class=\"detail-link\" data-id=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
 output += "\" href=\"/photos/";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
 output += "\">\n        <span class=\"rounded-icon\">\n            <svg version=\"1.1\" width=\"22\" height=\"22\" viewBox=\"0 0 22 22\">\n                <path d=\"M3.4 20.2L9 14.5 7.5 13l-5.7 5.6L1 14H0v7.5l.5.5H8v-1l-4.6-.8M18.7 1.9L13 7.6 14.4 9l5.7-5.7.5 4.7h1.2V.6l-.5-.5H14v1.2l4.7.6\">\n                </path>\n            </svg>\n        </span>\n        </a>\n";
-;
-}
-output += "\n";
 ;
 }
 output += "\n";

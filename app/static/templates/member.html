@@ -25,18 +25,9 @@
             {% if post.nickname %}
                 <a class="link-button member-link" href="/members/{{ post.nickname }}">{{ post.nickname }}</a>
             {% endif %}
-
             {% if post.last_seen %}
-                <p><em>Last seen: {{ momentjs(post.last_seen).calendar() }}</em></p>
-            {% endif %}
-            {% if g.user.is_authenticated() %}
-                {% if post.nickname != g.user.nickname %}
-                    {% if g.user.is_following(post) %}
-                        <a class="link-button unfollow" href="{{ url_for('members', category='unfollow', nickname=post.nickname) }}"><strong>Unfollow</strong></a>
-                    {% else %}
-                        <a class="link-button follow" href="{{ url_for('members', category='follow', nickname=post.nickname) }}"><strong>Follow</strong></a>
-                    {% endif %}
-                {% endif %}
+                <p><em>Last seen:</em></p>
+                <p><em>{{ momentjs(post.last_seen).calendar() }}</em></p>
             {% endif %}
         </span>
     </span>

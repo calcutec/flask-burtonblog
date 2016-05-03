@@ -12,7 +12,7 @@
                         <a class="link-button member-link" href="/members/{{ post.author.nickname }}/" rel="tag">{{ post.author.nickname }}</a><br>
                             <b>{{ momentjs(post.timestamp).calendar() }}</b><br>
                     {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
-                    {% if current_user.is_authenticated() and post.author.id == current_user.id %}
+                    {% if current_user.is_authenticated() and post.author.nickname == current_user.nickname %}
                         <a href="#">Edit</a><br>
                         <a class="link-button red" href="#">Delete</a>
                     {% endif %}

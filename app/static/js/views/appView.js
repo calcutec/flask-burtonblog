@@ -8,28 +8,14 @@ define(['jquery'],
                 }
                 this.mainView = view;
                 if (options.render) {
-                    if (options.entity == 'home'){
-                        if (this.headerView) {
-                            this.headerView.close();
-                        }
-                        if (this.navView) {
-                            this.navView.close();
-                        }
+                    if (options.entity == 'photo' || options.entity == 'home' ){
                         if (this.archiveView) {
                             this.archiveView.unrender();
                             this.archiveView.close();
                         }
                     }
-                    if (options.entity == 'photo'){
-                        if (this.archiveView) {
-                            this.archiveView.unrender();
-                            this.archiveView.close();
-                        }
-                    }
-                    this.mainView.render(options);
+                    this.mainView.render();
                     $('#photo-main').html(this.mainView.el)
-                } else {
-                    this.mainView.attachToView();               
                 }
             } else if (view.el.id == 'links') {
                 if (this.archiveView) {
@@ -64,6 +50,7 @@ define(['jquery'],
                 this.navView = view;
                 if (options.render) {
                     this.navView.render(options);
+                    $('nav').html(this.navView.el);
                 }
             }
         };

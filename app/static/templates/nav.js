@@ -5,9 +5,7 @@ var colno = null;
 var output = "";
 try {
 var parentTemplate = null;
-output += "<div id=\"navbar\">\n";
-if(runtime.contextOrFrameLookup(context, frame, "assets")) {
-output += "\n    <input class=\"burger-check\" id=\"burger-check\" type=\"checkbox\"><label for=\"burger-check\" class=\"burger\"></label>\n                ";
+output += " <input class=\"burger-check\" id=\"burger-check\" type=\"checkbox\"><label for=\"burger-check\" class=\"burger\"></label>\n                ";
 if(runtime.inOperator(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity"),["author","photos","member","members"]) && runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"category") != "upload") {
 output += "\n\n                    ";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity") == "author") {
@@ -293,7 +291,7 @@ output += "</span></div>\n            ";
 ;
 }
 output += "\n    <span class=\"loginlogout\">\n        ";
-if((lineno = 48, colno = 41, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"is_authenticated"), "current_user[\"is_authenticated\"]", context, []))) {
+if((lineno = 46, colno = 41, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"is_authenticated"), "current_user[\"is_authenticated\"]", context, []))) {
 output += "\n            <a href=\"/logout\"><i class=\"fa fa-sign-out\"></i></a>\n        ";
 ;
 }
@@ -307,7 +305,7 @@ output += "\n        ";
 ;
 }
 output += "\n    </span>\n    <div id=\"nav\" class=\"navigation\">\n        <ul>\n        ";
-if(!(lineno = 56, colno = 45, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"is_authenticated"), "current_user[\"is_authenticated\"]", context, []))) {
+if(!(lineno = 54, colno = 45, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"is_authenticated"), "current_user[\"is_authenticated\"]", context, []))) {
 output += "\n            <li class=\"";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity") == "home") {
 output += "current";
@@ -327,7 +325,7 @@ output += "current";
 ;
 }
 output += "\"><a href=\"/members/latest\"><i class=\"fa fa-users\"></i></a></li>\n        ";
-if((lineno = 61, colno = 41, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"is_authenticated"), "current_user[\"is_authenticated\"]", context, []))) {
+if((lineno = 59, colno = 41, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"is_authenticated"), "current_user[\"is_authenticated\"]", context, []))) {
 output += "\n            <li class=\"";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity") == "author") {
 output += "current";
@@ -343,10 +341,7 @@ output += "current";
 output += "\"><a href=\"/photos/upload\"><i class=\"fa fa-upload\"></i></a></li>\n        ";
 ;
 }
-output += "\n        </ul>\n    </div>\n";
-;
-}
-output += "\n</div>";
+output += "\n        </ul>\n    </div>";
 if(parentTemplate) {
 parentTemplate.rootRenderFunc(env, context, frame, runtime, cb);
 } else {
