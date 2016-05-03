@@ -232,8 +232,10 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/profileMainView', 
                     }
 
                 }
-                if (itemDict.entity == 'photos' || itemDict.entity == 'member' || itemDict.entity == 'author'){
+                if (itemDict.entity == 'photos'){
                     AppView(new ArchiveView({id: 'links', tagName: 'ul', className: 'img-list', 'collection': itemDict.collection.splice(1)}), itemDict);
+                } else if (itemDict.entity == 'member' || itemDict.entity == 'author') {
+                    AppView(new ArchiveView({id: 'links', tagName: 'ul', className: 'img-list', 'collection': itemDict.collection}), itemDict);
                 } else if (itemDict.entity == 'members') {
                     AppView(new MembersView({id: 'links', tagName: 'ul', className: 'img-list', 'collection': itemDict.collection}), itemDict);
                 }

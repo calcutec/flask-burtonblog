@@ -25,9 +25,9 @@ lm.login_message = 'Please log in to access this page.'
 mail = Mail(app)
 CsrfProtect(app)
 
-js_nunjucks = Bundle('templates/archive_entry.js', 'templates/header.js', 'templates/nav.js', 'templates/main_entry.js',
-                     'templates/person.js', 'templates/photo_detail.js', 'templates/home_page.js',
-                     output='templates/nunjucks.js')
+js_nunjucks = Bundle('templates/archive_entry.js', 'templates/member.js', 'templates/header.js', 'templates/nav.js',
+                     'templates/main_entry.js', 'templates/person.js', 'templates/photo_detail.js',
+                     'templates/home_page.js', output='templates/nunjucks.js')
 assets.register('js_nunjucks', js_nunjucks)
 
 
