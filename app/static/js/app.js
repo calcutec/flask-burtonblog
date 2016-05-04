@@ -1,0 +1,1 @@
+define(["routers/home"],function(n){var e=function(){this.router=new n};return{init:e}});

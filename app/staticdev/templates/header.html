@@ -1,0 +1,21 @@
+{% if assets %}
+    {% if assets.entity == "author" %}
+        {{ current_user.nickname }}'s Photos
+    {% elif assets.entity == "login" %}
+        Login/Signup
+    {% elif assets.entity == "home" %}
+        This Great Pic
+    {% elif assets.category == "upload"  %}
+        Upload Photo
+    {% elif assets.entity == "photo"  %}
+        Photo #{{ assets['photo_id'] }}
+    {% elif assets.entity == "photos"  %}
+        Photos
+    {% elif assets.entity == "member" %}
+        {{ assets['person'].nickname }}'s Photos
+    {% elif assets.entity == "members"  %}
+        Members
+    {% else %}
+        {{ assets.entity }} - {{ assets.category }}
+    {% endif %}
+{% endif %}

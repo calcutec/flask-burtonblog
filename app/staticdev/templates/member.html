@@ -1,0 +1,34 @@
+{% if post.photo %}
+        <img src="https://aperturus.imgix.net/{{ post.photo }}?w=175&h=175&fit=crop&q=85&auto=format&sharp=10"
+        srcset="https://aperturus.imgix.net/{{ post.photo }}?w=175&h=175&fit=crop&q=85&auto=format&sharp=10 175w,
+        https://aperturus.imgix.net/{{ post.photo }}?w=190&h=190&fit=crop&q=85&auto=format&sharp=10 190w,
+        https://aperturus.imgix.net/{{ post.photo }}?w=220&h=220&fit=crop&q=85&auto=format&sharp=10 220w,
+        https://aperturus.imgix.net/{{ post.photo }}?w=320&h=320&fit=crop&q=85&auto=format&sharp=10 320w,
+        https://aperturus.imgix.net/{{ post.photo }}?w=640&h=640&fit=crop&q=85&auto=format&sharp=10 640w"
+        sizes="(min-width: 40em) 30.5vw, (min-width: 60em) 22.75vw, 46vw"
+        class="responsive-img"
+        alt="{{ post.photo }}">
+{% else %}
+         <img src="https://aperturus.imgix.net/img/profile.jpg?w=175&h=175&fit=crop&q=85&auto=format&sharp=10"
+        srcset="https://aperturus.imgix.net/img/profile.jpg?w=175&h=175&fit=crop&q=85&auto=format&sharp=10 175w,
+        https://aperturus.imgix.net/img/profile.jpg?w=190&h=190&fit=crop&q=85&auto=format&sharp=10 190w,
+        https://aperturus.imgix.net/img/profile.jpg?w=220&h=220&fit=crop&q=85&auto=format&sharp=10 220w,
+        https://aperturus.imgix.net/img/profile.jpg?w=320&h=320&fit=crop&q=85&auto=format&sharp=10 320w,
+        https://aperturus.imgix.net/img/profile.jpg?w=640&h=640&fit=crop&q=85&auto=format&sharp=10 640w"
+        sizes="(min-width: 40em) 30.5vw, (min-width: 60em) 22.75vw, 46vw"
+        class="responsive-img"
+        alt="{{ post.photo }}">
+{% endif %}
+<span onclick="" class="text-content">
+    <span>
+        <span class="details-well">
+            {% if post.nickname %}
+                <a class="link-button member-link" href="/members/{{ post.nickname }}">{{ post.nickname }}</a>
+            {% endif %}
+            {% if post.last_seen %}
+                <p><em>Last seen:</em></p>
+                <p><em>{{ momentjs(post.last_seen).calendar() }}</em></p>
+            {% endif %}
+        </span>
+    </span>
+</span>

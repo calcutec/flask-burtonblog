@@ -1,12 +1,1 @@
-define(['jquery', 'backbone'],
-    function($, Backbone){
-        return Backbone.View.extend({
-            render: function() {
-                var post = this.model.toJSON();
-                post['author'] = { "nickname": post.nickname };
-                $(this.el).html(window.env.render("photo_detail.html", {'post': post, 'momentjs': moment }));
-                return this;
-            }
-        });
-    }
-);
+define(["jquery","backbone"],function(e,n){return n.View.extend({render:function(){var n=this.model.toJSON();return n.author={nickname:n.nickname},e(this.el).html(window.env.render("photo_detail.html",{post:n,momentjs:moment})),this}})});

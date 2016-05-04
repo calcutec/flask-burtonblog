@@ -1,0 +1,38 @@
+<ul class="img-list">
+    <li>
+        <img data-id="{{ post.id }}" sizes="92.5vw" src="https://aperturus.imgix.net/{{ post.photo }}?w=300&q=85&auto=format&sharp=10"
+        srcset="https://aperturus.imgix.net/{{ post.photo }}?w=300&q=85&sharp=10 300w,
+        https://aperturus.imgix.net/{{ post.photo }}?w=600&q=85&sharp=10 600w,
+        https://aperturus.imgix.net/{{ post.photo }}?w=900&q=85&sharp=10 900w,
+        https://aperturus.imgix.net/{{ post.photo }}?w=1290&q=85&sharp=10 1290w"
+        alt="{{ post.photo }}" class="main-responsive-img">
+        <span onclick="" class="text-content">
+            <span>
+                <div class="details-well">
+                        <a class="link-button member-link" href="/members/{{ post.author.nickname }}/" rel="tag">{{ post.author.nickname }}</a><br>
+                            <b>{{ momentjs(post.timestamp).calendar() }}</b><br>
+                    {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
+                    {% if current_user.is_authenticated() and post.author.nickname == current_user.nickname %}
+                        <a href="#">Edit</a><br>
+                        <a class="link-button red" href="#">Delete</a>
+                    {% endif %}
+
+{#                    {% if current_user.is_authenticated() and post.author.id != current_user.id %}#}
+{#                        {% if post.has_voted(g.user.id) %}#}
+{#                            <a data-voted="true" style="color:#eb6864;" href="{{ url_for('photos', category='vote', post_id=post.id) }}" class="{{ post.id }} likeme"><i class="fa fa-smile-o fa-lg icon-white"></i></a>#}
+{#                        {% else %}#}
+{#                            <a data-voted="false" style="color:#000;" href="{{ url_for('photos', category='vote', post_id=post.id) }}" class="{{ post.id }} likeme"><i class="fa fa-meh-o fa-lg icon-white"></i></a>#}
+{#                        {% endif %}#}
+{#                            Like/Unlike <br>#}
+{#                            <a href="{{ url_for('photos', id=post.id) }}">Add Comment</a>#}
+{#                    {% endif %}#}
+                </div>
+            </span>
+        </span>
+    </li>
+</ul>
+<div>
+    {{ post.body }}
+    <h4>Comments</h4>
+{#    {% include "comments.html" %}#}
+</div>

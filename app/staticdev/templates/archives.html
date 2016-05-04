@@ -1,0 +1,6 @@
+{% if posts %}
+    {% for post in posts %}<li data-id="{{ post.id }}">{% include "archive_entry.html" %}</li>{% endfor %}
+{% endif %}
+
+
+

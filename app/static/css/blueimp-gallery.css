@@ -9,7 +9,6 @@
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/MIT
  */
-
 .blueimp-gallery,
 .blueimp-gallery > .slides > .slide > .slide-content {
   position: absolute;
@@ -17,7 +16,7 @@
   right: 0;
   bottom: 0;
   left: 0;
-  /* Prevent artifacts in Mozilla Firefox: */
+  
   -moz-backface-visibility: hidden;
 }
 .blueimp-gallery > .slides > .slide > .slide-content {
@@ -44,7 +43,7 @@
   position: relative;
   z-index: auto;
   margin: 1em auto;
-  /* Set the carousel width/height ratio to 16/9: */
+  
   padding-bottom: 56.25%;
   box-shadow: 0 0 10px #000;
   -ms-touch-action: pan-y;
@@ -177,7 +176,7 @@
 .blueimp-gallery-controls > .title,
 .blueimp-gallery-controls > .play-pause {
   display: block;
-  /* Fix z-index issues (controls behind slide element) on Android: */
+  
   -webkit-transform: translateZ(0);
      -moz-transform: translateZ(0);
       -ms-transform: translateZ(0);
@@ -202,8 +201,6 @@
       -ms-user-select: none;
           user-select: none;
 }
-
-/* Replace PNGs with SVGs for capable browsers (excluding IE<9) */
 body:last-child .blueimp-gallery > .slides > .slide-error {
   background-image: url(../img/error.svg);
 }
@@ -216,8 +213,6 @@ body:last-child .blueimp-gallery > .play-pause {
 body:last-child .blueimp-gallery-playing > .play-pause {
   background-position: -20px 0;
 }
-
-/* IE7 fixes */
 *+html .blueimp-gallery > .slides > .slide {
   min-height: 300px;
 }

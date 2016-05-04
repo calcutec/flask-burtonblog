@@ -1,0 +1,26 @@
+<div id="loginforms">
+    <input id="tab1" type="radio" name="tabs" checked>
+    <label for="tab1">1 Click</label>
+
+    <input id="tab2" type="radio" name="tabs">
+    <label for="tab2">Email</label>
+
+    <input id="tab3" type="radio" name="tabs">
+    <label for="tab3">Signup</label>
+
+    <section id="content1">
+        <h3>1-Click-Login</h3>
+        <ul id="auto-login">
+{#            <li><a class="button button-primary" href="/login/facebook"><i class="icon-white fa fa-facebook fa-lg"></i>&nbsp; Facebook</a></li>#}
+            <li><a class="button button-primary" href="/login/google"><i class="icon-white fa fa-google-plus fa-lg"></i>&nbsp; Google</a></li>
+        </ul>
+    </section>
+
+    <section id="content2">
+        {% include "assets/forms/email_login_form.html" %}
+    </section>
+
+    <section id="content3">
+        {%  include "assets/forms/signup_form.html" %}
+    </section>
+</div>

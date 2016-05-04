@@ -10,9 +10,28 @@ from config import ADMINS, MAIL_SERVER, MAIL_PORT, MAIL_USERNAME, \
     MAIL_PASSWORD, SQLALCHEMY_DATABASE_URI
 from flask_wtf.csrf import CsrfProtect
 
-app = Flask(__name__)
+
+class MyFlask(Flask):
+    @property
+    def static_folder(self):
+        if self.config.get('STATIC_FOLDER') is not None:
+            return os.path.join(self.root_path, self.config.get('STATIC_FOLDER'))
+
+    @static_folder.setter
+    def static_folder(self, value):
+        self.config['STATIC_FOLDER'] = value
+
+# Now these are equivalent:
+app = Flask(__name__, static_folder='staticdev')
+app.config['STATIC_FOLDER'] = 'staticdev'
+
+
+
+
+
+
 base_dir = os.path.dirname(os.path.realpath(__file__))
-app.jinja_loader = FileSystemLoader(os.path.join(base_dir, 'static', 'templates'))
+app.jinja_loader = FileSystemLoader(os.path.join(base_dir, 'staticdev', 'templates'))
 app.jinja_env.globals['momentjs'] = momentjs
 app.config.from_object('config')
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
@@ -25,10 +44,10 @@ lm.login_message = 'Please log in to access this page.'
 mail = Mail(app)
 CsrfProtect(app)
 
-js_nunjucks = Bundle('templates/archive_entry.js', 'templates/member.js', 'templates/header.js', 'templates/nav.js',
-                     'templates/main_entry.js', 'templates/person.js', 'templates/photo_detail.js',
-                     'templates/home_page.js', output='templates/nunjucks.js')
-assets.register('js_nunjucks', js_nunjucks)
+js_templates = Bundle('templates/archive_entry.js', 'templates/member.js', 'templates/header.js', 'templates/nav.js',
+                      'templates/main_entry.js', 'templates/person.js', 'templates/photo_detail.js',
+                      'templates/home_page.js', output='templates/templates.js')
+assets.register('js_templates', js_templates)
 
 
 app.config['OAUTH_CREDENTIALS'] = {

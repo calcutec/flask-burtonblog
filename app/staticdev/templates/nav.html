@@ -1,0 +1,65 @@
+ <input class="burger-check" id="burger-check" type="checkbox"><label for="burger-check" class="burger"></label>
+                {% if assets.entity in ["author", "photos", "member", "members"] and assets.category != "upload" %}
+
+                    {% if assets.entity == "author" %}
+                        <div id="title"><i class="current fa-briefcase fa"></i></div>
+                    {% elif assets.entity == "photos"  %}
+                        <div id="title"><i class="current fa-picture-o fa"></i></div>
+                    {% elif assets.entity == "member" %}
+                        <div id="title"><i class="current fa-user fa"></i></div>
+                    {% elif assets.entity == "members"  %}
+                        <div id="title"><i class="current fa-users fa"></i></div>
+                    {% endif %}
+                    <label id="element-label" for="element">
+                        <select name="element" id="element">
+                            <option value="latest" {% if assets.category == "latest" %}selected{% endif %}>Latest</option>
+                            <option value="all" {% if assets.category == "all" %}selected{% endif %}>All</option>
+                            <option class="select-dash" disabled="disabled">----------</option>
+                            {%  if assets.entity == "author" %}
+                                {% for key, value in assets.category_counts|dictsort %}
+                                     <option value={{ key }} {% if assets.category == key %}selected{% endif %}>{{ key }} ({{ value }})</option>
+                                {% endfor %}
+            {#                {% elif assets.entity == "members" %}#}
+            {#                    <option value="followed" {% if assets.category == "followed" %}selected{% endif %}>Followed</option>#}
+            {#                    <option value="followers" {% if assets.category == "followers" %}selected{% endif %}>Followers</option>#}
+                            {% elif assets.entity == "member" %}
+                                {% for key, value in assets.category_counts|dictsort %}
+                                     <option value={{ key }} {% if assets.category == key %}selected{% endif %}>{{ key }} ({{ value }})</option>
+                                {% endfor %}
+                            {%  elif assets.entity == "photos" %}
+                                {% for key, value in assets.category_counts|dictsort %}
+                                     <option value={{ key }} {% if assets.category == key %}selected{% endif %}>{{ key }} ({{ value }})</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </label>
+            {% endif %}
+            {% if request.endpoint == "login" %}
+                <div id="title"><i class="current fa fa-sign-in"></i></div>
+            {% elif assets.entity == "home" %}
+                <div id="title"><i class="current fa fa-home"></i></div>
+            {% elif assets.category == "upload"  %}
+                <div id="title"><i class="current fa fa-upload"></i><span id="subtitle">{{ assets.category }}</span></div>
+            {% elif assets.entity == "photo"  %}
+                <div id="title"><i class="current fa-picture-o fa"></i><span id="subtitle">#{{ assets['photo_id'] }}</span></div>
+            {% endif %}
+    <span class="loginlogout">
+        {% if current_user.is_authenticated() %}
+            <a href="/logout"><i class="fa fa-sign-out"></i></a>
+        {% else %}
+            {% if assets.entity != "login"  %}<a href="/login"><i class="fa fa-sign-in fa-2x"></i></a>{% endif %}
+        {% endif %}
+    </span>
+    <div id="nav" class="navigation">
+        <ul>
+        {% if not current_user.is_authenticated() %}
+            <li class="{% if assets.entity == "home"  %}current{% endif %}"><a href="/home"><i class="fa fa-home"></i></a></li>
+        {% endif %}
+            <li class="{% if assets.entity == "photos" and assets.category != "upload"  %}current{% endif %}"><a href="/photos/latest"><i class="fa fa-picture-o"></i></a></li>
+            <li class="{% if assets.entity == "members" %}current{% endif %}"><a href="/members/latest"><i class="fa fa-users"></i></a></li>
+        {% if current_user.is_authenticated()  %}
+            <li class="{%  if assets.entity == "author" %}current{% endif %}"><a href="/members/{{ current_user.nickname }}/latest"><i class="fa fa-briefcase"></i></a></li>
+            <li class="{% if assets.category == "upload" %}current{% endif %}"><a href="/photos/upload"><i class="fa fa-upload"></i></a></li>
+        {% endif %}
+        </ul>
+    </div>
