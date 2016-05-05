@@ -25,7 +25,7 @@ output += "?w=320&h=320&fit=crop&q=85&auto=format 320w,\n    https://aperturus.i
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"photo"), env.opts.autoescape);
 output += "?w=640&h=640&fit=crop&q=85&auto=format 640w\"\n    sizes=\"(min-width: 40em) 30.5vw, (min-width: 60em) 22.75vw, 46vw\"\n    class=\"responsive-img\"\n    alt=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"photo"), env.opts.autoescape);
-output += "\">\n</a>\n<span class=\"text-content\">\n    <span class=\"inner-span\">\n        <span class=\"details-well\">\n            ";
+output += "\">\n</a>\n<span onclick=\"\" class=\"text-content\">\n    <span class=\"inner-span\">\n        <span class=\"details-well\">\n            ";
 if(runtime.contextOrFrameLookup(context, frame, "assets")) {
 output += "\n                ";
 if(!runtime.inOperator(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity"),["member","author"])) {

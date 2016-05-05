@@ -128,7 +128,6 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/profileMainView', 
                     } else if (e.currentTarget.classList[1] == 'fa-briefcase'){
                         itemDict.collection = this.photoCollection;
                         itemDict.entity = 'author';
-                        itemDict.template = 'person.html';
                         itemDict.nickname = this.memberCollection.usernickname;
                         itemDict.usernickname = this.memberCollection.usernickname;
                         itemDict.target_user = this.memberCollection.where({nickname: itemDict.usernickname})[0];
@@ -137,7 +136,6 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/profileMainView', 
                     } else if (e.currentTarget.classList[1] == 'fa-home'){
                         itemDict.collection = this.photoCollection;
                         itemDict.entity = 'home';
-                        itemDict.template = 'home_page.html';
                         itemDict.route = '/home/';
                         Backbone.history.navigate(itemDict.route, {trigger: false});
                         AppView(new HeaderView({id: 'header'}), itemDict);

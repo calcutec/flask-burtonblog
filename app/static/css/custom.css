@@ -353,7 +353,7 @@ label > .label-body {
     float: left;
 }
 ul.img-list li:hover span.text-content {
-    opacity: 1;
+    display:table;
 }
 ul.img-list li:hover span.rounded-icon {
     opacity: 1;
@@ -369,15 +369,14 @@ ul.img-list li {
     padding-right: .5vw;
 }
 span.text-content {
+    display:none;
     position: absolute;
     color: white;
-    display: table;
     height: 46vw;
     left: 0;
     bottom: 0;
     width: 46vw;
-    opacity: 0;
-    transition: opacity 500ms;
+    opacity: 1;
 }
 span.text-content span {
     display: table-cell;
