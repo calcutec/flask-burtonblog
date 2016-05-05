@@ -9,4 +9,182 @@
  * http://www.opensource.org/licenses/MIT
  */
 
-!function(){"use strict";function t(t,e){var n;for(n in e)e.hasOwnProperty(n)&&(t[n]=e[n]);return t}function e(t){if(!this||this.find!==e.prototype.find)return new e(t);if(this.length=0,t)if("string"==typeof t&&(t=this.find(t)),t.nodeType||t===t.window)this.length=1,this[0]=t;else{var n=t.length;for(this.length=n;n;)n-=1,this[n]=t[n]}}e.extend=t,e.contains=function(t,e){do if(e=e.parentNode,e===t)return!0;while(e);return!1},e.parseJSON=function(t){return window.JSON&&JSON.parse(t)},t(e.prototype,{find:function(t){var n=this[0]||document;return"string"==typeof t&&(t=n.querySelectorAll?n.querySelectorAll(t):"#"===t.charAt(0)?n.getElementById(t.slice(1)):n.getElementsByTagName(t)),new e(t)},hasClass:function(t){return this[0]?new RegExp("(^|\\s+)"+t+"(\\s+|$)").test(this[0].className):!1},addClass:function(t){for(var e,n=this.length;n;){if(n-=1,e=this[n],!e.className)return e.className=t,this;if(this.hasClass(t))return this;e.className+=" "+t}return this},removeClass:function(t){for(var e,n=new RegExp("(^|\\s+)"+t+"(\\s+|$)"),i=this.length;i;)i-=1,e=this[i],e.className=e.className.replace(n," ");return this},on:function(t,e){for(var n,i,s=t.split(/\s+/);s.length;)for(t=s.shift(),n=this.length;n;)n-=1,i=this[n],i.addEventListener?i.addEventListener(t,e,!1):i.attachEvent&&i.attachEvent("on"+t,e);return this},off:function(t,e){for(var n,i,s=t.split(/\s+/);s.length;)for(t=s.shift(),n=this.length;n;)n-=1,i=this[n],i.removeEventListener?i.removeEventListener(t,e,!1):i.detachEvent&&i.detachEvent("on"+t,e);return this},empty:function(){for(var t,e=this.length;e;)for(e-=1,t=this[e];t.hasChildNodes();)t.removeChild(t.lastChild);return this},first:function(){return new e(this[0])}}),"function"==typeof define&&define.amd?define([],function(){return e}):(window.blueimp=window.blueimp||{},window.blueimp.helper=e)}();
+/* global define, window, document */
+
+;(function () {
+  'use strict'
+
+  function extend (obj1, obj2) {
+    var prop
+    for (prop in obj2) {
+      if (obj2.hasOwnProperty(prop)) {
+        obj1[prop] = obj2[prop]
+      }
+    }
+    return obj1
+  }
+
+  function Helper (query) {
+    if (!this || this.find !== Helper.prototype.find) {
+      // Called as function instead of as constructor,
+      // so we simply return a new instance:
+      return new Helper(query)
+    }
+    this.length = 0
+    if (query) {
+      if (typeof query === 'string') {
+        query = this.find(query)
+      }
+      if (query.nodeType || query === query.window) {
+        // Single HTML element
+        this.length = 1
+        this[0] = query
+      } else {
+        // HTML element collection
+        var i = query.length
+        this.length = i
+        while (i) {
+          i -= 1
+          this[i] = query[i]
+        }
+      }
+    }
+  }
+
+  Helper.extend = extend
+
+  Helper.contains = function (container, element) {
+    do {
+      element = element.parentNode
+      if (element === container) {
+        return true
+      }
+    } while (element)
+    return false
+  }
+
+  Helper.parseJSON = function (string) {
+    return window.JSON && JSON.parse(string)
+  }
+
+  extend(Helper.prototype, {
+    find: function (query) {
+      var container = this[0] || document
+      if (typeof query === 'string') {
+        if (container.querySelectorAll) {
+          query = container.querySelectorAll(query)
+        } else if (query.charAt(0) === '#') {
+          query = container.getElementById(query.slice(1))
+        } else {
+          query = container.getElementsByTagName(query)
+        }
+      }
+      return new Helper(query)
+    },
+
+    hasClass: function (className) {
+      if (!this[0]) {
+        return false
+      }
+      return new RegExp('(^|\\s+)' + className +
+        '(\\s+|$)').test(this[0].className)
+    },
+
+    addClass: function (className) {
+      var i = this.length
+      var element
+      while (i) {
+        i -= 1
+        element = this[i]
+        if (!element.className) {
+          element.className = className
+          return this
+        }
+        if (this.hasClass(className)) {
+          return this
+        }
+        element.className += ' ' + className
+      }
+      return this
+    },
+
+    removeClass: function (className) {
+      var regexp = new RegExp('(^|\\s+)' + className + '(\\s+|$)')
+      var i = this.length
+      var element
+      while (i) {
+        i -= 1
+        element = this[i]
+        element.className = element.className.replace(regexp, ' ')
+      }
+      return this
+    },
+
+    on: function (eventName, handler) {
+      var eventNames = eventName.split(/\s+/)
+      var i
+      var element
+      while (eventNames.length) {
+        eventName = eventNames.shift()
+        i = this.length
+        while (i) {
+          i -= 1
+          element = this[i]
+          if (element.addEventListener) {
+            element.addEventListener(eventName, handler, false)
+          } else if (element.attachEvent) {
+            element.attachEvent('on' + eventName, handler)
+          }
+        }
+      }
+      return this
+    },
+
+    off: function (eventName, handler) {
+      var eventNames = eventName.split(/\s+/)
+      var i
+      var element
+      while (eventNames.length) {
+        eventName = eventNames.shift()
+        i = this.length
+        while (i) {
+          i -= 1
+          element = this[i]
+          if (element.removeEventListener) {
+            element.removeEventListener(eventName, handler, false)
+          } else if (element.detachEvent) {
+            element.detachEvent('on' + eventName, handler)
+          }
+        }
+      }
+      return this
+    },
+
+    empty: function () {
+      var i = this.length
+      var element
+      while (i) {
+        i -= 1
+        element = this[i]
+        while (element.hasChildNodes()) {
+          element.removeChild(element.lastChild)
+        }
+      }
+      return this
+    },
+
+    first: function () {
+      return new Helper(this[0])
+    }
+
+  })
+
+  if (typeof define === 'function' && define.amd) {
+    define(function () {
+      return Helper
+    })
+  } else {
+    window.blueimp = window.blueimp || {}
+    window.blueimp.helper = Helper
+  }
+}())

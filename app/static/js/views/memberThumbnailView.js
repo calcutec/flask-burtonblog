@@ -1,1 +1,32 @@
-define(["jquery","backbone"],function(e,t){return t.View.extend({tagName:"li",events:{"click .gallery":"gallery"},render:function(t){var n=this.model.toJSON();n.author={nickname:n.nickname};var r={};r.entity=t.entity;var l=this;return n.comments={all:function(){return l.models.get("comments")}},e(this.el).html(window.env.render("member.html",{post:n,momentjs:moment,assets:r})),this},gallery:function(t){t.preventDefault();var n=t.target||t.srcElement,r=n.src?n.parentNode:n,l={index:r,event:t},i=window.document.getElementsByClassName("gallery-image"),a=window.blueimp.Gallery(i,l);a.slide(e(this.el).index())}})});
+define(['jquery', 'backbone'],
+    function($, Backbone){
+        return Backbone.View.extend({
+            tagName: "li",
+            events: {
+                'click .gallery':   'gallery'
+            },
+            render: function(options) {
+                var post = this.model.toJSON();
+                post['author'] = { "nickname": post.nickname };
+                var assets = {};
+                assets['entity'] = options['entity'];
+                var self = this;
+                post['comments'] = { "all": function(){
+                    return self.models.get('comments')
+                } };
+                $(this.el).html(window.env.render("member.html", {'post': post, 'momentjs': moment, 'assets': assets}));
+                return this;
+            },
+            
+            gallery: function(event) {
+                event.preventDefault();
+                var target = event.target || event.srcElement,
+                    link = target.src ? target.parentNode : target,
+                    options = {index: link, event: event},
+                    links = window.document.getElementsByClassName('gallery-image');
+                var currentgallery = window.blueimp.Gallery(links, options);
+                currentgallery.slide($(this.el).index());
+            }
+        });
+    }
+);

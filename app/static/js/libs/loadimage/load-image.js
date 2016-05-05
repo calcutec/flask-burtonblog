@@ -9,4 +9,340 @@
  * http://www.opensource.org/licenses/MIT
  */
 
-!function(t){"use strict";var e=function(t,n,i){var o,r,a=document.createElement("img");if(a.onerror=n,a.onload=function(){!r||i&&i.noRevoke||e.revokeObjectURL(r),n&&n(e.scale(a,i))},e.isInstanceOf("Blob",t)||e.isInstanceOf("File",t))o=r=e.createObjectURL(t),a._type=t.type;else{if("string"!=typeof t)return!1;o=t,i&&i.crossOrigin&&(a.crossOrigin=i.crossOrigin)}return o?(a.src=o,a):e.readFile(t,function(t){var e=t.target;e&&e.result?a.src=e.result:n&&n(t)})},n=window.createObjectURL&&window||window.URL&&URL.revokeObjectURL&&URL||window.webkitURL&&webkitURL;e.isInstanceOf=function(t,e){return Object.prototype.toString.call(e)==="[object "+t+"]"},e.transformCoordinates=function(){},e.getTransformedOptions=function(t,e){var n,i,o,r,a=e.aspectRatio;if(!a)return e;n={};for(i in e)e.hasOwnProperty(i)&&(n[i]=e[i]);return n.crop=!0,o=t.naturalWidth||t.width,r=t.naturalHeight||t.height,o/r>a?(n.maxWidth=r*a,n.maxHeight=r):(n.maxWidth=o,n.maxHeight=o/a),n},e.renderImageToCanvas=function(t,e,n,i,o,r,a,c,d,s){return t.getContext("2d").drawImage(e,n,i,o,r,a,c,d,s),t},e.hasCanvasOption=function(t){return t.canvas||t.crop||!!t.aspectRatio},e.scale=function(t,n){function i(){var t=Math.max((c||O)/O,(d||b)/b);t>1&&(O*=t,b*=t)}function o(){var t=Math.min((r||O)/O,(a||b)/b);1>t&&(O*=t,b*=t)}n=n||{};var r,a,c,d,s,h,u,f,g,m,l,v=document.createElement("canvas"),w=t.getContext||e.hasCanvasOption(n)&&v.getContext,p=t.naturalWidth||t.width,R=t.naturalHeight||t.height,O=p,b=R;if(w&&(n=e.getTransformedOptions(t,n),u=n.left||0,f=n.top||0,n.sourceWidth?(s=n.sourceWidth,void 0!==n.right&&void 0===n.left&&(u=p-s-n.right)):s=p-u-(n.right||0),n.sourceHeight?(h=n.sourceHeight,void 0!==n.bottom&&void 0===n.top&&(f=R-h-n.bottom)):h=R-f-(n.bottom||0),O=s,b=h),r=n.maxWidth,a=n.maxHeight,c=n.minWidth,d=n.minHeight,w&&r&&a&&n.crop?(O=r,b=a,l=s/h-r/a,0>l?(h=a*s/r,void 0===n.top&&void 0===n.bottom&&(f=(R-h)/2)):l>0&&(s=r*h/a,void 0===n.left&&void 0===n.right&&(u=(p-s)/2))):((n.contain||n.cover)&&(c=r=r||c,d=a=a||d),n.cover?(o(),i()):(i(),o())),w){if(g=n.pixelRatio,g>1&&(v.style.width=O+"px",v.style.height=b+"px",O*=g,b*=g,v.getContext("2d").scale(g,g)),m=n.downsamplingRatio,m>0&&1>m&&s>O&&h>b)for(;s*m>O;)v.width=s*m,v.height=h*m,e.renderImageToCanvas(v,t,u,f,s,h,0,0,v.width,v.height),s=v.width,h=v.height,t=document.createElement("canvas"),t.width=s,t.height=h,e.renderImageToCanvas(t,v,0,0,s,h,0,0,s,h);return v.width=O,v.height=b,e.transformCoordinates(v,n),e.renderImageToCanvas(v,t,u,f,s,h,0,0,O,b)}return t.width=O,t.height=b,t},e.createObjectURL=function(t){return n?n.createObjectURL(t):!1},e.revokeObjectURL=function(t){return n?n.revokeObjectURL(t):!1},e.readFile=function(t,e,n){if(window.FileReader){var i=new FileReader;if(i.onload=i.onerror=e,n=n||"readAsDataURL",i[n])return i[n](t),i}return!1},"function"==typeof define&&define.amd?define([],function(){return e}):"object"==typeof module&&module.exports?module.exports=e:t.loadImage=e}(window);
+/*global define, module, window, document, URL, webkitURL, FileReader */
+
+;(function ($) {
+  'use strict'
+
+  // Loads an image for a given File object.
+  // Invokes the callback with an img or optional canvas
+  // element (if supported by the browser) as parameter:
+  var loadImage = function (file, callback, options) {
+    var img = document.createElement('img')
+    var url
+    var oUrl
+    img.onerror = callback
+    img.onload = function () {
+      if (oUrl && !(options && options.noRevoke)) {
+        loadImage.revokeObjectURL(oUrl)
+      }
+      if (callback) {
+        callback(loadImage.scale(img, options))
+      }
+    }
+    if (loadImage.isInstanceOf('Blob', file) ||
+      // Files are also Blob instances, but some browsers
+      // (Firefox 3.6) support the File API but not Blobs:
+      loadImage.isInstanceOf('File', file)) {
+      url = oUrl = loadImage.createObjectURL(file)
+      // Store the file type for resize processing:
+      img._type = file.type
+    } else if (typeof file === 'string') {
+      url = file
+      if (options && options.crossOrigin) {
+        img.crossOrigin = options.crossOrigin
+      }
+    } else {
+      return false
+    }
+    if (url) {
+      img.src = url
+      return img
+    }
+    return loadImage.readFile(file, function (e) {
+      var target = e.target
+      if (target && target.result) {
+        img.src = target.result
+      } else {
+        if (callback) {
+          callback(e)
+        }
+      }
+    })
+  }
+  // The check for URL.revokeObjectURL fixes an issue with Opera 12,
+  // which provides URL.createObjectURL but doesn't properly implement it:
+  var urlAPI = (window.createObjectURL && window) ||
+                (window.URL && URL.revokeObjectURL && URL) ||
+                (window.webkitURL && webkitURL)
+
+  loadImage.isInstanceOf = function (type, obj) {
+    // Cross-frame instanceof check
+    return Object.prototype.toString.call(obj) === '[object ' + type + ']'
+  }
+
+  // Transform image coordinates, allows to override e.g.
+  // the canvas orientation based on the orientation option,
+  // gets canvas, options passed as arguments:
+  loadImage.transformCoordinates = function () {
+    return
+  }
+
+  // Returns transformed options, allows to override e.g.
+  // maxWidth, maxHeight and crop options based on the aspectRatio.
+  // gets img, options passed as arguments:
+  loadImage.getTransformedOptions = function (img, options) {
+    var aspectRatio = options.aspectRatio
+    var newOptions
+    var i
+    var width
+    var height
+    if (!aspectRatio) {
+      return options
+    }
+    newOptions = {}
+    for (i in options) {
+      if (options.hasOwnProperty(i)) {
+        newOptions[i] = options[i]
+      }
+    }
+    newOptions.crop = true
+    width = img.naturalWidth || img.width
+    height = img.naturalHeight || img.height
+    if (width / height > aspectRatio) {
+      newOptions.maxWidth = height * aspectRatio
+      newOptions.maxHeight = height
+    } else {
+      newOptions.maxWidth = width
+      newOptions.maxHeight = width / aspectRatio
+    }
+    return newOptions
+  }
+
+  // Canvas render method, allows to implement a different rendering algorithm:
+  loadImage.renderImageToCanvas = function (
+    canvas,
+    img,
+    sourceX,
+    sourceY,
+    sourceWidth,
+    sourceHeight,
+    destX,
+    destY,
+    destWidth,
+    destHeight
+  ) {
+    canvas.getContext('2d').drawImage(
+      img,
+      sourceX,
+      sourceY,
+      sourceWidth,
+      sourceHeight,
+      destX,
+      destY,
+      destWidth,
+      destHeight
+    )
+    return canvas
+  }
+
+  // This method is used to determine if the target image
+  // should be a canvas element:
+  loadImage.hasCanvasOption = function (options) {
+    return options.canvas || options.crop || !!options.aspectRatio
+  }
+
+  // Scales and/or crops the given image (img or canvas HTML element)
+  // using the given options.
+  // Returns a canvas object if the browser supports canvas
+  // and the hasCanvasOption method returns true or a canvas
+  // object is passed as image, else the scaled image:
+  loadImage.scale = function (img, options) {
+    options = options || {}
+    var canvas = document.createElement('canvas')
+    var useCanvas = img.getContext ||
+                    (loadImage.hasCanvasOption(options) && canvas.getContext)
+    var width = img.naturalWidth || img.width
+    var height = img.naturalHeight || img.height
+    var destWidth = width
+    var destHeight = height
+    var maxWidth
+    var maxHeight
+    var minWidth
+    var minHeight
+    var sourceWidth
+    var sourceHeight
+    var sourceX
+    var sourceY
+    var pixelRatio
+    var downsamplingRatio
+    var tmp
+    function scaleUp () {
+      var scale = Math.max(
+        (minWidth || destWidth) / destWidth,
+        (minHeight || destHeight) / destHeight
+      )
+      if (scale > 1) {
+        destWidth *= scale
+        destHeight *= scale
+      }
+    }
+    function scaleDown () {
+      var scale = Math.min(
+        (maxWidth || destWidth) / destWidth,
+        (maxHeight || destHeight) / destHeight
+      )
+      if (scale < 1) {
+        destWidth *= scale
+        destHeight *= scale
+      }
+    }
+    if (useCanvas) {
+      options = loadImage.getTransformedOptions(img, options)
+      sourceX = options.left || 0
+      sourceY = options.top || 0
+      if (options.sourceWidth) {
+        sourceWidth = options.sourceWidth
+        if (options.right !== undefined && options.left === undefined) {
+          sourceX = width - sourceWidth - options.right
+        }
+      } else {
+        sourceWidth = width - sourceX - (options.right || 0)
+      }
+      if (options.sourceHeight) {
+        sourceHeight = options.sourceHeight
+        if (options.bottom !== undefined && options.top === undefined) {
+          sourceY = height - sourceHeight - options.bottom
+        }
+      } else {
+        sourceHeight = height - sourceY - (options.bottom || 0)
+      }
+      destWidth = sourceWidth
+      destHeight = sourceHeight
+    }
+    maxWidth = options.maxWidth
+    maxHeight = options.maxHeight
+    minWidth = options.minWidth
+    minHeight = options.minHeight
+    if (useCanvas && maxWidth && maxHeight && options.crop) {
+      destWidth = maxWidth
+      destHeight = maxHeight
+      tmp = sourceWidth / sourceHeight - maxWidth / maxHeight
+      if (tmp < 0) {
+        sourceHeight = maxHeight * sourceWidth / maxWidth
+        if (options.top === undefined && options.bottom === undefined) {
+          sourceY = (height - sourceHeight) / 2
+        }
+      } else if (tmp > 0) {
+        sourceWidth = maxWidth * sourceHeight / maxHeight
+        if (options.left === undefined && options.right === undefined) {
+          sourceX = (width - sourceWidth) / 2
+        }
+      }
+    } else {
+      if (options.contain || options.cover) {
+        minWidth = maxWidth = maxWidth || minWidth
+        minHeight = maxHeight = maxHeight || minHeight
+      }
+      if (options.cover) {
+        scaleDown()
+        scaleUp()
+      } else {
+        scaleUp()
+        scaleDown()
+      }
+    }
+    if (useCanvas) {
+      pixelRatio = options.pixelRatio
+      if (pixelRatio > 1) {
+        canvas.style.width = destWidth + 'px'
+        canvas.style.height = destHeight + 'px'
+        destWidth *= pixelRatio
+        destHeight *= pixelRatio
+        canvas.getContext('2d').scale(pixelRatio, pixelRatio)
+      }
+      downsamplingRatio = options.downsamplingRatio
+      if (downsamplingRatio > 0 && downsamplingRatio < 1 &&
+            destWidth < sourceWidth && destHeight < sourceHeight) {
+        while (sourceWidth * downsamplingRatio > destWidth) {
+          canvas.width = sourceWidth * downsamplingRatio
+          canvas.height = sourceHeight * downsamplingRatio
+          loadImage.renderImageToCanvas(
+            canvas,
+            img,
+            sourceX,
+            sourceY,
+            sourceWidth,
+            sourceHeight,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+          )
+          sourceWidth = canvas.width
+          sourceHeight = canvas.height
+          img = document.createElement('canvas')
+          img.width = sourceWidth
+          img.height = sourceHeight
+          loadImage.renderImageToCanvas(
+            img,
+            canvas,
+            0,
+            0,
+            sourceWidth,
+            sourceHeight,
+            0,
+            0,
+            sourceWidth,
+            sourceHeight
+          )
+        }
+      }
+      canvas.width = destWidth
+      canvas.height = destHeight
+      loadImage.transformCoordinates(
+        canvas,
+        options
+      )
+      return loadImage.renderImageToCanvas(
+        canvas,
+        img,
+        sourceX,
+        sourceY,
+        sourceWidth,
+        sourceHeight,
+        0,
+        0,
+        destWidth,
+        destHeight
+      )
+    }
+    img.width = destWidth
+    img.height = destHeight
+    return img
+  }
+
+  loadImage.createObjectURL = function (file) {
+    return urlAPI ? urlAPI.createObjectURL(file) : false
+  }
+
+  loadImage.revokeObjectURL = function (url) {
+    return urlAPI ? urlAPI.revokeObjectURL(url) : false
+  }
+
+  // Loads a given File object via FileReader interface,
+  // invokes the callback with the event object (load or error).
+  // The result can be read via event.target.result:
+  loadImage.readFile = function (file, callback, method) {
+    if (window.FileReader) {
+      var fileReader = new FileReader()
+      fileReader.onload = fileReader.onerror = callback
+      method = method || 'readAsDataURL'
+      if (fileReader[method]) {
+        fileReader[method](file)
+        return fileReader
+      }
+    }
+    return false
+  }
+
+  if (typeof define === 'function' && define.amd) {
+    define(function () {
+      return loadImage
+    })
+  } else if (typeof module === 'object' && module.exports) {
+    module.exports = loadImage
+  } else {
+    $.loadImage = loadImage
+  }
+}(window))

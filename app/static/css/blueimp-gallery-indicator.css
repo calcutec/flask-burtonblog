@@ -9,6 +9,7 @@
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/MIT
  */
+
 .blueimp-gallery > .indicator {
   position: absolute;
   top: auto;
@@ -46,7 +47,7 @@
 }
 .blueimp-gallery-controls > .indicator {
   display: block;
-  
+  /* Fix z-index issues (controls behind slide element) on Android: */
   -webkit-transform: translateZ(0);
      -moz-transform: translateZ(0);
       -ms-transform: translateZ(0);
@@ -63,6 +64,8 @@
       -ms-user-select: none;
           user-select: none;
 }
+
+/* IE7 fixes */
 *+html .blueimp-gallery > .indicator > li {
   display: inline;
 }

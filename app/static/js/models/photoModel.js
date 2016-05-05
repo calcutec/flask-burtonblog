@@ -1,1 +1,27 @@
-define(["backbone"],function(o){return o.Model.extend({url:"/photos/",defaults:{id:"",photoid:"",author:"",nickname:"",header:"",body:"",photo:"",category:"",comments:"",timestamp:""},parse:function(o){return o},validate:function(o){o.body||alert("Your forgot to say why this photo is great..")}})});
+define(['backbone'], function(Backbone) {
+    return Backbone.Model.extend({
+        url: "/photos/",
+        defaults: {
+            id: '',
+            photoid: '',
+            author: '',
+            nickname: '',
+            header: '',
+            body: '',
+            photo: '',
+            category: '',
+            comments: '',
+            timestamp: ''
+        },
+
+        parse: function(response){
+            return response;
+        },
+        
+        validate: function(attrs){
+            if (!attrs.body){
+                alert('Your forgot to say why this photo is great..');
+            }
+        }
+    });
+});

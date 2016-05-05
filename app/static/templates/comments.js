@@ -1,1 +1,54 @@
-!function(){(window.nunjucksPrecompiled=window.nunjucksPrecompiled||{})["comments.html"]=function(){function e(e,o,t,n,r){var p=null,s=null,l="";try{var m=null;t=t.push();var u=n.memberLookup(n.contextOrFrameLookup(o,t,"post"),"all_comments");if(u)for(var a=u.length,c=0;c<u.length;c++){var d=u[c];t.set("comment",d),t.set("loop.index",c+1),t.set("loop.index0",c),t.set("loop.revindex",a-c),t.set("loop.revindex0",a-c-1),t.set("loop.first",0===c),t.set("loop.last",c===a-1),t.set("loop.length",a),l+="\n    <p>",n.memberLookup(d,"created_at")&&(l+="<small>On ",l+=n.suppressValue((p=1,s=68,n.callWrap(n.memberLookup(n.memberLookup(d,"created_at"),"strftime"),'comment["created_at"]["strftime"]',o,["%H:%M %Y-%m-%d"])),e.opts.autoescape),l+=", </small>"),l+="\n        ",l+=n.suppressValue(n.memberLookup(n.memberLookup(d,"author"),"nickname"),e.opts.autoescape),l+=" commented:</p>\n    <p>",l+=n.suppressValue(n.memberLookup(d,"body"),e.opts.autoescape),l+="</p>\n"}t=t.pop(),m?m.rootRenderFunc(e,o,t,n,r):r(null,l)}catch(i){r(n.handleError(i,p,s))}}return{root:e}}()}();
+(function() {(window.nunjucksPrecompiled = window.nunjucksPrecompiled || {})["comments.html"] = (function() {
+function root(env, context, frame, runtime, cb) {
+var lineno = null;
+var colno = null;
+var output = "";
+try {
+var parentTemplate = null;
+frame = frame.push();
+var t_3 = runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"all_comments");
+if(t_3) {var t_2 = t_3.length;
+for(var t_1=0; t_1 < t_3.length; t_1++) {
+var t_4 = t_3[t_1];
+frame.set("comment", t_4);
+frame.set("loop.index", t_1 + 1);
+frame.set("loop.index0", t_1);
+frame.set("loop.revindex", t_2 - t_1);
+frame.set("loop.revindex0", t_2 - t_1 - 1);
+frame.set("loop.first", t_1 === 0);
+frame.set("loop.last", t_1 === t_2 - 1);
+frame.set("loop.length", t_2);
+output += "\n    <p>";
+if(runtime.memberLookup((t_4),"created_at")) {
+output += "<small>On ";
+output += runtime.suppressValue((lineno = 1, colno = 68, runtime.callWrap(runtime.memberLookup((runtime.memberLookup((t_4),"created_at")),"strftime"), "comment[\"created_at\"][\"strftime\"]", context, ["%H:%M %Y-%m-%d"])), env.opts.autoescape);
+output += ", </small>";
+;
+}
+output += "\n        ";
+output += runtime.suppressValue(runtime.memberLookup((runtime.memberLookup((t_4),"author")),"nickname"), env.opts.autoescape);
+output += " commented:</p>\n    <p>";
+output += runtime.suppressValue(runtime.memberLookup((t_4),"body"), env.opts.autoescape);
+output += "</p>\n";
+;
+}
+}
+frame = frame.pop();
+output += "\n\n";
+if(parentTemplate) {
+parentTemplate.rootRenderFunc(env, context, frame, runtime, cb);
+} else {
+cb(null, output);
+}
+;
+} catch (e) {
+  cb(runtime.handleError(e, lineno, colno));
+}
+}
+return {
+root: root
+};
+
+})();
+})();
+

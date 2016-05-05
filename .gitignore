@@ -4,6 +4,7 @@
 app.db
 test.db
 search.db
+app/dist/
 flask
 venvburtonblog
 app/static/.webassets-cache/

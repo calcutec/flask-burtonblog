@@ -1,1 +1,17 @@
-define(["jquery","backbone"],function(e,n){return n.View.extend({render:function(){var e=this.model.toJSON();e.author={nickname:e.nickname};var n={};return n.user={},this.$el.html(""),this.$el.html(window.env.render("main_entry.html",{post:e,g:n,momentjs:moment})),this}})});
+define(['jquery', 'backbone'],
+    function($, Backbone){
+        return Backbone.View.extend({
+            
+            render: function() {
+                var post = this.model.toJSON();
+                post['author'] = { "nickname": post.nickname };
+                var g = {};
+                g.user = {};
+                this.$el.html('');
+                this.$el.html(window.env.render("main_entry.html", {'post': post, 'g': g, 'momentjs': moment }));
+
+                return this;
+            }
+        });
+    }
+);

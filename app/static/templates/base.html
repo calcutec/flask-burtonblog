@@ -16,13 +16,13 @@
 
         <!-- CSS
         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-        <link rel="stylesheet" href="{{ static_url }}buildcss/main.css">
-        <script src="{{ static_url }}js/libs/moment/moment.min.js"></script>
+        <link rel="stylesheet" href="{{ local_static_url }}buildcss/main.css">
+        <script src="{{ local_static_url }}js/libs/moment/moment.min.js"></script>
 
         <!-- Favicon
         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ static_url }}img/apple-touch-icon-144x144.png" />
-        <link rel="icon" type="image/png" href="{{ static_url }}img/favicon-32x32.png" sizes="32x32" />
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ local_static_url }}img/apple-touch-icon-144x144.png" />
+        <link rel="icon" type="image/png" href="{{ local_static_url }}img/favicon-32x32.png" sizes="32x32" />
     </head>
 	<body id="thisgreatpic">
         <nav><div id="navbar">{% include 'nav.html' %}</div></nav>
@@ -46,10 +46,10 @@
             <ol class="indicator"></ol>
         </div>
         {% assets "js_templates" %}
-            <script type="text/javascript" src="{{ static_url }}templates/templates.js"></script>
+            <script type="text/javascript" src="{{ local_static_url }}templates/templates.js"></script>
         {% endassets %}
-        <script src="{{ static_url }}js/libs/loadimage/canvas-to-blob.min.js"></script>
-{#            <script src="{{ static_url }}js/libs/loadimage/load-image.all.min.js"></script>#}
-        <script data-main="{{ static_url }}js/main" src="{{ static_url }}js/libs/require.js"></script>
+        <script src="{{ local_static_url }}js/libs/loadimage/canvas-to-blob.min.js"></script>
+{#            <script src="{{ local_static_url }}js/libs/loadimage/load-image.all.min.js"></script>#}
+        <script data-main="{{ local_static_url }}js/main" src="{{ local_static_url }}js/libs/require.js"></script>
 	</body>
 </html>

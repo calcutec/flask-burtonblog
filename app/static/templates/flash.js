@@ -1,1 +1,52 @@
-!function(){(window.nunjucksPrecompiled=window.nunjucksPrecompiled||{})["flash.html"]=function(){function e(e,n,o,t,s){var l=null,r=null,a="";try{var u=null;if(a+="\n",t.contextOrFrameLookup(n,o,"messages")){a+="\n",o=o.push();var i=t.contextOrFrameLookup(n,o,"messages");if(i)for(var p=i.length,c=0;c<i.length;c++){var d=i[c];o.set("message",d),o.set("loop.index",c+1),o.set("loop.index0",c),o.set("loop.revindex",p-c),o.set("loop.revindex0",p-c-1),o.set("loop.first",0===c),o.set("loop.last",c===p-1),o.set("loop.length",p),a+='\n    <div class="alert alert-info">\n    <button type="button" class="close" data-dismiss="alert">&times;</button>\n    ',a+=t.suppressValue(d,e.opts.autoescape),a+="\n    </div>\n"}o=o.pop(),a+="\n"}a+="\n",a+="\n\n",u?u.rootRenderFunc(e,n,o,t,s):s(null,a)}catch(m){s(t.handleError(m,l,r))}}return{root:e}}()}();
+(function() {(window.nunjucksPrecompiled = window.nunjucksPrecompiled || {})["flash.html"] = (function() {
+function root(env, context, frame, runtime, cb) {
+var lineno = null;
+var colno = null;
+var output = "";
+try {
+var parentTemplate = null;
+output += "\n";
+if(runtime.contextOrFrameLookup(context, frame, "messages")) {
+output += "\n";
+frame = frame.push();
+var t_3 = runtime.contextOrFrameLookup(context, frame, "messages");
+if(t_3) {var t_2 = t_3.length;
+for(var t_1=0; t_1 < t_3.length; t_1++) {
+var t_4 = t_3[t_1];
+frame.set("message", t_4);
+frame.set("loop.index", t_1 + 1);
+frame.set("loop.index0", t_1);
+frame.set("loop.revindex", t_2 - t_1);
+frame.set("loop.revindex0", t_2 - t_1 - 1);
+frame.set("loop.first", t_1 === 0);
+frame.set("loop.last", t_1 === t_2 - 1);
+frame.set("loop.length", t_2);
+output += "\n    <div class=\"alert alert-info\">\n    <button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>\n    ";
+output += runtime.suppressValue(t_4, env.opts.autoescape);
+output += "\n    </div>\n";
+;
+}
+}
+frame = frame.pop();
+output += "\n";
+;
+}
+output += "\n";
+output += "\n\n";
+if(parentTemplate) {
+parentTemplate.rootRenderFunc(env, context, frame, runtime, cb);
+} else {
+cb(null, output);
+}
+;
+} catch (e) {
+  cb(runtime.handleError(e, lineno, colno));
+}
+}
+return {
+root: root
+};
+
+})();
+})();
+

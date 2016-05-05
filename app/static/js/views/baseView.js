@@ -1,1 +1,248 @@
-define(["jquery","backbone","views/contentMainView","views/profileMainView","views/archiveView","views/membersView","views/navView","views/headerView","views/contentThumbnailView","views/memberThumbnailView","views/detailView","views/appView","views/homeView","collections/memberCollection","collections/photoCollection"],function(e,t,i,n,o,l,c,r,a,s,m,h,u,g){return t.View.extend({el:"#thisgreatpic",initialize:function(e){if(e.photoCollection){this.photoCollection=e.photoCollection,this.memberCollection=new g;var t=this.getItemDict();t.entity=e.pageType;var l=this;this.memberCollection.fetch({success:function(){if("photo"==t.entity)h(new m({el:"#main-view",collection:l.photoCollection}),t);else if("home"==t.entity)h(new c({el:"#navbar"})),h(new r({el:"#header"})),h(new u({el:"#main-view"}),t);else if("photos"==t.entity)h(new c({el:"#navbar"})),h(new r({el:"#header"})),h(new i({el:"#main-view",collection:l.photoCollection}),t),h(new o({el:"#links",collection:l.photoCollection}));else if("members"==t.entity)h(new c({el:"#navbar"})),h(new r({el:"#header"})),h(new o({el:"#links",collection:l.memberCollection}),t);else if("member"==t.entity){var a=l.memberCollection.where({nickname:e.username})[0];h(new c({el:"#navbar"})),h(new r({el:"#header"})),h(new n({el:"#main-view",model:a}),t),h(new o({el:"#links",collection:l.photoCollection}))}},fail:function(e){console.log(e)}})}},events:{"click a.member-link":"memberLink","click a.detail-link":"detailLink","change #element":"filterOnSelect","click i.fa-picture-o":"iconLink","click i.fa-users":"iconLink","click i.fa-briefcase":"iconLink","click i.fa-home":"iconLink"},getItemDict:function(){return{route:null,collection:null,category:null,entity:null,nickname:null,authenticated:this.photoCollection.authenticated,count:null,postId:null,template:null,render:null}},filterOnSelect:function(i){i.preventDefault();var n=this.getItemDict();n.authenticated=this.memberCollection.authenticated,n.category=e("#element").val(),n.render=!0,n.usernickname=this.memberCollection.usernickname;var o=window.location.pathname.split("/");"photos"==o[1]?(n.collection=this.photoCollection,n.entity="photos",n.route="/photos/"+n.category+"/",t.history.navigate(n.route,{trigger:!1})):"members"==o[1]&&(o[2].match("all|latest")||""==o[2]?(n.collection=this.memberCollection,n.entity="members",n.route="/members/"+n.category+"/",t.history.navigate(n.route,{trigger:!1})):(n.collection=this.photoCollection,n.entity="member",n.nickname=o[2],n.target_user=this.memberCollection.where({nickname:n.nickname})[0],n.route="/members/"+n.nickname+"/"+n.category+"/",t.history.navigate(n.route,{trigger:!1}))),this.filter(n)},getCounts:function(e){var t=[];e.forEach(function(e){t.push(e.get("category"))});for(var i={},n=0;n<t.length;++n)i[t[n]]||(i[t[n]]=0),++i[t[n]];return i},iconLink:function(e){e.preventDefault();var i=this.getItemDict();if(i.authenticated=this.memberCollection.authenticated,i.category="latest",i.render="true",i.usernickname=this.memberCollection.usernickname,"fa-users"==e.currentTarget.classList[1])i.collection=this.memberCollection,i.entity="members",i.route="/members/"+i.category+"/",t.history.navigate(i.route,{trigger:!1});else if("fa-picture-o"==e.currentTarget.classList[1])i.collection=this.photoCollection,i.entity="photos",i.route="/photos/"+i.category+"/",t.history.navigate(i.route,{trigger:!1});else if("fa-briefcase"==e.currentTarget.classList[1])i.collection=this.photoCollection,i.entity="author",i.template="person.html",i.nickname=this.memberCollection.usernickname,i.usernickname=this.memberCollection.usernickname,i.target_user=this.memberCollection.where({nickname:i.usernickname})[0],i.route="/members/"+i.usernickname+"/",t.history.navigate(i.route,{trigger:!1});else if("fa-home"==e.currentTarget.classList[1])return i.collection=this.photoCollection,i.entity="home",i.template="home_page.html",i.route="/home/",t.history.navigate(i.route,{trigger:!1}),h(new r({id:"header"}),i),h(new c({id:"navbar"}),i),h(new u({id:"main-view"}),i),!0;this.filter(i)},memberLink:function(e){e.preventDefault();var i=this.getItemDict();i.authenticated=this.memberCollection.authenticated,i.entity="member",i.nickname=e.target.href.split("/")[4],i.usernickname=this.memberCollection.usernickname,i.target_user=this.memberCollection.where({nickname:i.nickname})[0],i.route="/members/"+i.nickname+"/",t.history.navigate(i.route,{trigger:!1}),i.collection=this.photoCollection.where({nickname:i.nickname}),i.counts=this.getCounts(i.collection),i.render=!0,this.render(i)},detailLink:function(e){e.preventDefault();var i=this.getItemDict();i.collection=this.photoCollection,i.authenticated=this.memberCollection.authenticated,i.entity="photo",i.postId=e.target.closest("a").dataset.id,i.route="/photos/"+i.postId+"/",i.usernickname=this.memberCollection.usernickname,t.history.navigate(i.route,{trigger:!1}),i.render=!0,h(new r({id:"header"}),i),h(new c({id:"navbar"}),i);var n=i.collection.get(i.postId);h(new m({id:"main-view",model:n}),i)},filter:function(e){"all"==e.category||"latest"==e.category?e.nickname?(e.collection=e.collection.where({nickname:e.nickname}),e.counts=this.getCounts(e.collection),"all"==e.category?e.collection=e.collection.splice(0,100):"latest"==e.category&&(e.collection=e.collection.splice(0,10)),this.render(e)):(e.counts=this.getCounts(e.collection),"all"==e.category?e.collection=e.collection.first(100):"latest"==e.category&&(e.collection=e.collection.first(10)),this.render(e)):(e.nickname&&e.category?(e.counts=this.getCounts(e.collection.where({nickname:e.nickname})),e.collection=e.collection.where({nickname:e.nickname,category:e.category})):e.category?(e.counts=this.getCounts(e.collection),e.collection=e.collection.where({category:e.category})):e.nickname&&(e.collection=e.collection.where({nickname:e.nickname}),e.counts=this.getCounts(e.collection)),this.render(e))},render:function(e){if(h(new r({id:"header"}),e),h(new c({id:"navbar"}),e),"members"!=e.entity){var t;"member"==e.entity||"author"==e.entity?(t=e.target_user,h(new n({id:"main-view",model:t}),e)):(t=e.collection[0],h(new i({id:"main-view",model:t}),e))}"photos"==e.entity?h(new o({id:"links",tagName:"ul",className:"img-list",collection:e.collection.splice(1)}),e):"member"==e.entity||"author"==e.entity?h(new o({id:"links",tagName:"ul",className:"img-list",collection:e.collection}),e):"members"==e.entity&&h(new l({id:"links",tagName:"ul",className:"img-list",collection:e.collection}),e)}})});
+define(['jquery', 'backbone', 'views/contentMainView', 'views/profileMainView', 'views/archiveView',
+    'views/membersView', 'views/navView', 'views/headerView', 'views/contentThumbnailView', 'views/memberThumbnailView',
+    'views/detailView', 'views/appView', 'views/homeView', 'collections/memberCollection', 
+    'collections/photoCollection'],
+    function($, Backbone, ContentMainView, ProfileMainView, ArchiveView, MembersView, NavView, HeaderView, 
+             ContentThumbnailView, MemberThumbnailView, DetailView, AppView, HomeView, MemberCollection){
+        return Backbone.View.extend({
+            el: '#thisgreatpic',
+            initialize: function(options){
+                if (options.photoCollection) {
+                    this.photoCollection = options.photoCollection;
+                    this.memberCollection = new MemberCollection();
+                    var itemDict = this.getItemDict();
+                    itemDict['entity'] = options.pageType;
+                    var self = this;
+                    this.memberCollection.fetch({
+                        success: function() {
+                            if(itemDict['entity'] == 'photo') {
+                                AppView(new DetailView({el: '#main-view', 'collection': self.photoCollection}), itemDict);
+                            } else if (itemDict['entity'] == 'home') {
+                                AppView(new NavView({el: '#navbar'}));
+                                AppView(new HeaderView({el: '#header'}));
+                                AppView(new HomeView({el: '#main-view'}), itemDict);
+                            } else if (itemDict['entity'] == 'photos'){
+                                AppView(new NavView({el: '#navbar'}));
+                                AppView(new HeaderView({el: '#header'}));
+                                AppView(new ContentMainView({el: '#main-view', 'collection': self.photoCollection}), itemDict);
+                                AppView(new ArchiveView({el: '#links', 'collection': self.photoCollection}));
+                            } else if (itemDict['entity'] == 'members'){
+                                AppView(new NavView({el: '#navbar'}));
+                                AppView(new HeaderView({el: '#header'}));
+                                AppView(new ArchiveView({el: '#links', 'collection': self.memberCollection}), itemDict);
+                            }   else if (itemDict['entity'] == 'member'){
+                                var model = self.memberCollection.where({nickname: options.username})[0];
+                                AppView(new NavView({el: '#navbar'}));
+                                AppView(new HeaderView({el: '#header'}));
+                                AppView(new ProfileMainView({el: '#main-view', model: model}), itemDict);
+                                AppView(new ArchiveView({el: '#links', 'collection': self.photoCollection}));
+                            }
+                        },
+                        fail: function(error) {
+                            console.log(error);
+                        }
+                    });
+                }
+            },
+
+            events: {
+                'click a.member-link':      'memberLink',
+                'click a.detail-link':      'detailLink',
+                'change #element':          'filterOnSelect',
+                'click i.fa-picture-o':     'iconLink',
+                'click i.fa-users':         'iconLink',
+                'click i.fa-briefcase':     'iconLink',
+                'click i.fa-home':          'iconLink'
+                // 'click i.fa-upload':   'uploadLink',
+            },
+
+            getItemDict: function(){
+                return {'route': null, 'collection': null, 'category': null, 'entity': null, 'nickname': null,
+                    'authenticated': this.photoCollection.authenticated, 'count': null, 'postId': null,
+                    'template': null, 'render': null };
+            },
+
+            filterOnSelect: function(e) {
+                e.preventDefault();
+                var itemDict = this.getItemDict();
+                itemDict.authenticated = this.memberCollection.authenticated;
+                itemDict.category = $( '#element' ).val();
+                itemDict.render = true;
+                itemDict.usernickname = this.memberCollection.usernickname;
+                var pathArray = window.location.pathname.split( '/' );
+                if (pathArray[1] == 'photos'){
+                    itemDict.collection = this.photoCollection;
+                    itemDict.entity = 'photos';
+                    itemDict.route = '/photos/' + itemDict.category + '/';
+                    Backbone.history.navigate(itemDict.route, {trigger: false});
+                } else if (pathArray[1] == 'members'){
+                    if (pathArray[2].match('all|latest') || pathArray[2] == ''){
+                        itemDict.collection = this.memberCollection;
+                        itemDict.entity = 'members';
+                        itemDict.route = '/members/' + itemDict.category + '/' ;
+                        Backbone.history.navigate(itemDict.route, {trigger: false});
+                    } else {
+                        itemDict.collection = this.photoCollection;
+                        itemDict.entity = 'member';
+                        itemDict.nickname = pathArray[2];
+                        itemDict.target_user = this.memberCollection.where({nickname: itemDict.nickname})[0];
+                        itemDict.route = '/members/' + itemDict.nickname + '/' + itemDict.category + '/';
+                        Backbone.history.navigate(itemDict.route, {trigger: false});
+                    }
+                }
+                this.filter(itemDict);
+            },
+            
+            getCounts: function(collection){
+                var categoryarray = [];
+                collection.forEach(function(model){
+                    categoryarray.push(model.get('category'))
+                });
+
+                var counts = {};
+                for(var i = 0; i < categoryarray.length; ++i) {
+                    if(!counts[categoryarray[i]])
+                        counts[categoryarray[i]] = 0;
+                    ++counts[categoryarray[i]];
+                }
+                return counts;
+            },
+
+            iconLink: function(e) {
+                e.preventDefault();
+                    var itemDict = this.getItemDict();
+                    itemDict.authenticated = this.memberCollection.authenticated;
+                    itemDict.category = 'latest';
+                    itemDict.render = 'true';
+                    itemDict.usernickname = this.memberCollection.usernickname;
+                    if (e.currentTarget.classList[1] == 'fa-users'){
+                        itemDict.collection = this.memberCollection;
+                        itemDict.entity = 'members';
+                        itemDict.route = '/members/' + itemDict.category + '/';
+                        Backbone.history.navigate(itemDict.route, {trigger: false});
+                    } else if (e.currentTarget.classList[1] == 'fa-picture-o'){
+                        itemDict.collection = this.photoCollection;
+                        itemDict.entity = 'photos';
+                        itemDict.route = '/photos/' + itemDict.category + '/';
+                        Backbone.history.navigate(itemDict.route, {trigger: false});
+                    } else if (e.currentTarget.classList[1] == 'fa-briefcase'){
+                        itemDict.collection = this.photoCollection;
+                        itemDict.entity = 'author';
+                        itemDict.template = 'person.html';
+                        itemDict.nickname = this.memberCollection.usernickname;
+                        itemDict.usernickname = this.memberCollection.usernickname;
+                        itemDict.target_user = this.memberCollection.where({nickname: itemDict.usernickname})[0];
+                        itemDict.route = '/members/' + itemDict.usernickname + '/';
+                        Backbone.history.navigate(itemDict.route, {trigger: false});
+                    } else if (e.currentTarget.classList[1] == 'fa-home'){
+                        itemDict.collection = this.photoCollection;
+                        itemDict.entity = 'home';
+                        itemDict.template = 'home_page.html';
+                        itemDict.route = '/home/';
+                        Backbone.history.navigate(itemDict.route, {trigger: false});
+                        AppView(new HeaderView({id: 'header'}), itemDict);
+                        AppView(new NavView({id: 'navbar'}), itemDict);
+                        AppView(new HomeView({id: 'main-view'}), itemDict);
+                        return true;
+                    }
+                    this.filter(itemDict);
+            },
+
+            memberLink: function(e){
+                e.preventDefault();
+                var itemDict = this.getItemDict();
+                itemDict.authenticated = this.memberCollection.authenticated;
+                itemDict.entity = 'member';
+                itemDict.nickname = e.target.href.split('/')[4];
+                itemDict.usernickname = this.memberCollection.usernickname;
+                itemDict.target_user = this.memberCollection.where({nickname: itemDict.nickname})[0];
+                itemDict.route = '/members/' + itemDict.nickname + '/';
+                Backbone.history.navigate(itemDict.route, {trigger: false});
+                itemDict.collection = this.photoCollection.where({nickname: itemDict.nickname});
+                itemDict.counts = this.getCounts(itemDict.collection);
+                itemDict.render = true;
+                this.render(itemDict);
+            },
+            
+            detailLink: function(e) {
+                e.preventDefault();
+                var itemDict = this.getItemDict();
+                itemDict.collection = this.photoCollection;
+                itemDict.authenticated = this.memberCollection.authenticated;
+                itemDict.entity = 'photo';
+                itemDict.postId = e.target.closest('a').dataset.id;
+                itemDict.route = '/photos/' + itemDict.postId + '/';
+                itemDict.usernickname = this.memberCollection.usernickname;
+                Backbone.history.navigate(itemDict.route, {trigger: false});
+                itemDict.render = true;
+                AppView(new HeaderView({id: 'header'}), itemDict);
+                AppView(new NavView({id: 'navbar'}), itemDict);
+                var itemModel = itemDict.collection.get(itemDict.postId);
+                AppView(new DetailView({id: 'main-view', model: itemModel}), itemDict);
+            },
+
+            filter: function(itemDict){
+                if (itemDict.category == 'all' || itemDict.category == 'latest'){
+                    if (itemDict.nickname){
+                        itemDict.collection = itemDict.collection.where({nickname: itemDict.nickname});
+                        itemDict.counts = this.getCounts(itemDict.collection);
+                        if (itemDict.category == 'all') {
+                            itemDict.collection = itemDict.collection.splice(0,100);
+                        } else if (itemDict.category == 'latest'){
+                            itemDict.collection = itemDict.collection.splice(0,10);
+                        }
+                        this.render(itemDict);
+                    } else {
+                        itemDict.counts = this.getCounts(itemDict.collection);
+                        if (itemDict.category == 'all') {
+                            itemDict.collection = itemDict.collection.first(100);
+                        } else if (itemDict.category == 'latest'){
+                            itemDict.collection = itemDict.collection.first(10);
+                        }
+                        this.render(itemDict);
+                    }
+                } else {
+                    if (itemDict.nickname && itemDict.category ){
+                        itemDict.counts = this.getCounts(itemDict.collection.where({nickname: itemDict.nickname}));
+                        itemDict.collection = itemDict.collection.where({nickname: itemDict.nickname,
+                            category: itemDict.category });
+
+                    } else if (itemDict.category){
+                        itemDict.counts = this.getCounts(itemDict.collection);
+                        itemDict.collection = itemDict.collection.where({category: itemDict.category});
+                    } else if (itemDict.nickname){
+                        itemDict.collection = itemDict.collection.where({nickname: itemDict.nickname});
+                        itemDict.counts = this.getCounts(itemDict.collection);
+                    }
+                    this.render(itemDict);
+                }
+            },
+
+            render: function(itemDict){
+                AppView(new HeaderView({id: 'header'}), itemDict);
+                AppView(new NavView({id: 'navbar'}), itemDict);
+                if (itemDict.entity != 'members') {
+                    var mainmodel;
+                    if (itemDict.entity == "member" || itemDict.entity == "author"){
+                        mainmodel = itemDict.target_user;
+                        AppView(new ProfileMainView({id: 'main-view', model: mainmodel}), itemDict);
+                    } else {
+                        mainmodel = itemDict.collection[0];
+                        AppView(new ContentMainView({id: 'main-view', model: mainmodel}), itemDict);
+                    }
+
+                }
+                if (itemDict.entity == 'photos'){
+                    AppView(new ArchiveView({id: 'links', tagName: 'ul', className: 'img-list', 
+                        'collection': itemDict.collection.splice(1)}), itemDict);
+                } else if (itemDict.entity == 'member' || itemDict.entity == 'author') {
+                    AppView(new ArchiveView({id: 'links', tagName: 'ul', className: 'img-list', 
+                        'collection': itemDict.collection}), itemDict);
+                } else if (itemDict.entity == 'members') {
+                    AppView(new MembersView({id: 'links', tagName: 'ul', className: 'img-list', 
+                        'collection': itemDict.collection}), itemDict);
+                }
+            }
+        });
+    }
+);

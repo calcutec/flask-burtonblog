@@ -1,1 +1,19 @@
-define(["jquery","backbone"],function(e,n){return n.View.extend({events:{"click .expand-one":"expandInfoBox"},expandInfoBox:function(n){n.preventDefault(),e(".content-one").slideToggle("slow")},render:function(){return this.$el.html(window.env.render("home_page.html")),this}})});
+define(['jquery', 'backbone'],
+    function($, Backbone){
+        return Backbone.View.extend({
+            events: {
+                'click .expand-one':   'expandInfoBox',
+            },
+
+            expandInfoBox: function(e) {
+                e.preventDefault();
+                $('.content-one').slideToggle('slow');
+            },
+            
+            render: function() {
+                this.$el.html(window.env.render("home_page.html"));
+                return this;
+            }
+        });
+    }
+);

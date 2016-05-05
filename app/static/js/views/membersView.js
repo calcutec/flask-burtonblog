@@ -1,1 +1,38 @@
-define(["jquery","backbone","views/memberThumbnailView"],function(e,i,n){return i.View.extend({initialize:function(){this.subViews=[]},attachToView:function(){var i=this;return this.$el.children("li").each(function(){var t=e(this),s=t.data().id,o=new n({model:i.collection.get(s),el:t});i.subViews.push(o)}),this},render:function(e){return this.collection.forEach(function(i){this.addOneToList(i,e)},this),this},addOneToList:function(e,i){var t=new n({model:e});this.subViews.push(t),this.$el.append(t.render(i).el)},unrender:function(){this.subViews.forEach(function(e){e.remove()})}})});
+define(['jquery', 'backbone', 'views/memberThumbnailView'],
+    function($, Backbone, MemberThumbnailView){
+        return Backbone.View.extend({
+            initialize: function() {
+              this.subViews = [];
+            },
+            
+            attachToView: function() {
+                var self = this;
+                this.$el.children('li').each(function(){
+                    var photoEl = $(this);
+                    var id = photoEl.data().id;
+                    var thumbnailView = new MemberThumbnailView({
+                        model: self.collection.get(id),
+                        el: photoEl
+                    });
+                    self.subViews.push(thumbnailView);
+                });
+                return this;
+            },
+            render: function(options) {
+                this.collection.forEach(function(model) {
+                    this.addOneToList(model, options);
+                }, this);
+                return this;
+            },
+            addOneToList: function (model, options) {
+                var thumbnailView = new MemberThumbnailView({ model: model});
+                this.subViews.push(thumbnailView);
+                this.$el.append(thumbnailView.render(options).el);
+            },
+            
+            unrender: function() {
+                this.subViews.forEach(function(model){model.remove()})
+            }
+        });
+    }
+);
