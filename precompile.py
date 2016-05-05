@@ -7,8 +7,7 @@ import sys
 from datetime import datetime
 from subprocess import call
 from time import sleep
-import os
-print os.environ['PATH']
+
 base_dir = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -53,8 +52,6 @@ def precompile(tempates_dir, filename):
     command = NUNJUCKS_REPO + "/bin/precompile --name " + filename + " " + path_to_html
     command = command + " >> " + path_to_js
     call(command, shell=True)
-    # call(['/usr/local/lib/node_modules/nunjucks/bin/precompile', '/Users/bburton/flask-burtonblog/app/staticdev/templates/404.html', '>>', '/Users/bburton/flask-burtonblog/app/staticdev/templates/404.js'], shell=True)
-    # string = string[1:-1]
     print(COLOUR_GREEN + datetime.now().strftime("%X" + " " + filename + " ...OK") + COLOUR_END)
 
 

@@ -172,7 +172,6 @@ class Post(db.Model):
     def all_comments(self):
         return self.comments.all()
 
-
     def get_voter_ids(self):
         """
         return ids of users who voted this post up
