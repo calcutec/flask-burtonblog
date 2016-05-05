@@ -199,7 +199,7 @@ app.add_url_rule('/photos/<any("all", "latest", "popular", "starred", "upload", 
                  '"wildlife"):category>/',
                  view_func=photo_api_view, methods=["GET", "POST"])
 # Update or Delete a single post
-app.add_url_rule('/photos/<int:post_id>/',
+app.add_url_rule('/photos/<int:post_id>',
                  view_func=photo_api_view, methods=["GET", "PUT", "DELETE"])
 # Vote on a single post
 app.add_url_rule('/photos/<int:post_id>/<any("vote"):category>',

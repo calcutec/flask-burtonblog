@@ -1,6 +1,6 @@
 define(['backbone'], function(Backbone) {
     return Backbone.Model.extend({
-        url: "/photos/",
+        urlRoot: "/photos/",
         defaults: {
             id: '',
             photoid: '',
