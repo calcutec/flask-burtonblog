@@ -1,5 +1,5 @@
-define(['jquery', 'backbone', 'moment'],
-    function($, Backbone, moment){
+define(['jquery', 'backbone'],
+    function($, Backbone){
         return Backbone.View.extend({
             tagName: "li",
             events: {
