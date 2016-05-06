@@ -15,7 +15,7 @@ define(['backbone', 'models/memberModel'],
             },
 
             comparator: function(member){
-                return -member.get('lastseen');
+                return -member.get('last_seen');
             }
         });
     }

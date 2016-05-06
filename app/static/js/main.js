@@ -6,11 +6,13 @@ require.config({
         nunjucks: 'libs/nunjucks/nunjucks-slim',
         underscore: 'libs/underscore/underscore-min',
         blueimp: 'libs/blueimp/blueimp-gallery',
-        loadimage: 'libs/loadimage/load-image.js',
+        loadimage: 'libs/loadimage/load-image',
+        moment: 'libs/moment/moment.min',
         app: 'app'
     },
     shim: {
         nunjucks: { exports : 'nunjucks'},
+        moment: { exports : 'moment'},
         backbone: {
             deps: ['jquery', 'underscore'],
             exports: 'Backbone'
@@ -21,6 +23,6 @@ require.config({
     }
 });
 
-define(['underscore', 'backbone', 'app'], function(_, Backbone, app){
+define(['underscore', 'backbone', 'app', 'moment'], function(_, Backbone, app, moment){
     app.init()
 });

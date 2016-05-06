@@ -30,7 +30,7 @@ class User(UserMixin, db.Model):
     comments = db.relationship('Comment', backref='author', lazy='dynamic')
     about_me = db.Column(db.String(140))
     photo = db.Column(db.String(240))
-    last_seen = db.Column(db.DateTime)
+    last_seen = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     followed = db.relationship('User',
                                secondary=followers,
                                primaryjoin=(followers.c.follower_id == id),
@@ -155,7 +155,7 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     header = db.Column(db.String(140))
     body = db.Column(db.Text())
-    timestamp = db.Column(db.DateTime)
+    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     writing_type = db.Column(db.String(32), default="writing-type")
     category = db.Column(db.String(32))

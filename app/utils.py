@@ -1,4 +1,5 @@
 from app import app, db
+from sqlalchemy import desc
 from flask.ext.login import current_user
 from config import ALLOWED_EXTENSIONS
 from rauth import OAuth2Service
@@ -81,9 +82,8 @@ class BasePage(object):
             posts_dict['member'] = {'obj': "post", 'filter': {'author': self.assets['person']}}
 
         posts_dict = posts_dict[self.assets['entity']]
-
         if posts_dict['obj'] == "user":
-            posts = User.query.all()
+            posts = User.query.order_by(User.last_seen.desc())
         else:
             posts = Post.query.filter_by(**posts_dict['filter']).order_by(Post.timestamp.desc())
             # Get count of photos in each category owned by the above entities (author, member, photos, home)

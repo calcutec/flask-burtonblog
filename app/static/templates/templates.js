@@ -41,7 +41,7 @@ output += "\n            ";
 }
 output += "\n            <b>";
 output += runtime.suppressValue((lineno = 19, colno = 49, runtime.callWrap(runtime.memberLookup(((lineno = 19, colno = 24, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"timestamp")]))),"calendar"), "the return value of (momentjs)[\"calendar\"]", context, [])), env.opts.autoescape);
-output += "</b><br>\n\n\n            ";
+output += "</b><br>\n            ";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"votes") > 0) {
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"votes"), env.opts.autoescape);
 output += " like";
@@ -142,7 +142,7 @@ output += "</a>\n            ";
 output += "\n            ";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"last_seen")) {
 output += "\n                <p><em>Last seen:</em></p>\n                <p><em>";
-output += runtime.suppressValue((lineno = 29, colno = 57, runtime.callWrap(runtime.memberLookup(((lineno = 29, colno = 32, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"last_seen")]))),"calendar"), "the return value of (momentjs)[\"calendar\"]", context, [])), env.opts.autoescape);
+output += runtime.suppressValue((lineno = 29, colno = 55, runtime.callWrap(runtime.memberLookup(((lineno = 29, colno = 32, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"last_seen")]))),"format"), "the return value of (momentjs)[\"format\"]", context, ["MMM do YYYY"])), env.opts.autoescape);
 output += "</em></p>\n            ";
 ;
 }
@@ -740,7 +740,7 @@ output += "\">\n        ";
 output += "\n        <div>\n            ";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"last_seen")) {
 output += "\n                <h5>Last seen: <em>";
-output += runtime.suppressValue((lineno = 23, colno = 69, runtime.callWrap(runtime.memberLookup(((lineno = 23, colno = 44, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"last_seen")]))),"calendar"), "the return value of (momentjs)[\"calendar\"]", context, [])), env.opts.autoescape);
+output += runtime.suppressValue((lineno = 23, colno = 67, runtime.callWrap(runtime.memberLookup(((lineno = 23, colno = 44, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"last_seen")]))),"format"), "the return value of (momentjs)[\"format\"]", context, ["MMM do YYYY"])), env.opts.autoescape);
 output += "</em></h5>\n            ";
 ;
 }

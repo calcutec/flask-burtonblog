@@ -9,8 +9,7 @@ from flask.ext.assets import Environment, Bundle
 from config import ADMINS, MAIL_SERVER, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD, SQLALCHEMY_DATABASE_URI
 from flask_wtf.csrf import CsrfProtect
 
-staticdirectory = "static"
-
+staticdirectory = "s"
 
 class MyFlask(Flask):
     @property
@@ -23,11 +22,11 @@ class MyFlask(Flask):
         self.config['STATIC_FOLDER'] = value
 
 # Now these are equivalent:
-app = Flask(__name__, static_folder=staticdirectory)
-app.config['STATIC_FOLDER'] = staticdirectory
+app = Flask(__name__, static_folder='static')
+app.config['STATIC_FOLDER'] = 'static'
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
-app.jinja_loader = FileSystemLoader(os.path.join(base_dir, staticdirectory, 'templates'))
+app.jinja_loader = FileSystemLoader(os.path.join(base_dir, 'static', 'templates'))
 app.jinja_env.globals['momentjs'] = momentjs
 app.config.from_object('config')
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI

@@ -27,7 +27,7 @@
             {% endif %}
             {% if post.last_seen %}
                 <p><em>Last seen:</em></p>
-                <p><em>{{ momentjs(post.last_seen).calendar() }}</em></p>
+                <p><em>{{ momentjs(post.last_seen).format('MMM do YYYY') }}</em></p>
             {% endif %}
         </span>
     </span>

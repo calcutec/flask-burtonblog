@@ -18,8 +18,6 @@
                 {% endif %}
             {% endif %}
             <b>{{ momentjs(post.timestamp).calendar() }}</b><br>
-
-
             {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
             {% if post.all_comments|length > 0 %}
                 <a href="/photos/{{ post.id }}">

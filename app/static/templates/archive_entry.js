@@ -41,7 +41,7 @@ output += "\n            ";
 }
 output += "\n            <b>";
 output += runtime.suppressValue((lineno = 19, colno = 49, runtime.callWrap(runtime.memberLookup(((lineno = 19, colno = 24, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"timestamp")]))),"calendar"), "the return value of (momentjs)[\"calendar\"]", context, [])), env.opts.autoescape);
-output += "</b><br>\n\n\n            ";
+output += "</b><br>\n            ";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"votes") > 0) {
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"votes"), env.opts.autoescape);
 output += " like";

@@ -21,7 +21,7 @@
         {% endif %}
         <div>
             {% if post.last_seen %}
-                <h5>Last seen: <em>{{ momentjs(post.last_seen).calendar() }}</em></h5>
+                <h5>Last seen: <em>{{ momentjs(post.last_seen).format('MMM do YYYY') }}</em></h5>
             {% endif %}
             {% if current_user.is_authenticated() %}
                 {% if post.nickname == current_user.nickname %}

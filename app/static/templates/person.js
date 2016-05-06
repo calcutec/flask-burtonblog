@@ -51,7 +51,7 @@ output += "\">\n        ";
 output += "\n        <div>\n            ";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"last_seen")) {
 output += "\n                <h5>Last seen: <em>";
-output += runtime.suppressValue((lineno = 23, colno = 69, runtime.callWrap(runtime.memberLookup(((lineno = 23, colno = 44, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"last_seen")]))),"calendar"), "the return value of (momentjs)[\"calendar\"]", context, [])), env.opts.autoescape);
+output += runtime.suppressValue((lineno = 23, colno = 67, runtime.callWrap(runtime.memberLookup(((lineno = 23, colno = 44, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"last_seen")]))),"format"), "the return value of (momentjs)[\"format\"]", context, ["MMM do YYYY"])), env.opts.autoescape);
 output += "</em></h5>\n            ";
 ;
 }
