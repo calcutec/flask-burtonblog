@@ -9,7 +9,8 @@ from flask.ext.assets import Environment, Bundle
 from config import ADMINS, MAIL_SERVER, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD, SQLALCHEMY_DATABASE_URI
 from flask_wtf.csrf import CsrfProtect
 
-staticdirectory = "s"
+staticdirectory = "static"
+
 
 class MyFlask(Flask):
     @property
@@ -22,11 +23,11 @@ class MyFlask(Flask):
         self.config['STATIC_FOLDER'] = value
 
 # Now these are equivalent:
-app = Flask(__name__, static_folder='static')
-app.config['STATIC_FOLDER'] = 'static'
+app = Flask(__name__, static_folder=staticdirectory)
+app.config['STATIC_FOLDER'] = staticdirectory
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
-app.jinja_loader = FileSystemLoader(os.path.join(base_dir, 'static', 'templates'))
+app.jinja_loader = FileSystemLoader(os.path.join(base_dir, staticdirectory, 'templates'))
 app.jinja_env.globals['momentjs'] = momentjs
 app.config.from_object('config')
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
@@ -41,7 +42,8 @@ CsrfProtect(app)
 
 js_templates = Bundle('templates/archive_entry.js', 'templates/member.js', 'templates/header.js', 'templates/nav.js',
                       'templates/main_entry.js', 'templates/person.js', 'templates/photo_detail.js',
-                      'templates/home_page.js', 'templates/comments.js', 'templates/comment.js', output='templates/templates.js')
+                      'templates/home_page.js', 'templates/comments.js', 'templates/comment.js',
+                      output='templates/templates.js')
 assets.register('js_templates', js_templates)
 
 
