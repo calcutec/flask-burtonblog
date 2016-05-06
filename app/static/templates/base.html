@@ -16,7 +16,7 @@
 
         <!-- CSS
         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-        <link rel="stylesheet" href="{{ local_static_url }}buildcss/main.css">
+        <link rel="stylesheet" href="{{ local_static_url }}css/main.css">
         <script src="{{ local_static_url }}js/libs/moment/moment.min.js"></script>
 
         <!-- Favicon
@@ -30,9 +30,7 @@
         <main>
         {% if assets %}
             <div id="photo-main"><div id="main-view">{{ assets.main_entry|safe if assets.main_entry != None }}</div></div>
-            <div id="photo-archives">
-                <ul class="img-list" id="links">{{ assets.archives|safe if assets.archives != None }}</ul>
-            </div>
+            <div id="photo-archives"><ul class="item-list" id="links">{{ assets.archives|safe if assets.archives != None }}</ul></div>
             <div id="body-form">{{ assets.body_form|safe if assets.body_form != None }}</div>
         {% endif %}
         </main>

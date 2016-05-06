@@ -1,6 +1,5 @@
-{% for comment in post.all_comments %}
-    <p>{% if comment.created_at %}<small>On {{ comment.created_at.strftime('%H:%M %Y-%m-%d') }}, </small>{% endif %}
-        {{ comment.author.nickname }} commented:</p>
-    <p>{{ comment.body }}</p>
+<h5>COMMENTS</h5>
+{% for comment in post.comments %}
+    <ul>{% include "comment.html" %}</ul>
 {% endfor %}
 

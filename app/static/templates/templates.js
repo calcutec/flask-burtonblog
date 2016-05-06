@@ -631,7 +631,7 @@ var colno = null;
 var output = "";
 try {
 var parentTemplate = null;
-output += "<ul id=\"main-image\" class=\"img-list\">\n    <li>\n    <img data-id=\"";
+output += "<ul id=\"main-image\" class=\"item-list\">\n    <li>\n    <img data-id=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
 output += "\" sizes=\"92.5vw\" src=\"https://aperturus.imgix.net/";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"photo"), env.opts.autoescape);
@@ -696,7 +696,7 @@ try {
 var parentTemplate = null;
 output += "<div data-id=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
-output += "\" class=\"img-list\" id=\"main-image\">\n    <div class=\"profile-content\">\n        <div class=\"profile-details\">\n                <h3>";
+output += "\" class=\"item-list\" id=\"main-image\">\n    <div class=\"profile-content\">\n        <div class=\"profile-details\">\n                <h3>";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"nickname"), env.opts.autoescape);
 output += "</h3>\n                <h5>Followers: ";
 output += runtime.suppressValue((lineno = 4, colno = 52, runtime.callWrap(runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"followers")),"count"), "post[\"followers\"][\"count\"]", context, [])), env.opts.autoescape);
@@ -787,7 +787,7 @@ var colno = null;
 var output = "";
 try {
 var parentTemplate = null;
-output += "<ul class=\"img-list\">\n    <li>\n        <img data-id=\"";
+output += "<ul class=\"item-list\">\n    <li>\n        <img data-id=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
 output += "\" sizes=\"92.5vw\" src=\"https://aperturus.imgix.net/";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"photo"), env.opts.autoescape);
@@ -820,23 +820,36 @@ output += "<br>";
 }
 output += "\n                    ";
 if((lineno = 14, colno = 53, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"is_authenticated"), "current_user[\"is_authenticated\"]", context, [])) && runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"author")),"nickname") == runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"nickname")) {
-output += "\n";
 output += "\n                        <a class=\"link-button red\" id=\"deletephoto\" href=\"#\">Delete</a>\n                    ";
 ;
 }
-output += "\n\n";
-output += "\n";
-output += "\n";
-output += "\n";
-output += "\n";
-output += "\n";
-output += "\n";
-output += "\n";
-output += "\n";
-output += "\n                </div>\n            </span>\n        </span>\n    </li>\n</ul>\n<div>\n    ";
+output += "\n                    ";
+if((lineno = 17, colno = 53, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"is_authenticated"), "current_user[\"is_authenticated\"]", context, [])) && runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"author")),"nickname") != runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"nickname")) {
+output += "\n                        ";
+if((lineno = 18, colno = 42, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"has_voted"), "post[\"has_voted\"]", context, [runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "g")),"user")),"id")]))) {
+output += "\n                            <a data-voted=\"true\" style=\"color:#eb6864;\" href=\"";
+output += runtime.suppressValue((lineno = 19, colno = 86, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "url_for"), "url_for", context, ["photos",runtime.makeKeywordArgs({"category": "vote","post_id": runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id")})])), env.opts.autoescape);
+output += "\" class=\"";
+output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
+output += " likeme\"><i class=\"fa fa-smile-o fa-lg icon-white\"></i></a>\n                        ";
+;
+}
+else {
+output += "\n                            <a data-voted=\"false\" style=\"color:#000;\" href=\"";
+output += runtime.suppressValue((lineno = 21, colno = 84, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "url_for"), "url_for", context, ["photos",runtime.makeKeywordArgs({"category": "vote","post_id": runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id")})])), env.opts.autoescape);
+output += "\" class=\"";
+output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
+output += " likeme\"><i class=\"fa fa-meh-o fa-lg icon-white\"></i></a>\n                        ";
+;
+}
+output += "\n                            Like/Unlike <br>\n                            <a href=\"";
+output += runtime.suppressValue((lineno = 24, colno = 45, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "url_for"), "url_for", context, ["photos",runtime.makeKeywordArgs({"id": runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id")})])), env.opts.autoescape);
+output += "\">Add Comment</a>\n                    ";
+;
+}
+output += "\n                </div>\n            </span>\n        </span>\n    </li>\n</ul>\n<div id=\"body-text\">\n    <h4>What makes this great:</h4>\n    <p>";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"body"), env.opts.autoescape);
-output += "\n    <h4>Comments</h4>\n";
-output += "\n</div>";
+output += "</p>\n</div>";
 if(parentTemplate) {
 parentTemplate.rootRenderFunc(env, context, frame, runtime, cb);
 } else {
@@ -865,6 +878,89 @@ var parentTemplate = null;
 output += "<img class=\"home-pic\" src=\"";
 output += runtime.suppressValue(runtime.contextOrFrameLookup(context, frame, "static_url"), env.opts.autoescape);
 output += "img/home_logo.svg\" alt=\"logo\">\n<div class=\"home-text\">\n    <h3>What is it?</h3>\n    <p >A website and app for sharing your very best photographic creations.</p>\n    <p>This Great Pic stores and displays a photo in its original aspect-ratio and in a resolution optimized for every screen size.</p>\n    <p>It also retains and gives automatic access to the photo file's <em>exif</em> data. This meta-data contains critical information on when, how (in terms of aperture, speed, light-settings, etc) and with what type of camera and lens the photo was taken.</p>\n</div>\n<div class=\"sitesection\">\n    <p class=\"expand-one\"><a class=\"link-button\" href=\"#\">More...</a></p>\n    <div class=\"content-one home-text well\">\n        A file chosen for upload must be an original version with exif data intact. This helps to:\n        <ul>\n            <li>1) Ensure that users submit photos they have taken themselves and presumably own.</li>\n            <li>2) Determine the best size for viewing the photo on either a desktop computer or mobile device.</li>\n            <li>3) Allow users to share info about the camera, lens, aperture, timing, light-setting, etc, used in capturing a given photo.</li>\n        </ul>\n    </div>\n</div>\n<div class=\"home-text\">\n<h3>How do I join?</h3>\n    <p>Click the arrow at the top right to go to the signup and login page. New users can join either by one-click login\n    connected to their Facebook or Google accounts, or by providing their email and a password and user name.</p><p>This Great Pic will never share your photos, email, comment's content or other user information with companies or other groups.</p>\n</div>\n<div class=\"home-text\">\n<h3>How does it work?</h3>\n<p>Pretty much like most social-media apps and sites: click appropriately-labeled buttons or icons to view, share, edit,\n    delete, or comment on photos.</p><p>Buttons for filtering content and navigating the site are accessed through the\n    menu on the top left of each page.</p>\n</div>\n<div class=\"home-text\">\n    <h3>Who runs this thing?</h3>\n    <p>I am a web-developer and amateur photographer who built and maintains this project in my freetime. Please contact me at\n    admin@thisgreatpic.com with any suggestions for improvements or if you run into any issues.</p>\n</div>";
+if(parentTemplate) {
+parentTemplate.rootRenderFunc(env, context, frame, runtime, cb);
+} else {
+cb(null, output);
+}
+;
+} catch (e) {
+  cb(runtime.handleError(e, lineno, colno));
+}
+}
+return {
+root: root
+};
+
+})();
+})();
+
+
+(function() {(window.nunjucksPrecompiled = window.nunjucksPrecompiled || {})["comments.html"] = (function() {
+function root(env, context, frame, runtime, cb) {
+var lineno = null;
+var colno = null;
+var output = "";
+try {
+var parentTemplate = null;
+output += "<h5>COMMENTS</h5>\n";
+frame = frame.push();
+var t_3 = runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"comments");
+if(t_3) {var t_2 = t_3.length;
+for(var t_1=0; t_1 < t_3.length; t_1++) {
+var t_4 = t_3[t_1];
+frame.set("comment", t_4);
+frame.set("loop.index", t_1 + 1);
+frame.set("loop.index0", t_1);
+frame.set("loop.revindex", t_2 - t_1);
+frame.set("loop.revindex0", t_2 - t_1 - 1);
+frame.set("loop.first", t_1 === 0);
+frame.set("loop.last", t_1 === t_2 - 1);
+frame.set("loop.length", t_2);
+output += "\n    <ul>";
+env.getTemplate("comment.html", false, "comments.html", null, function(t_7,t_5) {
+if(t_7) { cb(t_7); return; }
+t_5.render(context.getVariables(), frame, function(t_8,t_6) {
+if(t_8) { cb(t_8); return; }
+output += t_6
+output += "</ul>\n";
+})});
+}
+}
+frame = frame.pop();
+output += "\n\n";
+if(parentTemplate) {
+parentTemplate.rootRenderFunc(env, context, frame, runtime, cb);
+} else {
+cb(null, output);
+}
+;
+} catch (e) {
+  cb(runtime.handleError(e, lineno, colno));
+}
+}
+return {
+root: root
+};
+
+})();
+})();
+
+
+(function() {(window.nunjucksPrecompiled = window.nunjucksPrecompiled || {})["comment.html"] = (function() {
+function root(env, context, frame, runtime, cb) {
+var lineno = null;
+var colno = null;
+var output = "";
+try {
+var parentTemplate = null;
+output += "<li><b>";
+output += runtime.suppressValue((lineno = 0, colno = 43, runtime.callWrap(runtime.memberLookup(((lineno = 0, colno = 16, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "comment")),"created_at")]))),"format"), "the return value of (momentjs)[\"format\"]", context, ["MMMM Do YYYY, h:mm:ss a"])), env.opts.autoescape);
+output += "</b></li>\n<li>";
+output += runtime.suppressValue(runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "comment")),"author")),"nickname"), env.opts.autoescape);
+output += " commented:</li>\n<li>";
+output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "comment")),"body"), env.opts.autoescape);
+output += "</li>";
 if(parentTemplate) {
 parentTemplate.rootRenderFunc(env, context, frame, runtime, cb);
 } else {

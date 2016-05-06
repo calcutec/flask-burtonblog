@@ -10,14 +10,12 @@ require.config({
         app: 'app'
     },
     shim: {
-        nunjucks: { exports : 'nunjucks'},
+        nunjucks: { exports : 'nunjucks' },
+        underscore: { exports: '_' },
         backbone: {
             deps: ['jquery', 'underscore'],
             exports: 'Backbone'
         },
-        underscore: {
-			'exports': '_'
-		}
     }
 });
 

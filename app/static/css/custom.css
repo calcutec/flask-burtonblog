@@ -354,22 +354,23 @@ label > .label-body {
     display: block;
     float: left;
 }
-ul.img-list li:hover span.text-content {
+ul.item-list > li:hover span.text-content {
     display:table;
 }
-ul.img-list li:hover span.rounded-icon {
+ul.item-list > li:hover span.rounded-icon {
     opacity: 1;
 }
-ul.img-list {
+ul.item-list {
     list-style-type: none;
     margin: 0;
     padding: 0;
 }
-ul.img-list li {
+ul.item-list > li {
     display: inline-block;
     position: relative;
     padding-right: .5vw;
 }
+
 span.text-content {
     display:none;
     position: absolute;
@@ -645,7 +646,7 @@ input, textarea, select {
 }
 /** 960 pixels or greater -- includes most tablets in landscape **/
 @media(min-width:60em){
-    ul.img-list li:nth-child(4n) { padding-right: 0; }
+    ul.item-list > li:nth-child(4n) { padding-right: 0; }
     .responsive-img { width: 22.75vw; max-width: 315px;}
     span.text-content {
         width: 22.75vw;
@@ -654,7 +655,7 @@ input, textarea, select {
 }
 /** 1384 pixels or greater -- site container at full-width of 1280px from this point **/
 @media(min-width:86.5em) {
-    ul.img-list li:not(:nth-child(4n)) { padding-right: 6px; }
+    ul.item-list > li:not(:nth-child(4n)) { padding-right: 6px; }
     .bodycontainer { margin-left: calc((100vw - 1280px)/2); }
 }
 
@@ -662,8 +663,6 @@ input, textarea, select {
 /* |||| PAGES |||| */
 
 /* Profile Page */
-
-
 
 .profile-content {
     padding: 1rem;
@@ -690,6 +689,32 @@ input, textarea, select {
 
 .follow, .unfollow {
     margin-top: .5rem;
+}
+
+
+/* Photo Page */
+
+
+.item-list > ul {
+    margin-top: 1rem;
+    margin-left: 2rem;
+}
+
+.item-list > ul > li {
+    line-height: 1.5;
+}
+
+#body-text {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+#body-text h4 {
+    margin-bottom: 1rem;
+}
+
+#body-text p {
+    line-height: 1.5;
 }
 
 

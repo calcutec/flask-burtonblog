@@ -5,7 +5,7 @@ var colno = null;
 var output = "";
 try {
 var parentTemplate = null;
-output += "<ul id=\"main-image\" class=\"img-list\">\n    <li>\n    <img data-id=\"";
+output += "<ul id=\"main-image\" class=\"item-list\">\n    <li>\n    <img data-id=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
 output += "\" sizes=\"92.5vw\" src=\"https://aperturus.imgix.net/";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"photo"), env.opts.autoescape);

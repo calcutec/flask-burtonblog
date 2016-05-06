@@ -83,7 +83,7 @@ class BasePage(object):
 
         posts_dict = posts_dict[self.assets['entity']]
         if posts_dict['obj'] == "user":
-            posts = User.query.order_by(User.last_seen.desc())
+            posts = User.query.order_by(User.last_seen.desc()).all()
         else:
             posts = Post.query.filter_by(**posts_dict['filter']).order_by(Post.timestamp.desc())
             # Get count of photos in each category owned by the above entities (author, member, photos, home)
@@ -150,26 +150,32 @@ class PhotoPage(BasePage):
                 home_context = {'hello': "hello world"}
                 self.assets['main_entry'] = self.get_asset(template="home_page.html", context=home_context)
         elif self.assets['entity'] == "photo":
-            main_photo_context = {'post': self.posts[0]}
-            self.assets['photo_id'] = self.posts[0].id
-            self.assets['main_entry'] = self.get_asset(template="photo_detail.html", context=main_photo_context)
-            if self.assets['category'] == "vote":
-                self.vote()
+            if request.is_xhr:
+                pass
+            else:
+                main_photo_context = {'post': self.posts[0]}
+                self.assets['photo_id'] = self.posts[0].id
+                self.assets['main_entry'] = self.get_asset(template="photo_detail.html", context=main_photo_context)
+                comments_context = {'post': self.posts[0]}
+                self.assets['archives'] = self.get_asset(template="comments.html", context=comments_context)
+                if self.assets['category'] == "vote": self.vote()
         elif self.assets['entity'] == "photos":
             if request.is_xhr:
                 # self.assets['collection'] = self.get_asset(context=[i.json_view() for i in self.posts])
                 self.assets['collection'] = [i.json_view() for i in self.posts]
             else:
                 if type(self.posts) == list and len(self.posts) > 0:
-                    self.render_sections()
+                    main_photo_context = {'post': self.posts[0], 'assets': self.assets}
+                    archive_photos_context = {'posts': self.posts[1:], 'assets': self.assets}
+                    self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=main_photo_context)
+                    self.assets['archives'] = self.get_asset(template="archives.html", context=archive_photos_context)
                 elif self.posts and self.posts.count() > 0:
-                    self.render_sections()
+                    main_photo_context = {'post': self.posts[0], 'assets': self.assets}
+                    archive_photos_context = {'posts': self.posts[1:], 'assets': self.assets}
+                    self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=main_photo_context)
+                    self.assets['archives'] = self.get_asset(template="archives.html", context=archive_photos_context)
 
-    def render_sections(self):
-        main_photo_context = {'post': self.posts[0], 'assets': self.assets}
-        archive_photos_context = {'posts': self.posts[1:], 'assets': self.assets}
-        self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=main_photo_context)
-        self.assets['archives'] = self.get_asset(template="archives.html", context=archive_photos_context)
+
 
     def vote(self):
         post_id = self.post_id

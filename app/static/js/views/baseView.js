@@ -224,6 +224,9 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/profileMainView', 
                     if (itemDict.entity == "member" || itemDict.entity == "author"){
                         mainmodel = itemDict.target_user;
                         AppView(new ProfileMainView({id: 'main-view', model: mainmodel}), itemDict);
+                    } else if (itemDict.entity == "photo") {
+                        mainmodel = itemDict.collection[0];
+                        AppView(new ContentMainView({id: 'main-view', model: mainmodel}), itemDict);
                     } else {
                         mainmodel = itemDict.collection[0];
                         AppView(new ContentMainView({id: 'main-view', model: mainmodel}), itemDict);
@@ -231,13 +234,13 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/profileMainView', 
 
                 }
                 if (itemDict.entity == 'photos'){
-                    AppView(new ArchiveView({id: 'links', tagName: 'ul', className: 'img-list', 
+                    AppView(new ArchiveView({id: 'links', tagName: 'ul', className: 'item-list',
                         'collection': itemDict.collection.splice(1)}), itemDict);
                 } else if (itemDict.entity == 'member' || itemDict.entity == 'author') {
-                    AppView(new ArchiveView({id: 'links', tagName: 'ul', className: 'img-list', 
+                    AppView(new ArchiveView({id: 'links', tagName: 'ul', className: 'item-list',
                         'collection': itemDict.collection}), itemDict);
                 } else if (itemDict.entity == 'members') {
-                    AppView(new MembersView({id: 'links', tagName: 'ul', className: 'img-list', 
+                    AppView(new MembersView({id: 'links', tagName: 'ul', className: 'item-list',
                         'collection': itemDict.collection}), itemDict);
                 }
             }

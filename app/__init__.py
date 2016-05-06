@@ -41,7 +41,7 @@ CsrfProtect(app)
 
 js_templates = Bundle('templates/archive_entry.js', 'templates/member.js', 'templates/header.js', 'templates/nav.js',
                       'templates/main_entry.js', 'templates/person.js', 'templates/photo_detail.js',
-                      'templates/home_page.js', output='templates/templates.js')
+                      'templates/home_page.js', 'templates/comments.js', 'templates/comment.js', output='templates/templates.js')
 assets.register('js_templates', js_templates)
 
 
