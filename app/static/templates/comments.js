@@ -5,7 +5,6 @@ var colno = null;
 var output = "";
 try {
 var parentTemplate = null;
-output += "<h5>COMMENTS</h5>\n";
 frame = frame.push();
 var t_3 = runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"comments");
 if(t_3) {var t_2 = t_3.length;
