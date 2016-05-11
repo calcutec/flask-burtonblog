@@ -355,7 +355,7 @@ label > .label-body {
     float: left;
 }
 ul.item-list > li:hover span.text-content {
-    opacity: 1;
+    display:table;
 }
 ul.item-list > li:hover span.rounded-icon {
     opacity: 1;
@@ -389,7 +389,7 @@ ul.item-list > li {
 /*}*/
 
 span.text-content {
-    display:table;
+    display:none;
     position: absolute;
     color: white;
     height: 46vw;
@@ -397,7 +397,7 @@ span.text-content {
     bottom: 0;
     width: 46vw;
     transition: opacity 1s ease-out;
-    opacity: 0;
+    opacity: 1;
 }
 span.text-content span {
     display: table-cell;
