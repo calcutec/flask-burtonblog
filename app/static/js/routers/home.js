@@ -1,5 +1,5 @@
 define(["jquery", "backbone", "nunjucks", "socketio", "collections/photoCollection", "views/baseView", "views/uploadFormView"],
-    function ($, Backbone, nunjucks, io, PhotoCollection, BaseView, UploadFormView) {
+    function ($, Backbone, nunjucks, socketio, PhotoCollection, BaseView, UploadFormView) {
         return Backbone.Router.extend({
 
             initialize: function () {
@@ -26,7 +26,7 @@ define(["jquery", "backbone", "nunjucks", "socketio", "collections/photoCollecti
                 };
 
                 window.namespace = '/greatpic'; // change to an empty string to use the global namespace
-                window.socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
+                window.socket = socketio.connect('http://' + document.domain + ':' + location.port + namespace);
                 console.log('socket connected');
             },
 

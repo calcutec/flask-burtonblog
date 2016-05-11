@@ -11,6 +11,7 @@
         underscore: 'libs/underscore/underscore-min',
         blueimp: 'libs/blueimp/blueimp-gallery',
         loadimage: 'libs/loadimage/load-image.js',
+        socketio: 'libs/socket/socket.io.min',
         app: 'app'
     },
     shim: {
