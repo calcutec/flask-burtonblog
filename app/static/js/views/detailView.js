@@ -3,7 +3,13 @@ define(['jquery', 'backbone', 'underscore', 'views/appView', 'views/commentsView
     function($, Backbone, _, AppView, CommentsView, CommentCollection, CommentModel){
         return Backbone.View.extend({
             events: {
-                'click #deletephoto':   'deletephoto'
+                'click #deletephoto':   'deletephoto',
+                'click .vote':   'vote',
+                'click .unvote':   'vote'
+            },
+
+            initialize: function() {
+                this.listenTo(this.model, 'change', this.render, this);
             },
 
             deletephoto: function() {
@@ -16,6 +22,30 @@ define(['jquery', 'backbone', 'underscore', 'views/appView', 'views/commentsView
                       error: function(response){
                         console.log(response);
                       }
+                });
+            },
+
+            vote: function(e) {
+                e.preventDefault();
+                if (this.model.get('has_voted') == true){
+                    this.model.set({has_voted: false});
+                } else {
+                    this.model.set({has_voted: true});
+                }
+
+                var self = this;
+                this.model.save(this.model.changedAttributes(), {
+                    patch: true,
+                    wait:true,
+                    success: function() {
+                        var changeddata = {'id': self.model.id, 'votes': self.model.get('votes')};
+                        window.socket.emit('my broadcast event', {data: changeddata});
+                        return false;
+
+                    },
+                    fail: function(error) {
+                        console.log(error);
+                    }
                 });
             },
 
@@ -36,6 +66,10 @@ define(['jquery', 'backbone', 'underscore', 'views/appView', 'views/commentsView
             render: function() {
                 var post = this.model.toJSON();
                 post['author'] = { "nickname": post.nickname };
+                var votestatus = post.has_voted
+                post['has_voted'] = function(){
+                    return votestatus
+                };
                 $(this.el).html(window.env.render("photo_detail.html", {'post': post, 'momentjs': moment }));
                 this.renderComments();
                 return this;

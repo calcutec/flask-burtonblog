@@ -1,4 +1,4 @@
-from app import app, db, socketio
+from app import app, db
 from flask.ext.login import current_user
 from config import ALLOWED_EXTENSIONS
 from rauth import OAuth2Service
@@ -34,7 +34,7 @@ class BasePage(object):
 
         if self.assets['category'] in ["login", "upload", "update", "signup"]:
             self.get_rendered_form()
-        elif self.assets['category'] in ["follow", "unfollow"]:
+        elif self.assets['category'] in ["follow", "unfollow", "votes"]:
             pass
         else:
             self.get_posts()
@@ -122,6 +122,8 @@ class BasePage(object):
                 response['collection'] = self.assets['collection']
             elif 'category' in self.assets and self.assets['category'] in ["follow", "unfollow"]:
                 response['user'] = self.assets['person'].json_view()
+            elif 'category' in self.assets and self.assets['category'] == 'vote':
+                response['photo'] = self.posts[0].json_view()
             elif 'body_form' in self.assets:
                 response['uploadForm'] = self.assets['body_form']
             return json.dumps(response)
@@ -150,15 +152,17 @@ class PhotoPage(BasePage):
                 self.assets['main_entry'] = self.get_asset(template="home_page.html", context=home_context)
         elif self.assets['entity'] == "photo":
             if request.is_xhr:
-                pass
+                if self.assets['category'] == "vote":
+                    self.vote()
             else:
+                if self.assets['category'] == "vote":
+                    self.vote()
                 main_photo_context = {'post': self.posts[0]}
                 self.assets['photo_id'] = self.posts[0].id
                 self.assets['main_entry'] = self.get_asset(template="photo_detail.html", context=main_photo_context)
                 comments_context = {'post': self.posts[0]}
                 self.assets['archives'] = self.get_asset(template="comments.html", context=comments_context)
-                if self.assets['category'] == "vote":
-                    self.vote()
+
         elif self.assets['entity'] == "photos":
             if request.is_xhr:
                 # self.assets['collection'] = self.get_asset(context=[i.json_view() for i in self.posts])

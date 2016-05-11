@@ -14,8 +14,12 @@ define(['backbone'], function(Backbone) {
             timestamp: ''
         },
 
-        parse: function(response){
-            return response;
+        parse: function(response, xhr){
+            if(xhr.patch){
+                return response.photo;
+            } else {
+                return response;
+            }
         },
         
         validate: function(attrs){

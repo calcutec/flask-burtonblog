@@ -27,7 +27,7 @@ class MyFlask(Flask):
 app = Flask(__name__, static_folder=staticdirectory)
 app.config['STATIC_FOLDER'] = staticdirectory
 
-async_mode = 'eventlet'
+async_mode = 'gevent'
 print('async_mode is ' + async_mode)
 
 # monkey patching is necessary because this application uses a background

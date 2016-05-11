@@ -48,6 +48,11 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/profileMainView', 
                     var member = self.memberCollection.get(msg.data.id);
                     member.set({'followers': msg.data.followers});
                 });
+                socket.on('voteup', function(msg) {
+                    console.log('VoteUp' + ': ' + msg.data);
+                    var photo = self.photoCollection.get(msg.data.id);
+                    photo.set({'votes': msg.data.votes});
+                });
             },
 
             events: {

@@ -17,7 +17,10 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 @socketio.on('my broadcast event', namespace='/greatpic')
 def followers(message):
-    socketio.emit('followup', {'data': message['data']}, broadcast=True, namespace='/greatpic', include_self=False)
+    if "followers" in message['data']:
+        socketio.emit('followup', {'data': message['data']}, broadcast=True, namespace='/greatpic', include_self=False)
+    elif "votes" in message['data']:
+        socketio.emit('voteup', {'data': message['data']}, broadcast=True, namespace='/greatpic', include_self=False)
 
 
 @app.route('/', methods=['GET'])
@@ -194,6 +197,14 @@ class PhotoAPI(MethodView):
         result = {'deletedsuccess': True}
         return json.dumps(result)
 
+    @login_required
+    def patch(self, post_id):
+        if 'has_voted' in request.json:
+            category = "vote"
+        page = PhotoPage(post_id=post_id, category=category)
+        rendered_page = page.render()
+        return rendered_page
+
 photo_api_view = PhotoAPI.as_view('photos')
 # Read all posts for a given page, Create a new post
 app.add_url_rule('/photos/',
@@ -203,9 +214,14 @@ app.add_url_rule('/photos/<any("all", "latest", "popular", "starred", "upload", 
                  '"family", "fantasy", "fashion", "landscape", "macro", "portrait", "street", "sport", "travel",'
                  '"wildlife"):category>/',
                  view_func=photo_api_view, methods=["GET", "POST"])
+
 # Update or Delete a single post
 app.add_url_rule('/photos/<int:post_id>',
                  view_func=photo_api_view, methods=["GET", "PUT", "DELETE"])
+
+app.add_url_rule('/photos/<int:post_id>',
+                 view_func=photo_api_view, methods=['PATCH'])
+
 # Vote on a single post
 app.add_url_rule('/photos/<int:post_id>/<any("vote"):category>',
                  view_func=photo_api_view, methods=["GET", "POST"])
