@@ -1,4 +1,4 @@
-web: --worker-class eventlet -w 1 app:app
+web: gunicorn -k eventlet app:app --log-file=-
 init: python db_create.py
 upgrade: python db_upgrade.py
 
