@@ -24,14 +24,13 @@ define(['jquery', 'backbone', 'underscore', 'views/appView', 'views/commentsView
                 itemDict.render = true;
                 itemDict.entity = "comments";
                 var comments = _.clone(this.model.get("comments"));
-                var commentCollection = new CommentCollection
+                var commentCollection = new CommentCollection;
                 comments.forEach(function(comment){
                     var commentModel = new CommentModel(comment);
                     commentCollection.add(commentModel);
                 });
                 var commentsView = new CommentsView({id: 'links', className: 'item-list', collection: commentCollection});
                 AppView(commentsView, itemDict);
-                var test = test;
             },
 
             render: function() {

@@ -1,4 +1,5 @@
 import os
+from flask.ext.socketio import SocketIO
 from .momentjs import momentjs
 from flask import Flask
 from jinja2 import FileSystemLoader
@@ -25,6 +26,20 @@ class MyFlask(Flask):
 # Now these are equivalent:
 app = Flask(__name__, static_folder=staticdirectory)
 app.config['STATIC_FOLDER'] = staticdirectory
+
+async_mode = 'eventlet'
+print('async_mode is ' + async_mode)
+
+# monkey patching is necessary because this application uses a background
+# thread
+if async_mode == 'eventlet':
+    import eventlet
+    eventlet.monkey_patch()
+elif async_mode == 'gevent':
+    from gevent import monkey
+    monkey.patch_all()
+
+socketio = SocketIO(app, async_mode=async_mode)
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
 app.jinja_loader = FileSystemLoader(os.path.join(base_dir, staticdirectory, 'templates'))

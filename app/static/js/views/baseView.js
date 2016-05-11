@@ -43,6 +43,11 @@ define(['jquery', 'backbone', 'views/contentMainView', 'views/profileMainView', 
                         }
                     });
                 }
+                socket.on('followup', function(msg) {
+                    console.log('FollowUp' + ': ' + msg.data);
+                    var member = self.memberCollection.get(msg.data.id);
+                    member.set({'followers': msg.data.followers});
+                });
             },
 
             events: {

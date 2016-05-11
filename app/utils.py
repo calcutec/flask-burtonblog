@@ -1,5 +1,4 @@
-from app import app, db
-from sqlalchemy import desc
+from app import app, db, socketio
 from flask.ext.login import current_user
 from config import ALLOWED_EXTENSIONS
 from rauth import OAuth2Service
@@ -158,7 +157,8 @@ class PhotoPage(BasePage):
                 self.assets['main_entry'] = self.get_asset(template="photo_detail.html", context=main_photo_context)
                 comments_context = {'post': self.posts[0]}
                 self.assets['archives'] = self.get_asset(template="comments.html", context=comments_context)
-                if self.assets['category'] == "vote": self.vote()
+                if self.assets['category'] == "vote":
+                    self.vote()
         elif self.assets['entity'] == "photos":
             if request.is_xhr:
                 # self.assets['collection'] = self.get_asset(context=[i.json_view() for i in self.posts])
@@ -174,8 +174,6 @@ class PhotoPage(BasePage):
                     archive_photos_context = {'posts': self.posts[1:], 'assets': self.assets}
                     self.assets['main_entry'] = self.get_asset(template="main_entry.html", context=main_photo_context)
                     self.assets['archives'] = self.get_asset(template="archives.html", context=archive_photos_context)
-
-
 
     def vote(self):
         post_id = self.post_id

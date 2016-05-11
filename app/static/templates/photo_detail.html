@@ -15,15 +15,15 @@
                     {% if current_user.is_authenticated() and post.author.nickname == current_user.nickname %}
                         <a class="link-button red" id="deletephoto" href="#">Delete</a>
                     {% endif %}
-                    {% if current_user.is_authenticated() and post.author.nickname != current_user.nickname %}
-                        {% if post.has_voted(g.user.id) %}
-                            <a data-voted="true" style="color:#eb6864;" href="{{ url_for('photos', category='vote', post_id=post.id) }}" class="{{ post.id }} likeme"><i class="fa fa-smile-o fa-lg icon-white"></i></a>
-                        {% else %}
-                            <a data-voted="false" style="color:#000;" href="{{ url_for('photos', category='vote', post_id=post.id) }}" class="{{ post.id }} likeme"><i class="fa fa-meh-o fa-lg icon-white"></i></a>
-                        {% endif %}
-                            Like/Unlike <br>
-                            <a href="{{ url_for('photos', id=post.id) }}">Add Comment</a>
-                    {% endif %}
+{#                    {% if current_user.is_authenticated() and post.author.nickname != current_user.nickname %}#}
+{#                        {% if post.has_voted(g.user.id) %}#}
+{#                            <a data-voted="true" style="color:#eb6864;" href="{{ url_for('photos', category='vote', post_id=post.id) }}" class="{{ post.id }} likeme"><i class="fa fa-smile-o fa-lg icon-white"></i></a>#}
+{#                        {% else %}#}
+{#                            <a data-voted="false" style="color:#000;" href="{{ url_for('photos', category='vote', post_id=post.id) }}" class="{{ post.id }} likeme"><i class="fa fa-meh-o fa-lg icon-white"></i></a>#}
+{#                        {% endif %}#}
+{#                            Like/Unlike <br>#}
+{#                            <a href="{{ url_for('photos', id=post.id) }}">Add Comment</a>#}
+{#                    {% endif %}#}
                 </div>
             </span>
         </span>

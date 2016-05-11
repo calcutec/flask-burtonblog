@@ -6,6 +6,7 @@ define(['jquery', 'backbone'],
                 'click .follow':   'followuser',
                 'click .unfollow':   'unfollowuser'
             },
+
             initialize: function() {
                 this.listenTo(this.model, 'change', this.render, this);
             },
@@ -13,9 +14,16 @@ define(['jquery', 'backbone'],
             unfollowuser: function(e) {
                 e.preventDefault();
                 this.model.set({is_following: false});
+                var self = this;
                 this.model.save(this.model.changedAttributes(), {
                     patch: true,
                     wait:true,
+                    success: function() {
+                        var changeddata = {'id': self.model.id, 'followers': self.model.get('followers')};
+                        window.socket.emit('my broadcast event', {data: changeddata});
+                        return false;
+                        
+                    },
                     fail: function(error) {
                         console.log(error);
                     }
@@ -25,9 +33,16 @@ define(['jquery', 'backbone'],
             followuser: function(e) {
                 e.preventDefault();
                 this.model.set({is_following: true});
+                var self = this;
                 this.model.save(this.model.changedAttributes(), {
                     patch: true,
                     wait:true,
+                    success: function() {
+                        var changeddata = {'id': self.model.id, 'followers': self.model.get('followers')};
+                        window.socket.emit('my broadcast event', {data: changeddata});
+                        return false;
+                        
+                    },
                     fail: function(error) {
                         console.log(error);
                     }

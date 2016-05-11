@@ -3,6 +3,7 @@ from flask.ext.login import login_user, logout_user, current_user, login_require
 from flask.ext.sqlalchemy import get_debug_queries
 from datetime import datetime
 from app import app, db, lm
+from app import socketio
 from config import DATABASE_QUERY_TIMEOUT
 from .decorators import auth_required
 from .forms import SignupForm, LoginForm, EditForm, PostForm
@@ -11,8 +12,12 @@ from .utils import OAuthSignIn, PhotoPage, MembersPage, SignupPage, LoginPage
 from flask.views import MethodView
 import os
 import json
-
 basedir = os.path.abspath(os.path.dirname(__file__))
+
+
+@socketio.on('my broadcast event', namespace='/greatpic')
+def followers(message):
+    socketio.emit('followup', {'data': message['data']}, broadcast=True, namespace='/greatpic', include_self=False)
 
 
 @app.route('/', methods=['GET'])
@@ -123,9 +128,9 @@ class MembersAPI(MethodView):
             category = "follow"
         else:
             category = "unfollow"
-
         page = MembersPage(person=person, category=category)
-        return page.render()
+        rendered_page = page.render()
+        return rendered_page
 
     @login_required
     def delete(self, nickname):

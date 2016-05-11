@@ -16,9 +16,8 @@
 
         <!-- CSS
         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-        <link rel="stylesheet" href="{{ local_static_url }}buildcss/main.css">
+        <link rel="stylesheet" href="{{ local_static_url }}css/main.css">
         <script src="{{ local_static_url }}js/libs/moment/moment.min.js"></script>
-
         <!-- Favicon
         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
         <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ local_static_url }}img/apple-touch-icon-144x144.png" />
@@ -32,6 +31,7 @@
             <div id="photo-main"><div id="main-view">{{ assets.main_entry|safe if assets.main_entry != None }}</div></div>
             <div id="photo-archives"><ul class="item-list" id="links">{{ assets.archives|safe if assets.archives != None }}</ul></div>
             <div id="body-form">{{ assets.body_form|safe if assets.body_form != None }}</div>
+            <div id="log"></div>
         {% endif %}
         </main>
         <div id="blueimp-gallery" class="blueimp-gallery">

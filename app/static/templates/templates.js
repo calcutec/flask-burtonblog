@@ -269,7 +269,8 @@ var colno = null;
 var output = "";
 try {
 var parentTemplate = null;
-output += " <input class=\"burger-check\" id=\"burger-check\" type=\"checkbox\"><label for=\"burger-check\" class=\"burger\"></label>\n                ";
+if(runtime.contextOrFrameLookup(context, frame, "assets")) {
+output += "\n <input class=\"burger-check\" id=\"burger-check\" type=\"checkbox\"><label for=\"burger-check\" class=\"burger\"></label>\n                ";
 if(runtime.inOperator(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity"),["author","photos","member","members"]) && runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"category") != "upload") {
 output += "\n\n                    ";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity") == "author") {
@@ -555,7 +556,7 @@ output += "</span></div>\n            ";
 ;
 }
 output += "\n    <span class=\"loginlogout\">\n        ";
-if((lineno = 46, colno = 41, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"is_authenticated"), "current_user[\"is_authenticated\"]", context, []))) {
+if((lineno = 47, colno = 41, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"is_authenticated"), "current_user[\"is_authenticated\"]", context, []))) {
 output += "\n            <a href=\"/logout\"><i class=\"fa fa-sign-out\"></i></a>\n        ";
 ;
 }
@@ -569,7 +570,7 @@ output += "\n        ";
 ;
 }
 output += "\n    </span>\n    <div id=\"nav\" class=\"navigation\">\n        <ul>\n        ";
-if(!(lineno = 54, colno = 45, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"is_authenticated"), "current_user[\"is_authenticated\"]", context, []))) {
+if(!(lineno = 55, colno = 45, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"is_authenticated"), "current_user[\"is_authenticated\"]", context, []))) {
 output += "\n            <li class=\"";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity") == "home") {
 output += "current";
@@ -589,7 +590,7 @@ output += "current";
 ;
 }
 output += "\"><a href=\"/members/latest\"><i class=\"fa fa-users\"></i></a></li>\n        ";
-if((lineno = 59, colno = 41, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"is_authenticated"), "current_user[\"is_authenticated\"]", context, []))) {
+if((lineno = 60, colno = 41, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"is_authenticated"), "current_user[\"is_authenticated\"]", context, []))) {
 output += "\n            <li class=\"";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity") == "author") {
 output += "current";
@@ -605,7 +606,9 @@ output += "current";
 output += "\"><a href=\"/photos/upload\"><i class=\"fa fa-upload\"></i></a></li>\n        ";
 ;
 }
-output += "\n        </ul>\n    </div>";
+output += "\n        </ul>\n    </div>\n";
+;
+}
 if(parentTemplate) {
 parentTemplate.rootRenderFunc(env, context, frame, runtime, cb);
 } else {
@@ -823,30 +826,15 @@ if((lineno = 14, colno = 53, runtime.callWrap(runtime.memberLookup((runtime.cont
 output += "\n                        <a class=\"link-button red\" id=\"deletephoto\" href=\"#\">Delete</a>\n                    ";
 ;
 }
-output += "\n                    ";
-if((lineno = 17, colno = 53, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"is_authenticated"), "current_user[\"is_authenticated\"]", context, [])) && runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"author")),"nickname") != runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"nickname")) {
-output += "\n                        ";
-if((lineno = 18, colno = 42, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"has_voted"), "post[\"has_voted\"]", context, [runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "g")),"user")),"id")]))) {
-output += "\n                            <a data-voted=\"true\" style=\"color:#eb6864;\" href=\"";
-output += runtime.suppressValue((lineno = 19, colno = 86, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "url_for"), "url_for", context, ["photos",runtime.makeKeywordArgs({"category": "vote","post_id": runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id")})])), env.opts.autoescape);
-output += "\" class=\"";
-output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
-output += " likeme\"><i class=\"fa fa-smile-o fa-lg icon-white\"></i></a>\n                        ";
-;
-}
-else {
-output += "\n                            <a data-voted=\"false\" style=\"color:#000;\" href=\"";
-output += runtime.suppressValue((lineno = 21, colno = 84, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "url_for"), "url_for", context, ["photos",runtime.makeKeywordArgs({"category": "vote","post_id": runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id")})])), env.opts.autoescape);
-output += "\" class=\"";
-output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
-output += " likeme\"><i class=\"fa fa-meh-o fa-lg icon-white\"></i></a>\n                        ";
-;
-}
-output += "\n                            Like/Unlike <br>\n                            <a href=\"";
-output += runtime.suppressValue((lineno = 24, colno = 45, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "url_for"), "url_for", context, ["photos",runtime.makeKeywordArgs({"id": runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id")})])), env.opts.autoescape);
-output += "\">Add Comment</a>\n                    ";
-;
-}
+output += "\n";
+output += "\n";
+output += "\n";
+output += "\n";
+output += "\n";
+output += "\n";
+output += "\n";
+output += "\n";
+output += "\n";
 output += "\n                </div>\n            </span>\n        </span>\n    </li>\n</ul>\n<div id=\"body-text\">\n    <h4>What makes this great:</h4>\n    <p>";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"body"), env.opts.autoescape);
 output += "</p>\n</div>";
