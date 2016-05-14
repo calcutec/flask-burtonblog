@@ -1,0 +1,33 @@
+<form id="photo-text-form" action="/photos/" method="post" enctype="form-data" name="post">
+    <input type="hidden" name="csrf_token"    value="{{ csrf_token }}">
+    <div class="form-group">
+        <label for="body"></label>
+        <textarea id="body-text" name="body" placeholder="What makes this photo great?"></textarea>
+        <div id="editable"></div>
+        <span id="error_header" class="help-inline" style="color:red"></span>
+    </div>
+
+    <div class="form-group">
+        <label>What category best matches this photo?</label>
+        <select id="category" name="category">
+            <option value="architecture">Architecture</option>
+            <option value="event">Event</option>
+            <option value="family">Family</option>
+            <option value="fantasy">Fantasy</option>
+            <option value="fashion">Fashion</option>
+            <option value="landscape">Landscape</option>
+            <option value="macro">Macro</option>
+            <option value="portrait">Portrait</option>
+            <option value="sport">Sport</option>
+            <option value="street">Street</option>
+            <option value="travel">Travel</option>
+            <option value="wildlife">Wildlife</option>
+        </select>
+        <span id="error_post" class="help-inline"></span><br>
+    </div>
+
+    <div class="hide">
+        <input id="photo" name="photo" type="text" value="{{ form.photo }}">
+    </div>
+    <input class="button-primary" id="photo-submit" type="submit" value="Post Photo">
+</form>

@@ -1,5 +1,6 @@
-define(["jquery", "backbone", "nunjucks", "socketio", "collections/photoCollection", "views/baseView", "views/uploadFormView"],
-    function ($, Backbone, nunjucks, socketio, PhotoCollection, BaseView, UploadFormView) {
+define(["jquery", "backbone", "nunjucks", "socketio", "ds", "collections/photoCollection", "views/baseView", 
+    "views/uploadFormView"],
+    function ($, Backbone, nunjucks, socketio, DS, PhotoCollection, BaseView, UploadFormView) {
         return Backbone.Router.extend({
 
             initialize: function () {
@@ -27,7 +28,24 @@ define(["jquery", "backbone", "nunjucks", "socketio", "collections/photoCollecti
 
                 window.namespace = '/greatpic'; // change to an empty string to use the global namespace
                 window.socket = socketio.connect('http://' + document.domain + ':' + location.port + namespace);
+
                 console.log('socket connected');
+
+                $.fn.serializeObject = function() {
+                    var o = {};
+                    var a = this.serializeArray();
+                    $.each(a, function() {
+                        if (o[this.name] !== undefined) {
+                            if (!o[this.name].push) {
+                                o[this.name] = [o[this.name]];
+                            }
+                            o[this.name].push(this.value || '');
+                        } else {
+                            o[this.name] = this.value || '';
+                        }
+                    });
+                    return o;
+                };
             },
 
             routes: {
@@ -112,21 +130,13 @@ define(["jquery", "backbone", "nunjucks", "socketio", "collections/photoCollecti
             },
 
             refreshdata: function(PageType, username) {
-                        var photoCollection = new PhotoCollection;
-                        photoCollection.fetch({
-                            success: function() {
-                                var current_user = {};
-                                window.env.addGlobal("current_user", current_user);
-                                current_user['is_authenticated'] = function(){
-                                    return photoCollection.authenticated;
-                                };
-                                current_user['nickname']= photoCollection.usernickname;
-                                new BaseView({ photoCollection: photoCollection, el: '#thisgreatpic', pageType:
-                                PageType, username: username });
-                    },
-                    fail: function(error) {
-                        console.log(error);
-                    }
+                DS.defineResource({
+                    name: 'photo',
+                    idAttribute: 'id', // 'id' is the default
+                    collection: PhotoCollection
+                });
+                DS.findAll('photo').done(function(photoCollection) {
+                    new BaseView({ el: '#thisgreatpic', pageType: PageType, username: username });
                 });
             }
         });

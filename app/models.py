@@ -51,13 +51,16 @@ class User(UserMixin, db.Model):
             self.lastname = lastname.title()
 
     def json_view(self):
+        is_following = None
+        main_user = False
         if g.user.is_authenticated():
             is_following = g.user.is_following(self)
-        else:
-            is_following = None
+            if g.user.id == self.id:
+                main_user = True
         return {'id': self.id, 'type': self.type, 'firstName': self.firstname, 'lastName': self.lastname,
                 'nickname': self.nickname, 'about_me': self.about_me, 'last_seen': self.last_seen, 'photo': self.photo,
-                'followers': self.followers.count(), 'followed': self.followed.count(), 'is_following': is_following}
+                'followers': self.followers.count(), 'followed': self.followed.count(), 'is_following': is_following,
+                'main_user': main_user}
 
     def set_password(self, password):
         self.pwdhash = generate_password_hash(password)
@@ -164,9 +167,8 @@ class Post(db.Model):
     slug = db.Column(db.String(255))
     votes = db.Column(db.Integer, default=1)
 
-    def __init__(self, comments, **kwargs):
+    def __init__(self, **kwargs):
         super(Post, self).__init__(**kwargs)
-        self.comments = comments
 
     @property
     def all_comments(self):

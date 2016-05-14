@@ -118,6 +118,7 @@ class BasePage(object):
                 response['category'] = self.assets['category']
             if g.user.is_authenticated():
                 response['usernickname'] = g.user.nickname
+                response['userid'] = g.user.id
             if 'collection' in self.assets:
                 response['collection'] = self.assets['collection']
             elif 'category' in self.assets and self.assets['category'] in ["follow", "unfollow"]:

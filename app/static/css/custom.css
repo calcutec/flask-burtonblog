@@ -737,3 +737,7 @@ input, textarea, select {
 }
 
 
+.full-width {
+    width: 100%;
+}
+

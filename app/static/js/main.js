@@ -8,6 +8,7 @@ require.config({
         blueimp: 'libs/blueimp/blueimp-gallery',
         loadimage: 'libs/loadimage/load-image',
         socketio: 'libs/socket/socket.io.min',
+        ds: 'libs/datastore/backbone-ds.min',
         app: 'app'
     },
     shim: {

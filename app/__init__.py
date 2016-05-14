@@ -27,7 +27,7 @@ class MyFlask(Flask):
 app = Flask(__name__, static_folder=staticdirectory)
 app.config['STATIC_FOLDER'] = staticdirectory
 
-async_mode = 'eventlet'
+async_mode = 'gevent'
 print('async_mode is ' + async_mode)
 
 # monkey patching is necessary because this application uses a background
@@ -58,6 +58,7 @@ CsrfProtect(app)
 js_templates = Bundle('templates/archive_entry.js', 'templates/member.js', 'templates/header.js', 'templates/nav.js',
                       'templates/main_entry.js', 'templates/person.js', 'templates/photo_detail.js',
                       'templates/home_page.js', 'templates/comments.js', 'templates/comment.js',
+                      'templates/upload_form.js', 'templates/photo_text_form.js', 'templates/photo_inputs.js',
                       output='templates/templates.js')
 assets.register('js_templates', js_templates)
 

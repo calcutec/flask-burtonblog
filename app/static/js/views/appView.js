@@ -8,7 +8,7 @@ define(['jquery'],
                 }
                 this.mainView = view;
                 if (options.render) {
-                    if (options.entity == 'home' | options.entity == 'photo'  ){
+                    if (options.entity == 'home' | options.entity == 'photo' | options.entity == 'upload' ){
                         if (this.archiveView) {
                             this.archiveView.unrender();
                             this.archiveView.close();
