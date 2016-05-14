@@ -132,10 +132,10 @@ define(["jquery", "backbone", "nunjucks", "socketio", "ds", "collections/photoCo
             refreshdata: function(PageType, username) {
                 DS.defineResource({
                     name: 'photo',
-                    idAttribute: 'id', // 'id' is the default
+                    idAttribute: 'id',
                     collection: PhotoCollection
                 });
-                DS.findAll('photo').done(function(photoCollection) {
+                DS.findAll('photo').done(function() {
                     new BaseView({ el: '#thisgreatpic', pageType: PageType, username: username });
                 });
             }

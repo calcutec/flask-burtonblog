@@ -8,7 +8,8 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
         return Backbone.View.extend({
             el: '#thisgreatpic',
             initialize: function(options){
-                this.photoCollection = DS.getAll('photo')
+
+                this.photoCollection = DS.getAll('photo');
 
                 DS.defineResource({
                     name: 'member',
@@ -51,7 +52,7 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
                     } else if (itemDict['entity'] == 'members'){
                         AppView(new NavView({el: '#navbar'}));
                         AppView(new HeaderView({el: '#header'}));
-                        AppView(new ArchiveView({el: '#links', 'collection': self.memberCollection}), itemDict);
+                        AppView(new ArchiveView({el: '#links', 'collection': memberCollection}), itemDict);
                     }   else if (itemDict['entity'] == 'member'){
                         var model = self.memberCollection.where({nickname: options.username})[0];
                         AppView(new NavView({el: '#navbar'}));
@@ -60,6 +61,8 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
                         AppView(new ArchiveView({el: '#links', 'collection': self.photoCollection}));
                     }
                 });
+
+                this.memberCollection = DS.getAll('member');
 
                 socket.on('followup', function(msg) {
                     console.log('FollowUp' + ': ' + msg.data);
