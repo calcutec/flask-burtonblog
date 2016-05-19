@@ -1,12 +1,12 @@
-define(['jquery', 'backbone', 'models/photoModel'],
-    function($, Backbone, PhotoModel){
+define(['jquery', 'backbone', 'ds', 'nunjucks', 'models/photoModel', 'views/appView', 'views/detailView'],
+    function($, Backbone, DS, nunjucks, PhotoModel, AppView, DetailView){
         return Backbone.View.extend({
-            initialize: function(options){
-                this.collection = options.collection
+            initialize: function(){
+                this.collection = DS.get('collection');
                 this.render()
             },
             events: {
-                'submit': 'postnewentry',
+                'submit': 'postnewentry'
             },
             postnewentry: function(e) {
                 e.preventDefault();
@@ -19,9 +19,9 @@ define(['jquery', 'backbone', 'models/photoModel'],
                 }
                 newPostModel.save(null, {
                     type: 'POST',
-                    success: function (model, response) {
-                        this.collection.add(model);
-                        return response;
+                    success: function (model) {
+                        DS.get('collection').add(model);
+                        AppView(new DetailView({el: '#main-view', 'model': model}));
                     },
                     error: function () {
                         alert('your poem did not save properly..')

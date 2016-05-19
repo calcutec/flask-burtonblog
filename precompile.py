@@ -31,16 +31,19 @@ COLOUR_BLUE = '\033[94m'
 def check_templates(templates_dir=TEMPLATES_DIR):
     file_list = os.listdir(templates_dir)
     for item in file_list:
-        if item.split(".")[-1] == "html":
-            modified = os.path.getmtime(templates_dir + "/" + item)
-            if item in FILES:
-                if FILES[item] != modified:
+        if item == "base.html":
+            pass
+        else:
+            if item.split(".")[-1] == "html":
+                modified = os.path.getmtime(templates_dir + "/" + item)
+                if item in FILES:
+                    if FILES[item] != modified:
+                        FILES[item] = modified
+                        precompile(templates_dir, item)
+                else:
+                    print (COLOUR_BLUE + item + " is being watched" + COLOUR_END)
                     FILES[item] = modified
                     precompile(templates_dir, item)
-            else:
-                print (COLOUR_BLUE + item + " is being watched" + COLOUR_END)
-                FILES[item] = modified
-                precompile(templates_dir, item)
 
 
 def precompile(tempates_dir, filename):

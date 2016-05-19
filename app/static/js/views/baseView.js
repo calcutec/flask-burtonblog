@@ -9,25 +9,22 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
             el: '#thisgreatpic',
             initialize: function(options){
 
-                this.photoCollection = DS.getAll('photo');
-
                 DS.defineResource({
                     name: 'member',
                     idAttribute: 'id',
                     collection: MemberCollection
                 });
 
-                var self = this;
+                self = this;
                 DS.findAll('member').done(function(memberCollection) {
-                    var authenticated;
                     var current_user = {};
                     window.env.addGlobal("current_user", current_user);
+                    var authenticated;
                     var main_user = memberCollection.find({'main_user': true});
                     if (main_user === undefined) {
                         authenticated = false;
                     } else {
                         authenticated = true;
-
                         current_user['nickname'] = main_user.get('nickname');
                         current_user['id'] = main_user.get('id');
                     }
@@ -35,43 +32,44 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
                         return authenticated;
                     };
 
-                    var itemDict = self.getItemDict();
-                    itemDict['entity'] = options.pageType;
+                    self.resetDataStore();
+                    DS.set('entity', options.pageType);
+                    DS.set('nickname', options.identifier);
 
-                    if(itemDict['entity'] == 'photo') {
-                        AppView(new DetailView({el: '#main-view', 'collection': self.photoCollection}), itemDict);
-                    } else if (itemDict['entity'] == 'home') {
+                    if(DS.get('entity') == 'photo') {
+                        var itemModel = DS.getAll('photo').get(options.identifier);
+                        AppView(new DetailView({el: '#main-view', 'model': itemModel}));
+                    } else if (DS.get('entity') == 'home') {
                         AppView(new NavView({el: '#navbar'}));
                         AppView(new HeaderView({el: '#header'}));
-                        AppView(new HomeView({el: '#main-view'}), itemDict);
-                    } else if (itemDict['entity'] == 'photos'){
+                        AppView(new HomeView({el: '#main-view'}));
+                    } else if (DS.get('entity') == 'photos'){
                         AppView(new NavView({el: '#navbar'}));
                         AppView(new HeaderView({el: '#header'}));
-                        AppView(new ContentMainView({el: '#main-view', 'collection': self.photoCollection}), itemDict);
-                        AppView(new ArchiveView({el: '#links', 'collection': self.photoCollection}));
-                    } else if (itemDict['entity'] == 'members'){
+                        AppView(new ContentMainView({el: '#main-view', 'collection': DS.getAll('photo')}));
+                        AppView(new ArchiveView({el: '#links', 'collection': DS.getAll('photo')}));
+                    } else if (DS.get('entity') == 'members'){
                         AppView(new NavView({el: '#navbar'}));
                         AppView(new HeaderView({el: '#header'}));
-                        AppView(new ArchiveView({el: '#links', 'collection': memberCollection}), itemDict);
-                    }   else if (itemDict['entity'] == 'member'){
-                        var model = self.memberCollection.where({nickname: options.username})[0];
+                        AppView(new ArchiveView({el: '#links', 'collection': memberCollection}));
+                    }   else if (DS.get('entity') == 'member'){
+                        var model = memberCollection.where({nickname: DS.get('nickname')})[0];
                         AppView(new NavView({el: '#navbar'}));
                         AppView(new HeaderView({el: '#header'}));
-                        AppView(new ProfileMainView({el: '#main-view', model: model}), itemDict);
-                        AppView(new ArchiveView({el: '#links', 'collection': self.photoCollection}));
+                        AppView(new ProfileMainView({el: '#main-view', model: model}));
+                        AppView(new ArchiveView({el: '#links', 'collection': DS.getAll('photo')}));
                     }
                 });
 
-                this.memberCollection = DS.getAll('member');
-
                 socket.on('followup', function(msg) {
                     console.log('FollowUp' + ': ' + msg.data);
-                    var member = self.memberCollection.get(msg.data.id);
+                    var member = DS.getAll('member').get(msg.data.id);
                     member.set({'followers': msg.data.followers});
                 });
+
                 socket.on('voteup', function(msg) {
                     console.log('VoteUp' + ': ' + msg.data);
-                    var photo = self.photoCollection.get(msg.data.id);
+                    var photo = DS.getAll('photo').get(msg.data.id);
                     photo.set({'votes': msg.data.votes});
                 });
             },
@@ -87,43 +85,41 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
                 'click i.fa-upload':        'iconLink'
             },
 
-            getItemDict: function(){
-                return {'route': null, 'collection': null, 'category': null, 'entity': null, 'nickname': null,
-                    'authenticated': window.env.globals.current_user.is_authenticated(), 'count': null, 'postId': null,
-                    'template': null, 'render': null };
+            resetDataStore: function(e) {
+                DS.set({'route': null, 'collection': null, 'category': null, 'entity': null, 'nickname':
+                    null, 'authenticated': window.env.globals.current_user.is_authenticated(), 'count': null,
+                    'postId': null, 'template': null, 'render': null });
             },
 
             filterOnSelect: function(e) {
                 e.preventDefault();
-                var itemDict = this.getItemDict();
-                itemDict.authenticated = window.env.globals.current_user.is_authenticated();
-                itemDict.category = $( '#element' ).val();
-                itemDict.render = true;
-                itemDict.usernickname = window.env.globals.current_user.nickname;
+                this.resetDataStore();
+                DS.set('category', $( '#element' ).val());
+                DS.set('render', true);
+                DS.set('usernickname', window.env.globals.current_user.nickname);
                 var pathArray = window.location.pathname.split( '/' );
                 if (pathArray[1] == 'photos'){
-                    itemDict.collection = this.photoCollection;
-                    itemDict.entity = 'photos';
-                    itemDict.route = '/photos/' + itemDict.category + '/';
-                    Backbone.history.navigate(itemDict.route, {trigger: false});
+                    DS.set('entity', 'photos');
+                    DS.set('route', '/photos/' + DS.get('category') + '/');
+                    Backbone.history.navigate(DS.get('route'), {trigger: false});
+                    this.filter('photo');
                 } else if (pathArray[1] == 'members'){
                     if (pathArray[2].match('all|latest') || pathArray[2] == ''){
-                        itemDict.collection = this.memberCollection;
-                        itemDict.entity = 'members';
-                        itemDict.route = '/members/' + itemDict.category + '/' ;
-                        Backbone.history.navigate(itemDict.route, {trigger: false});
+                        DS.set('entity', 'members');
+                        DS.set('route', '/members/' + DS.get('category') + '/');
+                        Backbone.history.navigate(DS.get('route'), {trigger: false});
+                        this.filter('member');
                     } else {
-                        itemDict.collection = this.photoCollection;
-                        itemDict.entity = 'member';
-                        itemDict.nickname = pathArray[2];
-                        itemDict.target_user = this.memberCollection.where({nickname: itemDict.nickname})[0];
-                        itemDict.route = '/members/' + itemDict.nickname + '/' + itemDict.category + '/';
-                        Backbone.history.navigate(itemDict.route, {trigger: false});
+                        DS.set('entity', 'member');
+                        DS.set('nickname', pathArray[2]);
+                        DS.set('target_user', DS.getAll('member').where({nickname: DS.get('nickname')})[0]);
+                        DS.set('route', '/members/' + DS.get('nickname') + '/' + DS.get('category') + '/');
+                        Backbone.history.navigate(DS.get('route'), {trigger: false});
+                        this.filter('photo');
                     }
                 }
-                this.filter(itemDict);
             },
-            
+
             getCounts: function(collection){
                 var categoryarray = [];
                 collection.forEach(function(model){
@@ -141,148 +137,143 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
 
             iconLink: function(e) {
                 e.preventDefault();
-                    var itemDict = this.getItemDict();
-                    itemDict.authenticated = window.env.globals.current_user.is_authenticated();
-                    itemDict.category = 'latest';
-                    itemDict.render = 'true';
-                    itemDict.usernickname = window.env.globals.current_user.nickname;
-                    itemDict.userid = window.env.globals.current_user.id;
+                    this.resetDataStore();
+                    DS.set('category', 'latest');
+                    DS.set('render', 'true');
+                    DS.set('usernickname', window.env.globals.current_user.nickname);
+                    DS.set('userid', window.env.globals.current_user.id);
                     if (e.currentTarget.classList[1] == 'fa-users'){
-                        itemDict.collection = this.memberCollection;
-                        itemDict.entity = 'members';
-                        itemDict.route = '/members/' + itemDict.category + '/';
-                        Backbone.history.navigate(itemDict.route, {trigger: false});
+                        DS.set('entity', 'members');
+                        DS.set('route', '/members/' + DS.get('category') + '/');
+                        Backbone.history.navigate(DS.get('route'), {trigger: false});
+                        this.filter('member');
                     } else if (e.currentTarget.classList[1] == 'fa-picture-o'){
-                        itemDict.collection = this.photoCollection;
-                        itemDict.entity = 'photos';
-                        itemDict.route = '/photos/' + itemDict.category + '/';
-                        Backbone.history.navigate(itemDict.route, {trigger: false});
+                        DS.set('collection', DS.getAll('photo'));
+                        DS.set('entity', 'photos');
+                        DS.set('route', '/photos/' + DS.get('category') + '/');
+                        Backbone.history.navigate(DS.get('route'), {trigger: false});
+                        this.filter('photo');
                     } else if (e.currentTarget.classList[1] == 'fa-briefcase'){
-                        itemDict.collection = this.photoCollection;
-                        itemDict.entity = 'author';
-                        itemDict.nickname = window.env.globals.current_user.nickname;
-                        itemDict.usernickname = window.env.globals.current_user.nickname;
-                        itemDict.target_user = this.memberCollection.where({nickname: itemDict.usernickname})[0];
-                        itemDict.route = '/members/' + itemDict.usernickname + '/';
-                        Backbone.history.navigate(itemDict.route, {trigger: false});
+                        DS.set('entity', 'author');
+                        DS.set('nickname', window.env.globals.current_user.nickname);
+                        DS.set('usernickname', window.env.globals.current_user.nickname);
+                        DS.set('target_user', DS.getAll('member').where({nickname: DS.get('usernickname')})[0]);
+                        DS.set('route', '/members/' + DS.get('usernickname') + '/');
+                        Backbone.history.navigate(DS.get('route'), {trigger: false});
+                        this.filter('photo');
                     } else if (e.currentTarget.classList[1] == 'fa-home'){
-                        itemDict.collection = this.photoCollection;
-                        itemDict.entity = 'home';
-                        itemDict.route = '/home/';
-                        Backbone.history.navigate(itemDict.route, {trigger: false});
-                        AppView(new HeaderView({id: 'header'}), itemDict);
-                        AppView(new NavView({id: 'navbar'}), itemDict);
-                        AppView(new HomeView({id: 'main-view'}), itemDict);
-                        return true;
+                        DS.set('collection', DS.getAll('photo'));
+                        DS.set('entity', 'home');
+                        DS.set('route', '/home/');
+                        Backbone.history.navigate(DS.get('route'), {trigger: false});
+                        AppView(new HeaderView({id: 'header'}));
+                        AppView(new NavView({id: 'navbar'}));
+                        AppView(new HomeView({id: 'main-view'}));
                     } else if (e.currentTarget.classList[1] == 'fa-upload'){
-                        itemDict.collection = this.photoCollection;
-                        itemDict.entity = 'upload';
-                        itemDict.route = '/photos/upload/';
-                        Backbone.history.navigate(itemDict.route, {trigger: false});
-                        AppView(new HeaderView({id: 'header'}), itemDict);
-                        AppView(new NavView({id: 'navbar'}), itemDict);
-                        AppView(new UploadFormView({id: 'main-view', collection: this.photoCollection}), itemDict);
-                        return true;
+                        DS.set('collection', DS.getAll('photo'));
+                        DS.set('entity', 'upload');
+                        DS.set('route', '/photos/upload/');
+                        Backbone.history.navigate(DS.get('route'), {trigger: false});
+                        AppView(new HeaderView({id: 'header'}));
+                        AppView(new NavView({id: 'navbar'}));
+                        AppView(new UploadFormView({id: 'main-view'}));
                     }
-                    this.filter(itemDict);
             },
 
             memberLink: function(e){
                 e.preventDefault();
-                var itemDict = this.getItemDict();
-                itemDict.authenticated = window.env.globals.current_user.is_authenticated();
-                itemDict.entity = 'member';
-                itemDict.nickname = e.target.href.split('/')[4];
-                itemDict.usernickname = window.env.globals.current_user.nickname;
-                itemDict.target_user = this.memberCollection.where({nickname: itemDict.nickname})[0];
-                itemDict.route = '/members/' + itemDict.nickname + '/';
-                Backbone.history.navigate(itemDict.route, {trigger: false});
-                itemDict.collection = this.photoCollection.where({nickname: itemDict.nickname});
-                itemDict.counts = this.getCounts(itemDict.collection);
-                itemDict.render = true;
-                this.render(itemDict);
+                this.resetDataStore();
+                DS.set('entity', 'member');
+                DS.set('nickname', e.target.href.split('/')[4]);
+                DS.set('target_user', DS.getAll('member').where({nickname: DS.get('nickname')})[0]);
+                DS.set('route', '/members/' + DS.get('nickname') + '/');
+                Backbone.history.navigate(DS.get('route'), {trigger: false});
+                DS.set('collection', DS.getAll('photo').where({nickname: DS.get('nickname')}));
+                DS.set('counts', this.getCounts(DS.get('collection')));
+                DS.set('render', true);
+                this.render();
             },
-            
+
             detailLink: function(e) {
                 e.preventDefault();
-                var itemDict = this.getItemDict();
-                itemDict.collection = this.photoCollection;
-                itemDict.authenticated = window.env.globals.current_user.is_authenticated();
-                itemDict.entity = 'photo';
-                itemDict.postId = e.target.closest('a').dataset.id;
-                itemDict.route = '/photos/' + itemDict.postId + '/';
-                itemDict.usernickname = window.env.globals.current_user.usernickname;
-                Backbone.history.navigate(itemDict.route, {trigger: false});
-                itemDict.render = true;
-                AppView(new HeaderView({id: 'header'}), itemDict);
-                AppView(new NavView({id: 'navbar'}), itemDict);
-                var itemModel = itemDict.collection.get(itemDict.postId);
-                AppView(new DetailView({id: 'main-view', model: itemModel}), itemDict);
+                this.resetDataStore();
+                DS.set('collection', DS.getAll('photo'));
+                DS.set('counts', this.getCounts(DS.get('collection')));
+                DS.set('entity', 'photo');
+                DS.set('postId', e.target.closest('a').dataset.id);
+                DS.set('route', '/photos/' + DS.get('postId') + '/');
+                DS.set('usernickname', window.env.globals.current_user.usernickname);
+                Backbone.history.navigate(DS.get('route'), {trigger: false});
+                DS.set('render', true);
+                AppView(new HeaderView({id: 'header'}));
+                AppView(new NavView({id: 'navbar'}));
+                var itemModel = DS.get('collection').get(DS.get('postId'));
+                AppView(new DetailView({id: 'main-view', model: itemModel}));
             },
 
-            filter: function(itemDict){
-                if (itemDict.category == 'all' || itemDict.category == 'latest'){
-                    if (itemDict.nickname){
-                        itemDict.collection = itemDict.collection.where({nickname: itemDict.nickname});
-                        itemDict.counts = this.getCounts(itemDict.collection);
-                        if (itemDict.category == 'all') {
-                            itemDict.collection = itemDict.collection.splice(0,100);
-                        } else if (itemDict.category == 'latest'){
-                            itemDict.collection = itemDict.collection.splice(0,10);
+            filter: function(item){
+                if (DS.get('category') == 'all' || DS.get('category') == 'latest'){
+                    if (DS.get('nickname')){
+                        DS.set('collection', DS.getAll(item).where({nickname: DS.get('nickname')}));
+                        DS.set('counts', this.getCounts(DS.get('collection')));
+                        if (DS.get('category') == 'all') {
+                            DS.set('collection', DS.get('collection').splice(0,100));
+                        } else if (DS.get('category') == 'latest'){
+                            DS.set('collection', DS.get('collection').splice(0,10));
                         }
-                        this.render(itemDict);
                     } else {
-                        itemDict.counts = this.getCounts(itemDict.collection);
-                        if (itemDict.category == 'all') {
-                            itemDict.collection = itemDict.collection.first(100);
-                        } else if (itemDict.category == 'latest'){
-                            itemDict.collection = itemDict.collection.first(10);
+                        DS.set('counts', this.getCounts(DS.getAll(item)));
+                        if (DS.get('category') == 'all') {
+                            DS.set('collection', DS.getAll(item).first(100));
+                        } else if (DS.get('category') == 'latest'){
+                            DS.set('collection', DS.getAll(item).first(10));
                         }
-                        this.render(itemDict);
                     }
+
+                    this.render();
                 } else {
-                    if (itemDict.nickname && itemDict.category ){
-                        itemDict.counts = this.getCounts(itemDict.collection.where({nickname: itemDict.nickname}));
-                        itemDict.collection = itemDict.collection.where({nickname: itemDict.nickname,
-                            category: itemDict.category });
+                    if (DS.get('nickname') && DS.get('category')){
+                        DS.set('counts', this.getCounts(DS.getAll(item).where({nickname: DS.get('nickname')})));
+                        DS.set('collection', DS.getAll(item).where({nickname: DS.get('nickname'),
+                            category: DS.get('category') }));
 
-                    } else if (itemDict.category){
-                        itemDict.counts = this.getCounts(itemDict.collection);
-                        itemDict.collection = itemDict.collection.where({category: itemDict.category});
-                    } else if (itemDict.nickname){
-                        itemDict.collection = itemDict.collection.where({nickname: itemDict.nickname});
-                        itemDict.counts = this.getCounts(itemDict.collection);
+                    } else if (DS.get('category')){
+                        DS.set('counts', this.getCounts(DS.getAll('photo')));
+                        DS.set('collection', DS.getAll(item).where({category: DS.get('category')}));
+                    } else if (DS.get('nickname')){
+                        DS.set('collection', DS.getAll(item).where({nickname: DS.get('nickname')}));
+                        DS.set('counts', this.getCounts(DS.getAll(item)));
                     }
-                    this.render(itemDict);
+                    this.render();
                 }
             },
 
-            render: function(itemDict){
-                AppView(new HeaderView({id: 'header'}), itemDict);
-                AppView(new NavView({id: 'navbar'}), itemDict);
-                if (itemDict.entity != 'members') {
+            render: function(){
+                AppView(new HeaderView({id: 'header'}));
+                AppView(new NavView({id: 'navbar'}));
+                if (DS.get('entity') != 'members') {
                     var mainmodel;
-                    if (itemDict.entity == "member" || itemDict.entity == "author"){
-                        mainmodel = itemDict.target_user;
-                        AppView(new ProfileMainView({id: 'main-view', model: mainmodel}), itemDict);
-                    } else if (itemDict.entity == "photo") {
-                        mainmodel = itemDict.collection[0];
-                        AppView(new ContentMainView({id: 'main-view', model: mainmodel}), itemDict);
+                    if (DS.get('entity') == "member" || DS.get('entity') == "author"){
+                        mainmodel = DS.get('target_user');
+                        AppView(new ProfileMainView({id: 'main-view', model: mainmodel}));
+                    } else if (DS.get('entity') == "photo") {
+                        mainmodel = DS.get('collection')[0];
+                        AppView(new ContentMainView({id: 'main-view', model: mainmodel}));
                     } else {
-                        mainmodel = itemDict.collection[0];
-                        AppView(new ContentMainView({id: 'main-view', model: mainmodel}), itemDict);
+                        mainmodel = DS.get('collection')[0];
+                        AppView(new ContentMainView({id: 'main-view', model: mainmodel}));
                     }
 
                 }
-                if (itemDict.entity == 'photos'){
+                if (DS.get('entity') == 'photos'){
                     AppView(new ArchiveView({id: 'links', tagName: 'ul', className: 'item-list',
-                        'collection': itemDict.collection.splice(1)}), itemDict);
-                } else if (itemDict.entity == 'member' || itemDict.entity == 'author') {
+                        'collection': DS.get('collection').splice(1)}));
+                } else if (DS.get('entity') == 'member' || DS.get('entity') == 'author') {
                     AppView(new ArchiveView({id: 'links', tagName: 'ul', className: 'item-list',
-                        'collection': itemDict.collection}), itemDict);
-                } else if (itemDict.entity == 'members') {
+                        'collection': DS.get('collection')}));
+                } else if (DS.get('entity') == 'members') {
                     AppView(new MembersView({id: 'links', tagName: 'ul', className: 'item-list',
-                        'collection': itemDict.collection}), itemDict);
+                        'collection': DS.get('collection')}));
                 }
             }
         });

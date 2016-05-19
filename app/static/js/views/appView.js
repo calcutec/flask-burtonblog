@@ -1,14 +1,13 @@
-define(['jquery'],
-    function($){
-        return function(view, options) {
-            options = options || {};
+define(['jquery', 'ds'],
+    function($, DS){
+        return function(view) {
             if (view.el.id == 'main-view') {
                 if (this.mainView) {
                     this.mainView.close();
                 }
                 this.mainView = view;
-                if (options.render) {
-                    if (options.entity == 'home' | options.entity == 'photo' | options.entity == 'upload' ){
+                if (DS.get('render')) {
+                    if (DS.get('entity') == 'home' || DS.get('entity') == 'photo' || DS.get('entity') == 'upload' ){
                         if (this.archiveView) {
                             this.archiveView.unrender();
                             this.archiveView.close();
@@ -23,13 +22,13 @@ define(['jquery'],
                     this.archiveView.close();
                 }
                 this.archiveView = view;
-                if (options.render) {
-                    if (options.entity == "members") {
+                if (DS.get('render')) {
+                    if (DS.get('entity') == "members") {
                         if (this.mainView) {
                             this.mainView.close();
                         }
                     }
-                    this.archiveView.render(options);
+                    this.archiveView.render();
                     $('#photo-archives').html(this.archiveView.el);
                 } else {
                     this.archiveView.attachToView();
@@ -39,8 +38,8 @@ define(['jquery'],
                     this.headerView.close();
                 }
                 this.headerView = view;
-                if (options.render) {
-                    this.headerView.render(options);
+                if (DS.get('render')) {
+                    this.headerView.render();
                     $('header').html(this.headerView.el);
                 }
             } else if (view.el.id == 'navbar') {
@@ -48,8 +47,8 @@ define(['jquery'],
                     this.navView.close();
                 }
                 this.navView = view;
-                if (options.render) {
-                    this.navView.render(options);
+                if (DS.get('render')) {
+                    this.navView.render();
                     $('nav').html(this.navView.el);
                 }
             }

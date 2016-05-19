@@ -5,11 +5,11 @@ define(['jquery', 'backbone', 'blueimp'],
             events: {
                 'click .gallery':   'gallery'
             },
-            render: function(options) {
+            render: function() {
                 var post = this.model.toJSON();
                 post['author'] = { "nickname": post.nickname };
                 var assets = {};
-                assets['entity'] = options['entity'];
+                assets['entity'] = DS.get('entity');
                 var self = this;
                 post['comments'] = { "all": function(){
                     return self.models.get('comments')

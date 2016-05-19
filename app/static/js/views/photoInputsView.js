@@ -1,10 +1,6 @@
-define(['jquery', 'backbone', 'views/photoTextFormView', 'views/appView'],
-    function($, Backbone, PhotoTextFormView, AppView){
+define(['jquery', 'backbone', 'ds', 'views/photoTextFormView'],
+    function($, Backbone, DS, PhotoTextFormView){
         return Backbone.View.extend({
-
-            initialize: function(options){
-                this.collection = options.collection;
-            },
 
             events: {
                 'click #photo-submit': 'submitPhoto'
@@ -13,8 +9,9 @@ define(['jquery', 'backbone', 'views/photoTextFormView', 'views/appView'],
             submitPhoto: function(e) {
                 e.preventDefault();
                 var fd = new FormData();
-                window.uploadedfilename = 'static/user-images/' + AppView.collection.userid + "/" + (new Date).getTime() + '-' + window.currentFile.name;
-                fd.append('key', window.uploadedfilename);
+                window.uploadedfilename = 'user-images/' + DS.get('userid') + "/" + (new Date).getTime() + '-' + window.currentFile.name;
+                window.amazons3path = 'static/user-images/' + DS.get('userid') + "/" + (new Date).getTime() + '-' + window.currentFile.name;
+                fd.append('key', window.amazons3path);
                 fd.append('acl', this.model.get('acl'));
                 fd.append('policy', this.model.get('policy'));
                 fd.append('success_action_status', this.model.get('success_action_status'));
@@ -42,8 +39,7 @@ define(['jquery', 'backbone', 'views/photoTextFormView', 'views/appView'],
                         if(xhr.status == 200){
                             self.model.destroy();
                             self.remove();
-                            var photoTextFormView = new PhotoTextFormView({id: "text-form-view",
-                                collection: self.collection});
+                            var photoTextFormView = new PhotoTextFormView({id: "text-form-view"});
                             $('#inputs-target').html(photoTextFormView.el)
                         } else {
                             console.log(xhr.statusText);
@@ -55,7 +51,7 @@ define(['jquery', 'backbone', 'views/photoTextFormView', 'views/appView'],
                 xhr.send(fd);
             },
 
-            render: function(itemDict){
+            render: function(){
                 $(this.el).html(window.env.render("photo_inputs.html"));
                 return this;
             }

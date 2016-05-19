@@ -1,14 +1,11 @@
-define(['jquery', 'backbone', 'app', 'views/AppView', 'models/s3FormModel', 'views/photoInputsView'],
-    function($, Backbone, app, AppView, S3FormModel, PhotoInputsView){
+define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView'],
+    function($, Backbone, DS, S3FormModel, PhotoInputsView){
         return Backbone.View.extend({
             currentFile: null,
             coordinates: null,
-            initialize: function (options) {
-                this.collection = AppView.photoCollection;
-            },
-
+            
             events: {
-                'change #file-input': 'validateanddisplaysample',
+                'change #file-input': 'validateanddisplaysample'
             },
 
             validateanddisplaysample: function(e) {
@@ -147,9 +144,8 @@ define(['jquery', 'backbone', 'app', 'views/AppView', 'models/s3FormModel', 'vie
                 s3FormModel.fetch({
                     parse: true,
                     success: function () {
-                        var photoInputsView = new PhotoInputsView({model: s3FormModel, id: "inputs-view", 
-                            collection: this.photoCollection}).render()
-                        $('#inputs-target').html(photoInputsView.render().el)
+                        var photoInputsView = new PhotoInputsView({model: s3FormModel, id: "inputs-view"}).render();
+                        $('#inputs-target').html(photoInputsView.render().el);
                         return false;
 
                     },

@@ -71,7 +71,9 @@ define(['jquery', 'backbone', 'underscore', 'views/appView', 'views/commentsView
                     return votestatus
                 };
                 $(this.el).html(window.env.render("photo_detail.html", {'post': post, 'momentjs': moment }));
-                this.renderComments();
+                if (this.model.get('comments').length > 0){
+                    this.renderComments();
+                }
                 return this;
             }
         });

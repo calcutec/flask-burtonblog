@@ -65,14 +65,9 @@ define(["jquery", "backbone", "nunjucks", "socketio", "ds", "collections/photoCo
                 'members/:username/:category(/)': 'member'
             },
 
-
             getItemDict: function(){
                 return {'route': null, 'collection': null, 'category': null, 'entity': null, 'nickname': null,
                     'authenticated': null, 'count': null, 'postId': null, 'template': null, 'render': null };
-            },
-
-            photo: function (id) {
-                console.log(id);
             },
 
             home: function() {
@@ -94,7 +89,8 @@ define(["jquery", "backbone", "nunjucks", "socketio", "ds", "collections/photoCo
                 if (this.initial) {
                     this.initial = false;
                     if (category && category.match(/^\d+$/)) { // if category is a number
-                        this.refreshdata("photo");
+                        var id = category
+                        this.refreshdata("photo", id);
                     }
                     else {
                         this.refreshdata("photos");
@@ -129,14 +125,14 @@ define(["jquery", "backbone", "nunjucks", "socketio", "ds", "collections/photoCo
                 }
             },
 
-            refreshdata: function(PageType, username) {
+            refreshdata: function(PageType, identifier) {
                 DS.defineResource({
                     name: 'photo',
                     idAttribute: 'id',
                     collection: PhotoCollection
                 });
                 DS.findAll('photo').done(function() {
-                    new BaseView({ el: '#thisgreatpic', pageType: PageType, username: username });
+                    new BaseView({ el: '#thisgreatpic', pageType: PageType, identifier: identifier });
                 });
             }
         });

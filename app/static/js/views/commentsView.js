@@ -18,16 +18,16 @@ define(['jquery', 'backbone', 'views/commentView'],
                 });
                 return this;
             },
-            render: function(options) {
+            render: function() {
                 this.collection.forEach(function(model) {
-                    this.addOneToList(model, options);
+                    this.addOneToList(model);
                 }, this);
                 return this;
             },
-            addOneToList: function (model, options) {
+            addOneToList: function (model) {
                 var commentView = new CommentView({ model: model});
                 this.subViews.push(commentView);
-                this.$el.append(commentView.render(options).el);
+                this.$el.append(commentView.render().el);
             },
             unrender: function() {
                 this.subViews.forEach(function(model){model.remove()})

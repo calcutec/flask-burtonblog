@@ -9,6 +9,7 @@ body {
     color: #222;
     padding: 0;
     margin: 0;
+    max-width: 1280px;
 }
 nav {
     position: fixed;
@@ -18,8 +19,11 @@ nav {
     top: 0;
     z-index: 9999;
 }
+div#navbar {
+    width: 93vw;
+}
+
 header {
-    max-width: 1280px;
     margin: 4rem 3.5vw 0 3.5vw;
     width: 92.5vw;
     padding-top: .4rem;
@@ -33,7 +37,6 @@ header {
     font-family: 'quicksanddash';
 }
 main {
-    max-width: 1280px;
     margin: .5rem 3.5vw 0 3.5vw;
     width: 93vw;
 }
@@ -43,7 +46,7 @@ main {
 .loginlogout {
     float: right;
     display: inline-block;
-    margin-right: 8vw;
+    margin-right: 1rem;
 }
 .well {
 
@@ -345,7 +348,6 @@ label > .label-body {
 /** Archive Images **/
 .main-responsive-img {
     width: 92.5vw;
-    max-width: 1280px;
     display: block;
     float: left;
 }
@@ -666,7 +668,7 @@ input, textarea, select {
 /** 960 pixels or greater -- includes most tablets in landscape **/
 @media(min-width:60em){
     ul.item-list > li:nth-child(4n) { padding-right: 0; }
-    .responsive-img { width: 22.75vw; max-width: 315px;}
+    .responsive-img { width: 22.75vw; }
     span.text-content {
         width: 22.75vw;
         height: 22.75vw;

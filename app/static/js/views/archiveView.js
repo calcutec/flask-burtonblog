@@ -18,16 +18,16 @@ define(['jquery', 'backbone', 'views/contentThumbnailView'],
                 });
                 return this;
             },
-            render: function(options) {
+            render: function() {
                 this.collection.forEach(function(model) {
-                    this.addOneToList(model, options);
+                    this.addOneToList(model);
                 }, this);
                 return this;
             },
-            addOneToList: function (model, options) {
+            addOneToList: function (model) {
                 var thumbnailView = new ContentThumbnailView({ model: model});
                 this.subViews.push(thumbnailView);
-                this.$el.append(thumbnailView.render(options).el);
+                this.$el.append(thumbnailView.render().el);
             },
             
             unrender: function() {
