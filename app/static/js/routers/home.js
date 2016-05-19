@@ -46,6 +46,21 @@ define(["jquery", "backbone", "nunjucks", "socketio", "ds", "collections/photoCo
                     });
                     return o;
                 };
+                
+                $.fn.getCounts = function(collection) {
+                    var categoryarray = [];
+                    collection.forEach(function(model){
+                        categoryarray.push(model.get('category'))
+                    });
+    
+                    var counts = {};
+                    for(var i = 0; i < categoryarray.length; ++i) {
+                        if(!counts[categoryarray[i]])
+                            counts[categoryarray[i]] = 0;
+                        ++counts[categoryarray[i]];
+                    }
+                    return counts;
+                };
             },
 
             routes: {

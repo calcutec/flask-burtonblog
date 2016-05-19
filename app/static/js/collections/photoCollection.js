@@ -4,6 +4,10 @@ define(['backbone', 'models/photoModel'],
             url: "/photos/",
             model: PhotoModel,
 
+            initialize: function() {
+                this.sort_order = 'asc';
+            },
+
             /**
              * @param {{collection:string, authenticated:string}} response
              */
@@ -14,8 +18,15 @@ define(['backbone', 'models/photoModel'],
                 return response.collection
             },
             
-            comparator: function(photo){
-                return -photo.get('timestamp');
+            sort_key: 'id', // default sort key
+
+            comparator: function(item) {
+                return !item.get(this.sort_key);
+            },
+
+            sortByField: function(fieldName) {
+                this.sort_key = fieldName;
+                this.sort();
             }
         });
     }

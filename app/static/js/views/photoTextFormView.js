@@ -1,8 +1,8 @@
-define(['jquery', 'backbone', 'ds', 'nunjucks', 'models/photoModel', 'views/appView', 'views/detailView'],
-    function($, Backbone, DS, nunjucks, PhotoModel, AppView, DetailView){
+define(['jquery', 'backbone', 'ds', 'nunjucks', 'models/photoModel', 'views/appView', 'views/detailView', 
+    'views/navView', 'views/headerView'],
+    function($, Backbone, DS, nunjucks, PhotoModel, AppView, DetailView, NavView, HeaderView){
         return Backbone.View.extend({
             initialize: function(){
-                this.collection = DS.get('collection');
                 this.render()
             },
             events: {
@@ -20,8 +20,21 @@ define(['jquery', 'backbone', 'ds', 'nunjucks', 'models/photoModel', 'views/appV
                 newPostModel.save(null, {
                     type: 'POST',
                     success: function (model) {
-                        DS.get('collection').add(model);
-                        AppView(new DetailView({el: '#main-view', 'model': model}));
+                        DS.inject('photo', model);
+                        DS.set({'route': null, 'collection': null, 'category': null, 'entity': null, 'nickname': null,
+                            'authenticated': window.env.globals.current_user.is_authenticated(), 'count': null,
+                            'postId': null, 'template': null, 'render': true });
+                        DS.set('collection', DS.getAll('photo'));
+                        DS.set('counts', self.$el.getCounts(DS.get('collection')));
+                        DS.set('entity', 'photo');
+                        DS.set('postId', model.id);
+                        DS.set('route', '/photos/' + DS.get('postId') + '/');
+                        DS.set('usernickname', window.env.globals.current_user.usernickname);
+                        Backbone.history.navigate(DS.get('route'), {trigger: false});
+                        DS.set('render', true);
+                        AppView(new HeaderView({id: 'header'}));
+                        AppView(new NavView({id: 'navbar'}));
+                        AppView(new DetailView({id: 'main-view', model: model}));
                     },
                     error: function () {
                         alert('your poem did not save properly..')

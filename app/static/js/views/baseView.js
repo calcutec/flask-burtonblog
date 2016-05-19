@@ -148,7 +148,6 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
                         Backbone.history.navigate(DS.get('route'), {trigger: false});
                         this.filter('member');
                     } else if (e.currentTarget.classList[1] == 'fa-picture-o'){
-                        DS.set('collection', DS.getAll('photo'));
                         DS.set('entity', 'photos');
                         DS.set('route', '/photos/' + DS.get('category') + '/');
                         Backbone.history.navigate(DS.get('route'), {trigger: false});
@@ -171,6 +170,7 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
                         AppView(new HomeView({id: 'main-view'}));
                     } else if (e.currentTarget.classList[1] == 'fa-upload'){
                         DS.set('collection', DS.getAll('photo'));
+                        DS.set('counts', this.getCounts(DS.get('collection')));
                         DS.set('entity', 'upload');
                         DS.set('route', '/photos/upload/');
                         Backbone.history.navigate(DS.get('route'), {trigger: false});
@@ -223,6 +223,7 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
                         }
                     } else {
                         DS.set('counts', this.getCounts(DS.getAll(item)));
+                        var collection = DS.getAll(item).sortBy('timestamp');
                         if (DS.get('category') == 'all') {
                             DS.set('collection', DS.getAll(item).first(100));
                         } else if (DS.get('category') == 'latest'){

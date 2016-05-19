@@ -249,7 +249,8 @@ class UploadFormProcessor(FormProcessor):
             if request.is_xhr:
                 response = post.json_view()
                 response['savedsuccess'] = True
-                return json.dumps(response)
+                self.rendered_form = response
+                # return json.dumps(response)
             else:
                 self.form = None
                 self.rendered_form = None

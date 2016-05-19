@@ -15,8 +15,16 @@ define(['backbone', 'models/memberModel'],
                 return response.collection;
             },
 
-            comparator: function(member){
-                return -member.get('last_seen');
+            
+            sort_key: 'id', // default sort key
+
+            comparator: function(item) {
+                return !item.get(this.sort_key);
+            },
+
+            sortByField: function(fieldName) {
+                this.sort_key = fieldName;
+                this.sort();
             }
         });
     }
