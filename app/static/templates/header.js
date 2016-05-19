@@ -24,7 +24,7 @@ output += "\n        This Great Pic\n    ";
 ;
 }
 else {
-if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"category") == "upload") {
+if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity") == "upload") {
 output += "\n        Upload Photo\n    ";
 ;
 }

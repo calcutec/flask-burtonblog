@@ -272,10 +272,8 @@ output += "\n                <div id=\"title\"><i class=\"current fa fa-home\"><
 ;
 }
 else {
-if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"category") == "upload") {
-output += "\n                <div id=\"title\"><i class=\"current fa fa-upload\"></i><span id=\"subtitle\">";
-output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"category"), env.opts.autoescape);
-output += "</span></div>\n            ";
+if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity") == "upload") {
+output += "\n                <div id=\"title\"><i class=\"current fa fa-upload\"></i></div>\n            ";
 ;
 }
 else {
@@ -335,7 +333,7 @@ output += "current";
 output += "\"><a href=\"/members/";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"nickname"), env.opts.autoescape);
 output += "/latest\"><i class=\"fa fa-briefcase\"></i></a></li>\n            <li class=\"";
-if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"category") == "upload") {
+if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity") == "upload") {
 output += "current";
 ;
 }

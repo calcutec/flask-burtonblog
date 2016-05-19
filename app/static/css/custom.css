@@ -9,7 +9,6 @@ body {
     color: #222;
     padding: 0;
     margin: 0;
-    max-width: 1280px;
 }
 nav {
     position: fixed;
@@ -49,11 +48,10 @@ main {
     margin-right: 1rem;
 }
 .well {
-
     box-shadow: 0 0 5px #888;
     padding: 1rem;
     border-radius: 5px;
-    margin: 1rem 0.5vw 1rem 0;
+    margin: .7rem 0.5vw 1rem 0;
 }
 .details-well {
     box-shadow: 0 0 5px #888;
@@ -373,23 +371,6 @@ ul.item-list > li {
     padding-right: .5vw;
 }
 
-/*.item-list > li:after {*/
-    /*content: attr(data-id);*/
-    /*color:#fff;*/
-    /*position:absolute;*/
-    /*width:100%;*/
-    /*height:20px;*/
-    /*bottom:0; left:0;*/
-    /*background:rgba(0,0,0,0.3);*/
-    /*opacity:0;*/
-    /*transition: height 0.5s;*/
-/*}*/
-
-/*.item-list > li:hover:after {*/
-    /*opacity:1;*/
-    /*height:30%;*/
-/*}*/
-
 span.text-content {
     display:none;
     position: absolute;
@@ -598,10 +579,6 @@ ul#auto-login li a{
     color: #bbb;
     border: 1px solid transparent;
 }
-/*#loginforms > label[for*='1']:before { content: '\f1cb'; }*/
-/*#loginforms > label[for*='2']:before { content: '\f17d'; }*/
-/*#loginforms > label[for*='3']:before { content: '\f16b'; }*/
-/*#loginforms > label[for*='4']:before { content: '\f1a9'; }*/
 
 #loginforms > label:hover {
     color: #888;
@@ -664,6 +641,50 @@ input, textarea, select {
         width: 30.5vw;
         height: 30.5vw;
     }
+    #loginforms > label[for*='1']:before { content: 'Login: '; }
+    #loginforms > label[for*='2']:before { content: 'Login: '; }
+    #loginforms > label[for*='3']:before { content: 'New User: '; }
+
+    i.fa-users:after {
+        content: ' MEMBERS';
+        font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 3rem;
+    }
+    i.fa-user:after {
+        content: ' MEMBER';
+        font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 3rem;
+    }
+    i.fa-picture-o:after{
+        content: ' PHOTOS';
+        font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 3rem;
+    }
+    i.fa-briefcase:after {
+        content: ' PORTFOLIO';
+        font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 3rem;
+    }
+    i.fa-home:after {
+        content: ' HOME';
+        font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 3rem;
+    }
+    i.fa-sign-in:after {
+        content: ' SIGN IN';
+        font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 3rem;
+    }
+    i.fa-sign-out:after {
+        content: ' SIGN OUT';
+        font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 3rem;
+    }
+    i.fa-upload:after {
+        content: ' UPLOAD';
+        font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 3rem;
+    }
 }
 /** 960 pixels or greater -- includes most tablets in landscape **/
 @media(min-width:60em){
@@ -672,14 +693,8 @@ input, textarea, select {
     span.text-content {
         width: 22.75vw;
         height: 22.75vw;
-        max-width: 315px;}
+    }
 }
-/** 1384 pixels or greater -- site container at full-width of 1280px from this point **/
-@media(min-width:86.5em) {
-    ul.item-list > li:not(:nth-child(4n)) { padding-right: 6px; }
-    .bodycontainer { margin-left: calc((100vw - 1280px)/2); }
-}
-
 
 /* |||| PAGES |||| */
 
@@ -687,7 +702,7 @@ input, textarea, select {
 
 .profile-content {
     padding: 1rem;
-    margin: 1vw .5vw 1vw 0;
+    margin: 1rem .5vw 1rem 0;
     line-height: 1.5;
     box-shadow: 0 0 5px #888;
     border-radius: 5px;

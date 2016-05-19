@@ -39,8 +39,8 @@
                 <div id="title"><i class="current fa fa-sign-in"></i></div>
             {% elif assets.entity == "home" %}
                 <div id="title"><i class="current fa fa-home"></i></div>
-            {% elif assets.category == "upload"  %}
-                <div id="title"><i class="current fa fa-upload"></i><span id="subtitle">{{ assets.category }}</span></div>
+            {% elif assets.entity == "upload"  %}
+                <div id="title"><i class="current fa fa-upload"></i></div>
             {% elif assets.entity == "photo"  %}
                 <div id="title"><i class="current fa-picture-o fa"></i><span id="subtitle">#{{ assets['photo_id'] }}</span></div>
             {% endif %}
@@ -60,7 +60,7 @@
             <li class="{% if assets.entity == "members" %}current{% endif %}"><a href="/members/latest"><i class="fa fa-users"></i></a></li>
         {% if current_user.is_authenticated()  %}
             <li class="{%  if assets.entity == "author" %}current{% endif %}"><a href="/members/{{ current_user.nickname }}/latest"><i class="fa fa-briefcase"></i></a></li>
-            <li class="{% if assets.category == "upload" %}current{% endif %}"><a href="/photos/upload"><i class="fa fa-upload"></i></a></li>
+            <li class="{% if assets.entity == "upload" %}current{% endif %}"><a href="/photos/upload"><i class="fa fa-upload"></i></a></li>
         {% endif %}
         </ul>
     </div>

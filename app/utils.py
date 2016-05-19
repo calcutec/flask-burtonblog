@@ -43,6 +43,8 @@ class BasePage(object):
         entity = None
         if self.assets['category'] == "login":
             entity = "login"
+        elif self.assets['category'] == "upload":
+                entity = "upload"
         elif request.endpoint == 'home':
             entity = 'home'
         elif request.endpoint == 'photos':
