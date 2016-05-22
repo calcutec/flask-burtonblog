@@ -34,7 +34,7 @@
                             {% endif %}
                         </select>
                     </label>
-            {% endif %}
+                {% endif %}
             {% if request.endpoint == "login" %}
                 <div id="title"><i class="current fa fa-sign-in"></i></div>
             {% elif assets.entity == "home" %}
@@ -56,7 +56,7 @@
         {% if not current_user.is_authenticated() %}
             <li class="{% if assets.entity == "home"  %}current{% endif %}"><a href="/home"><i class="fa fa-home"></i></a></li>
         {% endif %}
-            <li class="{% if assets.entity == "photos" and assets.category != "upload"  %}current{% endif %}"><a href="/photos/latest"><i class="fa fa-picture-o"></i></a></li>
+            {% if assets.entity != "photo" %}<li class="{% if assets.entity == "photos" %}current{% endif %}"><a href="/photos/latest"><i class="fa fa-picture-o"></i></a></li>{% endif %}
             <li class="{% if assets.entity == "members" %}current{% endif %}"><a href="/members/latest"><i class="fa fa-users"></i></a></li>
         {% if current_user.is_authenticated()  %}
             <li class="{%  if assets.entity == "author" %}current{% endif %}"><a href="/members/{{ current_user.nickname }}/latest"><i class="fa fa-briefcase"></i></a></li>

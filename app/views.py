@@ -6,7 +6,7 @@ from app import app, db, lm
 from app import socketio
 from config import DATABASE_QUERY_TIMEOUT
 from .decorators import auth_required
-from .forms import SignupForm, LoginForm, EditForm, PostForm
+from .forms import SignupForm, LoginForm, EditForm, PostForm, CommentForm
 from .models import User, Post
 from .utils import OAuthSignIn, PhotoPage, MembersPage, SignupPage, LoginPage
 from flask.views import MethodView
@@ -156,12 +156,19 @@ app.add_url_rule('/members/<nickname>/<category>/',  # Get photos of a given cat
 
 class PhotoAPI(MethodView):
     @login_required
-    def post(self):
-        page = PhotoPage(category="upload", form=PostForm())
-        if page.assets['body_form']:
-            return page.render()
+    def post(self, post_id=None, category=None):
+        if category:
+            page = PhotoPage(post_id=post_id, category=category, form=CommentForm())
+            if page.assets['body_form'] or (page.assets['category'] and page.assets['category'] == "comment"):
+                return redirect(url_for('photos', post_id=120))
+            else:
+                return redirect(url_for("photos", category="latest"))
         else:
-            return redirect(url_for("photos", category="latest"))
+            page = PhotoPage(category="update", form=PostForm())
+            if page.assets['body_form']:
+                return page.render()
+            else:
+                return redirect(url_for("photos", category="latest"))
 
     def get(self, post_id=None, category=None):
         if current_user.is_authenticated() or category != "upload":
@@ -199,6 +206,7 @@ class PhotoAPI(MethodView):
 
     @login_required
     def patch(self, post_id):
+        category = None
         if 'has_voted' in request.json:
             category = "vote"
         page = PhotoPage(post_id=post_id, category=category)
@@ -215,15 +223,15 @@ app.add_url_rule('/photos/<any("all", "latest", "popular", "starred", "upload", 
                  '"wildlife"):category>/',
                  view_func=photo_api_view, methods=["GET", "POST"])
 
-# Update or Delete a single post
+# Get, Update, or Delete a single post
 app.add_url_rule('/photos/<int:post_id>',
                  view_func=photo_api_view, methods=["GET", "PUT", "DELETE"])
 
 app.add_url_rule('/photos/<int:post_id>',
                  view_func=photo_api_view, methods=['PATCH'])
 
-# Vote on a single post
-app.add_url_rule('/photos/<int:post_id>/<any("vote"):category>',
+# Vote or comment on a single post
+app.add_url_rule('/photos/<int:post_id>/<any("vote", "comment"):category>',
                  view_func=photo_api_view, methods=["GET", "POST"])
 
 

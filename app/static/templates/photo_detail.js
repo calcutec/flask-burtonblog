@@ -60,14 +60,10 @@ output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLook
 output += " likeme\"><i class=\"fa fa-meh-o fa-lg icon-white\"></i></a>\n                        ";
 ;
 }
-output += "\n                            Like/Unlike <br>\n                            <a href=\"/photos/";
-output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
-output += "\">Add Comment</a>\n                    ";
+output += "\n                            Like/Unlike <br>\n                    ";
 ;
 }
-output += "\n                </div>\n            </span>\n        </span>\n    </li>\n</ul>\n<div id=\"body-text\">\n    <h4>What makes this great:</h4>\n    <p>";
-output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"body"), env.opts.autoescape);
-output += "</p>\n</div>";
+output += "\n                </div>\n            </span>\n        </span>\n    </li>\n</ul>\n";
 if(parentTemplate) {
 parentTemplate.rootRenderFunc(env, context, frame, runtime, cb);
 } else {

@@ -258,7 +258,7 @@ output += "\n                            ";
 }
 ;
 }
-output += "\n                        </select>\n                    </label>\n            ";
+output += "\n                        </select>\n                    </label>\n                ";
 ;
 }
 output += "\n            ";
@@ -313,12 +313,17 @@ output += "current";
 output += "\"><a href=\"/home\"><i class=\"fa fa-home\"></i></a></li>\n        ";
 ;
 }
-output += "\n            <li class=\"";
-if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity") == "photos" && runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"category") != "upload") {
+output += "\n            ";
+if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity") != "photo") {
+output += "<li class=\"";
+if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity") == "photos") {
 output += "current";
 ;
 }
-output += "\"><a href=\"/photos/latest\"><i class=\"fa fa-picture-o\"></i></a></li>\n            <li class=\"";
+output += "\"><a href=\"/photos/latest\"><i class=\"fa fa-picture-o\"></i></a></li>";
+;
+}
+output += "\n            <li class=\"";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity") == "members") {
 output += "current";
 ;

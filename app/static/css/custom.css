@@ -562,15 +562,15 @@ ul#auto-login li a{
     font-size: 1.2rem;
     font-weight: 600;
 }
-#loginforms > section {
+#tabmenu > section {
     display: none;
     padding: 20px 0 0;
     border-top: 1px solid #ddd;
 }
-#loginforms > input {
+#tabmenu > input {
     display: none;
 }
-#loginforms > label {
+#tabmenu > label {
     display: inline-block;
     margin: 0 0 -1px;
     padding: 15px;
@@ -580,11 +580,11 @@ ul#auto-login li a{
     border: 1px solid transparent;
 }
 
-#loginforms > label:hover {
+#tabmenu > label:hover {
     color: #888;
     cursor: pointer;
 }
-#loginforms > input:checked + label {
+#tabmenu > input:checked + label {
     color: #555;
     border: 1px solid #ddd;
     border-top: 2px solid orange;
@@ -632,7 +632,7 @@ input, textarea, select {
 
 /** 400 pixels or greater (larger than common mobiles in portrait) **/
 @media screen and (min-width: 25em) {
-    #loginforms > label { padding: 15px 25px; }
+    #tabmenu > label { padding: 15px 25px; }
 }
 /** 640 pixels or greater (larger than common mobiles in landscape) **/
 @media(min-width:40em) {
@@ -641,9 +641,9 @@ input, textarea, select {
         width: 30.5vw;
         height: 30.5vw;
     }
-    #loginforms > label[for*='1']:before { content: 'Login: '; }
-    #loginforms > label[for*='2']:before { content: 'Login: '; }
-    #loginforms > label[for*='3']:before { content: 'New User: '; }
+    .loginmenu > label[for*='1']:before { content: 'Login: '; }
+    .loginmenu > label[for*='2']:before { content: 'Login: '; }
+    .loginmenu > label[for*='3']:before { content: 'New User: '; }
 
     i.fa-users:after {
         content: ' MEMBERS';

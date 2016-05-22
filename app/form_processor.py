@@ -1,8 +1,9 @@
+import pytz
 from flask import request, render_template, g
 from flask.ext.login import current_user
-from forms import SignupForm, EditForm, PostForm, LoginForm, UploadForm
+from forms import SignupForm, EditForm, PostForm, LoginForm, UploadForm, CommentForm
 from app import db
-from models import Post
+from models import Post, Comment
 from datetime import datetime
 from uuid import uuid4
 
@@ -33,13 +34,15 @@ class FormProcessor(object):
 
     def render_form(self):
         if self.form:
-            if self.form_template == '/assets/forms/post_form.html' \
-                    or self.form_template == '/assets/forms/update_photo.html':
+            if self.form_template in ['/assets/forms/post_form.html', '/assets/forms/update_photo.html']:
                 post = dict()
                 if 'new_photo' in self.page.assets:
                     post['photo'] = self.page.assets['new_photo']
                 context = {'form': self.form, 'post': post}
                 rendered_form = render_template(self.form_template, **context)
+            elif self.form_template == 'comment_form.html':
+                post = self.page.posts[0]
+                rendered_form = render_template(self.form_template, form=self.form, post=post)
             else:
                 rendered_form = render_template(self.form_template, form=self.form)
         else:
@@ -140,6 +143,49 @@ class SignupFormProcessor(FormProcessor):
                 return json.dumps(self.form.errors)
             else:
                 self.template = "signup_form.html"
+                self.form_template = self.get_form_template()
+                self.rendered_form = self.render_form()
+
+
+class CommentFormProcessor(FormProcessor):
+    def __init__(self, *args, **kwargs):
+        super(CommentFormProcessor, self).__init__(*args, **kwargs)
+        self.select_form()
+
+    def select_form(self):
+        if self.page.form:
+            self.form = self.page.form
+            self.form = self.process_form()
+        else:
+            self.get_form()
+            self.form_template = "comment_form.html"
+            self.rendered_form = self.render_form()
+
+    def get_form(self):
+        self.form = CommentForm()
+
+    def process_form(self):
+        if self.form.validate_on_submit():
+            # eastern = pytz.timezone('America/New_York')
+            # current_time = datetime.now(eastern).isoformat()
+            current_time = datetime.utcnow()
+            comment = Comment(body=self.form.comment.data, post_id=self.page.post_id, user_id=current_user.id,
+                              created_at=current_time)
+            db.session.add(comment)
+            db.session.commit()
+            if request.is_xhr:
+                response = comment.json_view()
+                response['savedsuccess'] = True
+                self.rendered_form = response
+            else:
+                self.form = None
+                self.rendered_form = None
+        else:
+            if request.is_xhr:
+                self.form.errors['iserror'] = True
+                return json.dumps(self.form.errors)
+            else:
+                self.template = "post_form.html"
                 self.form_template = self.get_form_template()
                 self.rendered_form = self.render_form()
 
@@ -250,7 +296,6 @@ class UploadFormProcessor(FormProcessor):
                 response = post.json_view()
                 response['savedsuccess'] = True
                 self.rendered_form = response
-                # return json.dumps(response)
             else:
                 self.form = None
                 self.rendered_form = None

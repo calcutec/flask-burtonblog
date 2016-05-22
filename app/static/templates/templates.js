@@ -522,7 +522,7 @@ output += "\n                            ";
 }
 ;
 }
-output += "\n                        </select>\n                    </label>\n            ";
+output += "\n                        </select>\n                    </label>\n                ";
 ;
 }
 output += "\n            ";
@@ -577,12 +577,17 @@ output += "current";
 output += "\"><a href=\"/home\"><i class=\"fa fa-home\"></i></a></li>\n        ";
 ;
 }
-output += "\n            <li class=\"";
-if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity") == "photos" && runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"category") != "upload") {
+output += "\n            ";
+if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity") != "photo") {
+output += "<li class=\"";
+if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity") == "photos") {
 output += "current";
 ;
 }
-output += "\"><a href=\"/photos/latest\"><i class=\"fa fa-picture-o\"></i></a></li>\n            <li class=\"";
+output += "\"><a href=\"/photos/latest\"><i class=\"fa fa-picture-o\"></i></a></li>";
+;
+}
+output += "\n            <li class=\"";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity") == "members") {
 output += "current";
 ;
@@ -843,14 +848,10 @@ output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLook
 output += " likeme\"><i class=\"fa fa-meh-o fa-lg icon-white\"></i></a>\n                        ";
 ;
 }
-output += "\n                            Like/Unlike <br>\n                            <a href=\"/photos/";
-output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
-output += "\">Add Comment</a>\n                    ";
+output += "\n                            Like/Unlike <br>\n                    ";
 ;
 }
-output += "\n                </div>\n            </span>\n        </span>\n    </li>\n</ul>\n<div id=\"body-text\">\n    <h4>What makes this great:</h4>\n    <p>";
-output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"body"), env.opts.autoescape);
-output += "</p>\n</div>";
+output += "\n                </div>\n            </span>\n        </span>\n    </li>\n</ul>\n";
 if(parentTemplate) {
 parentTemplate.rootRenderFunc(env, context, frame, runtime, cb);
 } else {
@@ -1043,6 +1044,59 @@ var output = "";
 try {
 var parentTemplate = null;
 output += "<input id=\"file-input\" type=\"file\" name=\"file\">\n<input class=\"button button-primary hide\" id=\"photo-submit\" type=\"submit\" value=\"Upload\">\n<span id=\"progress-bar\"></span>";
+if(parentTemplate) {
+parentTemplate.rootRenderFunc(env, context, frame, runtime, cb);
+} else {
+cb(null, output);
+}
+;
+} catch (e) {
+  cb(runtime.handleError(e, lineno, colno));
+}
+}
+return {
+root: root
+};
+
+})();
+})();
+
+
+(function() {(window.nunjucksPrecompiled = window.nunjucksPrecompiled || {})["comment_form.html"] = (function() {
+function root(env, context, frame, runtime, cb) {
+var lineno = null;
+var colno = null;
+var output = "";
+try {
+var parentTemplate = null;
+output += "<div id=\"comments\">\n    <form id=\"comment-form\" class=\"form-horizontal\" action=\"/photos/";
+output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
+output += "/comment\" method=\"post\"\n          enctype=\"multipart/form-data\" name=\"comment\">\n        ";
+output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "form")),"csrf_token"), env.opts.autoescape);
+output += "\n        <div class=\"form-group\">\n            <label for=\"comment\">Add your comment!:</label>\n            ";
+output += runtime.suppressValue((lineno = 6, colno = 25, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "form")),"comment"), "form[\"comment\"]", context, [runtime.makeKeywordArgs({"class": "form-control","placeholder": "Comments.."})])), env.opts.autoescape);
+output += "\n            ";
+frame = frame.push();
+var t_3 = runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "form")),"comment")),"errors");
+if(t_3) {var t_2 = t_3.length;
+for(var t_1=0; t_1 < t_3.length; t_1++) {
+var t_4 = t_3[t_1];
+frame.set("error", t_4);
+frame.set("loop.index", t_1 + 1);
+frame.set("loop.index0", t_1);
+frame.set("loop.revindex", t_2 - t_1);
+frame.set("loop.revindex0", t_2 - t_1 - 1);
+frame.set("loop.first", t_1 === 0);
+frame.set("loop.last", t_1 === t_2 - 1);
+frame.set("loop.length", t_2);
+output += "\n                <span class=\"help-inline\" style=\"color:red\">[";
+output += runtime.suppressValue(t_4, env.opts.autoescape);
+output += "]</span><br>\n            ";
+;
+}
+}
+frame = frame.pop();
+output += "\n            <span id=\"error_comment\" class=\"help-inline\" style=\"color:red\"></span>\n            <button class=\"btn btn-info\" id=\"login-form-submit\" type=\"submit\">Send</button>\n        </div>\n    </form>\n</div>";
 if(parentTemplate) {
 parentTemplate.rootRenderFunc(env, context, frame, runtime, cb);
 } else {

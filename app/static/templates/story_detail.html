@@ -1,0 +1,24 @@
+<div id="tabmenu" class="photo-detail">
+    <input id="tab1" type="radio" name="tabs" checked>
+    <label for="tab1">Story</label>
+
+    <input id="tab2" type="radio" name="tabs">
+    <label for="tab2">Comments</label>
+
+    <input id="tab3" type="radio" name="tabs">
+    <label for="tab3">Data</label>
+
+    <section id="content1">
+        <h3>What makes this great...</h3>
+        <section>{{ post.body }}</section>
+    </section>
+
+    <section id="content2">
+        {{ form|safe }}
+        {% include "comments.html" %}
+    </section>
+
+    <section id="content3">
+        <h3>Exif Data</h3>
+    </section>
+</div>

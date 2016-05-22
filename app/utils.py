@@ -9,7 +9,7 @@ from flask.ext.login import login_user
 from models import User, Post
 from .emails import follower_notification
 from .form_processor import UploadFormProcessor, LoginFormProcessor, PhotosFormProcessor,\
-    SignupFormProcessor, UpdateFormProcessor
+    SignupFormProcessor, UpdateFormProcessor, CommentFormProcessor
 
 
 class BasePage(object):
@@ -32,8 +32,10 @@ class BasePage(object):
 
         self.get_entity()
 
-        if self.assets['category'] in ["login", "upload", "update", "signup"]:
+        if self.assets['category'] in ["login", "upload", "update", "signup", "comment"]:
             self.get_rendered_form()
+            if self.assets['category'] == "comment":
+                self.get_posts()
         elif self.assets['category'] in ["follow", "unfollow", "votes"]:
             pass
         else:
@@ -45,6 +47,8 @@ class BasePage(object):
             entity = "login"
         elif self.assets['category'] == "upload":
                 entity = "upload"
+        elif self.assets['category'] == "comment":
+            entity = "photo"
         elif request.endpoint == 'home':
             entity = 'home'
         elif request.endpoint == 'photos':
@@ -67,6 +71,7 @@ class BasePage(object):
             "photo":  PhotosFormProcessor,
             "update": UpdateFormProcessor,
             "login": LoginFormProcessor,
+            "comment": CommentFormProcessor
         }
         self.assets['body_form'] = processor_dict[self.assets['category']](page=self).rendered_form
 
@@ -94,7 +99,7 @@ class BasePage(object):
                                                 .filter(Post.category == value[0]).count())
             self.assets['category_counts'] = category_counts
 
-        if self.assets['category'] in ["all", "vote", "follow", "unfollow"] or self.assets['category'] is None:
+        if self.assets['category'] in ["all", "vote", "follow", "unfollow", "comment"] or self.assets['category'] is None:
             self.posts = posts
         elif self.assets['category'] == "latest":
             self.posts = posts[0:10]
@@ -163,8 +168,12 @@ class PhotoPage(BasePage):
                 main_photo_context = {'post': self.posts[0]}
                 self.assets['photo_id'] = self.posts[0].id
                 self.assets['main_entry'] = self.get_asset(template="photo_detail.html", context=main_photo_context)
-                comments_context = {'post': self.posts[0]}
-                self.assets['archives'] = self.get_asset(template="comments.html", context=comments_context)
+                self.assets['category'] = 'comment'
+                # self.get_rendered_form()
+                form = self.assets['body_form']
+                story_context = {'post': self.posts[0], 'form': form}
+                self.assets['body_form'] = None
+                self.assets['archives'] = render_template("story_detail.html", **story_context)
 
         elif self.assets['entity'] == "photos":
             if request.is_xhr:
