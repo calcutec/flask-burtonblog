@@ -164,6 +164,7 @@ class Post(db.Model):
     category = db.Column(db.String(32))
     photo = db.Column(db.String(240))
     comments = db.relationship('Comment', backref='original_post', lazy='dynamic')
+    stats = db.relationship('ExifStats', uselist=False, backref='original_post', lazy='joined')
     slug = db.Column(db.String(255))
     votes = db.Column(db.Integer, default=1)
 
@@ -236,13 +237,44 @@ class Post(db.Model):
             has_voted = self.has_voted(g.user.id)
         return {'id': self.id, 'author': self.user_id, 'header': self.header, 'body': self.body, 'photo': self.photo,
                 'category': self.category, 'nickname': self.author.nickname, 'timestamp': self.timestamp,
-                'has_voted': has_voted, 'votes': self.votes, 'comments': [i.json_view() for i in self.comments.all()]}
+                'has_voted': has_voted, 'votes': self.votes, 'comments': [i.json_view() for i in self.comments.all()],
+                'exifData': self.stats.json_view()}
 
     def get_absolute_url(self):
         return url_for('post', kwargs={"slug": self.slug})
 
     def __repr__(self):  # pragma: no cover
         return '<Post %r>' % self.body
+
+
+class ExifStats(db.Model):
+    __tablename__ = 'exifstats'
+    id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+    Make = db.Column(db.String(80))
+    Model = db.Column(db.String(80))
+    DateTime = db.Column(db.DateTime)
+    DateTimeOriginal = db.Column(db.DateTime)
+    ShutterSpeedValue = db.Column(db.String(80))
+    FNumber = db.Column(db.String(16))
+    ExposureProgram = db.Column(db.String(80))
+    PhotographicSensitivity = db.Column(db.String(80))
+    FocalLength = db.Column(db.String(80))
+    FocalLengthIn35mmFilm = db.Column(db.String(80))
+    LensModel = db.Column(db.String(80))
+    Sharpness = db.Column(db.String(80))
+    PixelXDimension = db.Column(db.String(80))
+    PixelYDimension = db.Column(db.String(80))
+    Orientation = db.Column(db.String(80))
+
+    def json_view(self):
+        return {'id': self.id, 'post_id': self.post_id, 'Make': self.Make, 'Model': self.Model,
+                'DateTime': self.DateTime, 'DateTimeOriginal': self.DateTimeOriginal,
+                'ShutterSpeedValue': self.ShutterSpeedValue,'FNumber': self.FNumber,
+                'ExposureProgram': self.ExposureProgram, 'PhotographicSensitivity': self.PhotographicSensitivity,
+                'FocalLength': self.FocalLength, 'FocalLengthIn35mmFilm': self.FocalLengthIn35mmFilm,
+                'LensModel': self.LensModel, 'Sharpness': self.Sharpness, 'PixelXDimension': self.PixelXDimension,
+                'PixelYDimension': self.PixelYDimension, 'Orientation': self.Orientation}
 
 
 class Comment(db.Model):
@@ -257,6 +289,6 @@ class Comment(db.Model):
         return '<Comment %r>' % self.body
 
     def json_view(self):
-        user_name = User.query.get(self.user_id).nickname
+        author = {'nickname': User.query.get(self.user_id).nickname}
         return {'id': self.id, 'body': self.body, 'post_id': self.post_id, 'user_id': self.user_id,
-                'user_name': user_name, 'created_at': self.created_at}
+                'author': author, 'created_at': self.created_at}

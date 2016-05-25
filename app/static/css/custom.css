@@ -127,6 +127,13 @@ table {
     table-layout: fixed;
     width: 100%
 }
+.odd {
+    background: #FFF
+}
+.even {
+    background: #CCC
+}
+
 .icon-white {
     color: white
 }

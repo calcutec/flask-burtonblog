@@ -6,7 +6,6 @@ require.config({
         nunjucks: 'libs/nunjucks/nunjucks-slim',
         underscore: 'libs/underscore/underscore-min',
         blueimp: 'libs/blueimp/blueimp-gallery',
-        loadimage: 'libs/loadimage/load-image',
         socketio: 'libs/socket/socket.io.min',
         ds: 'libs/datastore/backbone-ds.min',
         app: 'app'

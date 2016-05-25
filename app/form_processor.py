@@ -3,7 +3,7 @@ from flask import request, render_template, g
 from flask.ext.login import current_user
 from forms import SignupForm, EditForm, PostForm, LoginForm, UploadForm, CommentForm
 from app import db
-from models import Post, Comment
+from models import Post, Comment, ExifStats
 from datetime import datetime
 from uuid import uuid4
 
@@ -91,7 +91,7 @@ class UpdateFormProcessor(FormProcessor):
         self.form.about_me.data = g.user.about_me
 
     def process_form(self):
-        if self.form.validate(current_user=current_user):
+        if self.form.validate():
             g.user.nickname = self.form.nickname.data
             g.user.about_me = self.form.about_me.data
             if self.form.photo.data != '':
@@ -290,7 +290,21 @@ class UploadFormProcessor(FormProcessor):
             photo_name = self.form.photo.data
             post = Post(body=self.form.body.data, timestamp=datetime.utcnow(), category=self.form.category.data,
                         author=g.user, photo=photo_name, writing_type="entry")
+
             db.session.add(post)
+            db.session.commit()
+
+            exif_stats = ExifStats()
+            exif_stats.post_id = post.id
+            exif_data = json.loads(json.dumps(request.json['exifTags']))
+            for key, value in exif_data.iteritems():
+                if key == "DateTime" or key == "DateTimeOriginal":
+                    datetimeobject = datetime.strptime(value, '%Y:%m:%d %H:%M:%S')
+                    setattr(exif_stats, key, datetimeobject)
+                else:
+                    setattr(exif_stats, key, value)
+
+            db.session.add(exif_stats)
             db.session.commit()
             if request.is_xhr:
                 response = post.json_view()

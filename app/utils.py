@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from app import app, db
 from flask.ext.login import current_user
 from config import ALLOWED_EXTENSIONS
@@ -6,7 +7,8 @@ import json
 import urllib2
 from flask import request, redirect, url_for, render_template, g, jsonify, abort, flash
 from flask.ext.login import login_user
-from models import User, Post
+from models import User, Post, ExifStats
+from forms import CommentForm
 from .emails import follower_notification
 from .form_processor import UploadFormProcessor, LoginFormProcessor, PhotosFormProcessor,\
     SignupFormProcessor, UpdateFormProcessor, CommentFormProcessor
@@ -155,7 +157,6 @@ class PhotoPage(BasePage):
             if request.is_xhr:
                 pass
             else:
-                # home_context = {'post': self.posts[0]}
                 home_context = {'hello': "hello world"}
                 self.assets['main_entry'] = self.get_asset(template="home_page.html", context=home_context)
         elif self.assets['entity'] == "photo":
@@ -169,15 +170,15 @@ class PhotoPage(BasePage):
                 self.assets['photo_id'] = self.posts[0].id
                 self.assets['main_entry'] = self.get_asset(template="photo_detail.html", context=main_photo_context)
                 self.assets['category'] = 'comment'
-                # self.get_rendered_form()
-                form = self.assets['body_form']
-                story_context = {'post': self.posts[0], 'form': form}
-                self.assets['body_form'] = None
+                form = CommentForm()
+                exifdata = ExifStats.query.filter_by(post_id=self.posts[0].id).first()
+                exif_dict = dict((col, getattr(exifdata, col)) for col in exifdata.__table__.columns.keys())
+                exif_dict = OrderedDict(sorted(exif_dict.items()))
+                story_context = {'post': self.posts[0], 'form': form, 'exifFields': exif_dict}
                 self.assets['archives'] = render_template("story_detail.html", **story_context)
 
         elif self.assets['entity'] == "photos":
             if request.is_xhr:
-                # self.assets['collection'] = self.get_asset(context=[i.json_view() for i in self.posts])
                 self.assets['collection'] = [i.json_view() for i in self.posts]
             else:
                 if type(self.posts) == list and len(self.posts) > 0:

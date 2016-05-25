@@ -55,18 +55,18 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
             },
 
             generateUploadFormThumb: function(nowCurrentFile){
-                var self = this;
                 var options = {
                   canvas: true,
                   pixelRatio: window.devicePixelRatio,
                   downsamplingRatio: 0.5
                 };
-                loadImage(
+                var self = this;
+                window.loadImage(
                    nowCurrentFile,
                    function (img) {
                        if(img.type === "error") {
                            return false;
-                       } else {;
+                       } else {
                            window.loadImage.parseMetaData(nowCurrentFile, function (data) {
                                if (data.exif) {
                                    options.orientation = data.exif[0x0112];
@@ -81,7 +81,7 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
             },
 
             generateServerFile: function(nowCurrentFile){
-                loadImage(
+                window.loadImage(
                     nowCurrentFile,
                     function (img) {
                         if(img.type === "error") {
@@ -109,12 +109,14 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
                 var row = $('<tr></tr>');
                 var cell = $('<td></td>');
                 var prop;
+                var exifTags = {}
                 for (prop in tags) {
                   if (tags.hasOwnProperty(prop)) {
                     if(prop in {'Make':'', 'Model':'', 'DateTime':'', 'ShutterSpeedValue':'', 'FNumber':'',
                             'ExposureProgram':'', 'PhotographicSensitivity':'', 'FocalLength':'',
                             'FocalLengthIn35mmFilm':'', 'LensModel':'', 'Sharpness':'', 'PixelXDimension':'',
-                            'PixelYDimension':'', 'Orientation':''}) {
+                            'PixelYDimension':'', 'Orientation':'', 'DateTimeOriginal':''}) {
+                            exifTags[prop] = tags[prop]
                             table.append(
                                 row.clone()
                                     .append(cell.clone().text(prop))
@@ -123,6 +125,7 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
                     }
                   }
                 }
+                DS.set('exifTags', exifTags)
                 $('#exif').show()
             },
 

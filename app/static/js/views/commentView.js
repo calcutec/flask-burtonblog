@@ -7,6 +7,9 @@ define(['jquery', 'backbone'],
                 comment['author'] = { "nickname": comment.user_name };
                 $(this.el).html(window.env.render("comment.html", {'comment': comment, 'momentjs': moment}));
                 return this;
+            },
+            unrender: function() {
+                console.log('Consider me unrendered');
             }
         });
     }

@@ -14,11 +14,22 @@
     </section>
 
     <section id="content2">
-        {{ form|safe }}
+        {% include "comment_form.html" %}
         {% include "comments.html" %}
     </section>
 
     <section id="content3">
-        <h3>Exif Data</h3>
+        <table>
+            <tbody>
+                {% for key, value in exifFields.iteritems() %}
+                    {% if key not in ['post_id', 'id'] %}
+                    <tr class="{{ loop.cycle('odd', 'even') }}">
+                        <td>{{ key }}</td>
+                        <td>{{ value }}</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
     </section>
 </div>

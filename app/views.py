@@ -160,11 +160,11 @@ class PhotoAPI(MethodView):
         if category:
             page = PhotoPage(post_id=post_id, category=category, form=CommentForm())
             if page.assets['body_form'] or (page.assets['category'] and page.assets['category'] == "comment"):
-                return redirect(url_for('photos', post_id=120))
+                return redirect('/photos/' + str(post_id))
             else:
                 return redirect(url_for("photos", category="latest"))
         else:
-            page = PhotoPage(category="update", form=PostForm())
+            page = PhotoPage(category="upload", form=PostForm())
             if page.assets['body_form']:
                 return page.render()
             else:

@@ -1,6 +1,5 @@
-define(['jquery', 'backbone', 'underscore', 'views/appView', 'views/commentsView', 'collections/commentCollection', 
-    'models/commentModel'],
-    function($, Backbone, _, AppView, CommentsView, CommentCollection, CommentModel){
+define(['jquery', 'backbone', 'underscore', 'views/appView', 'views/tabsView'],
+    function($, Backbone, _, AppView, TabsView){
         return Backbone.View.extend({
             events: {
                 'click #deletephoto':   'deletephoto',
@@ -48,32 +47,22 @@ define(['jquery', 'backbone', 'underscore', 'views/appView', 'views/commentsView
                     }
                 });
             },
-
-            renderComments: function() {
-                var itemDict = {};
-                itemDict.render = true;
-                itemDict.entity = "comments";
-                var comments = _.clone(this.model.get("comments"));
-                var commentCollection = new CommentCollection;
-                comments.forEach(function(comment){
-                    var commentModel = new CommentModel(comment);
-                    commentCollection.add(commentModel);
-                });
-                var commentsView = new CommentsView({id: 'links', className: 'item-list', collection: commentCollection});
-                AppView(commentsView, itemDict);
+            
+            renderTabView: function() {
+                var tabsView = new TabsView({id: 'links', className: 'item-list', model: this.model, collection:_.clone(this.model.get("comments"))});
+                AppView(tabsView);
+                return this
             },
 
             render: function() {
                 var post = this.model.toJSON();
                 post['author'] = { "nickname": post.nickname };
-                var votestatus = post.has_voted
+                var votestatus = post.has_voted;
                 post['has_voted'] = function(){
                     return votestatus
                 };
                 $(this.el).html(window.env.render("photo_detail.html", {'post': post, 'momentjs': moment }));
-                if (this.model.get('comments').length > 0){
-                    this.renderComments();
-                }
+                this.renderTabView();
                 return this;
             }
         });
