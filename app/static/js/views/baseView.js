@@ -100,20 +100,20 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
                 var pathArray = window.location.pathname.split( '/' );
                 if (pathArray[1] == 'photos'){
                     DS.set('entity', 'photos');
-                    DS.set('route', '/photos/' + DS.get('category') + '/');
+                    DS.set('route', '/photos/' + DS.get('category'));
                     Backbone.history.navigate(DS.get('route'), {trigger: false});
                     this.filter('photo');
                 } else if (pathArray[1] == 'members'){
                     if (pathArray[2].match('all|latest') || pathArray[2] == ''){
                         DS.set('entity', 'members');
-                        DS.set('route', '/members/' + DS.get('category') + '/');
+                        DS.set('route', '/members/' + DS.get('category'));
                         Backbone.history.navigate(DS.get('route'), {trigger: false});
                         this.filter('member');
                     } else {
                         DS.set('entity', 'member');
                         DS.set('nickname', pathArray[2]);
                         DS.set('target_user', DS.getAll('member').where({nickname: DS.get('nickname')})[0]);
-                        DS.set('route', '/members/' + DS.get('nickname') + '/' + DS.get('category') + '/');
+                        DS.set('route', '/members/' + DS.get('nickname') + '/' + DS.get('category'));
                         Backbone.history.navigate(DS.get('route'), {trigger: false});
                         this.filter('photo');
                     }
@@ -144,12 +144,12 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
                     DS.set('userid', window.env.globals.current_user.id);
                     if (e.currentTarget.classList[1] == 'fa-users'){
                         DS.set('entity', 'members');
-                        DS.set('route', '/members/' + DS.get('category') + '/');
+                        DS.set('route', '/members/' + DS.get('category'));
                         Backbone.history.navigate(DS.get('route'), {trigger: false});
                         this.filter('member');
                     } else if (e.currentTarget.classList[1] == 'fa-picture-o'){
                         DS.set('entity', 'photos');
-                        DS.set('route', '/photos/' + DS.get('category') + '/');
+                        DS.set('route', '/photos/' + DS.get('category'));
                         Backbone.history.navigate(DS.get('route'), {trigger: false});
                         this.filter('photo');
                     } else if (e.currentTarget.classList[1] == 'fa-briefcase'){
@@ -157,13 +157,13 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
                         DS.set('nickname', window.env.globals.current_user.nickname);
                         DS.set('usernickname', window.env.globals.current_user.nickname);
                         DS.set('target_user', DS.getAll('member').where({nickname: DS.get('usernickname')})[0]);
-                        DS.set('route', '/members/' + DS.get('usernickname') + '/');
+                        DS.set('route', '/members/' + DS.get('usernickname'));
                         Backbone.history.navigate(DS.get('route'), {trigger: false});
                         this.filter('photo');
                     } else if (e.currentTarget.classList[1] == 'fa-home'){
                         DS.set('collection', DS.getAll('photo'));
                         DS.set('entity', 'home');
-                        DS.set('route', '/home/');
+                        DS.set('route', '/home');
                         Backbone.history.navigate(DS.get('route'), {trigger: false});
                         AppView(new HeaderView({id: 'header'}));
                         AppView(new NavView({id: 'navbar'}));
@@ -172,7 +172,7 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
                         DS.set('collection', DS.getAll('photo'));
                         DS.set('counts', this.getCounts(DS.get('collection')));
                         DS.set('entity', 'upload');
-                        DS.set('route', '/photos/upload/');
+                        DS.set('route', '/photos/upload');
                         Backbone.history.navigate(DS.get('route'), {trigger: false});
                         AppView(new HeaderView({id: 'header'}));
                         AppView(new NavView({id: 'navbar'}));
@@ -186,7 +186,7 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
                 DS.set('entity', 'member');
                 DS.set('nickname', e.target.href.split('/')[4]);
                 DS.set('target_user', DS.getAll('member').where({nickname: DS.get('nickname')})[0]);
-                DS.set('route', '/members/' + DS.get('nickname') + '/');
+                DS.set('route', '/members/' + DS.get('nickname'));
                 Backbone.history.navigate(DS.get('route'), {trigger: false});
                 DS.set('collection', DS.getAll('photo').where({nickname: DS.get('nickname')}));
                 DS.set('counts', this.getCounts(DS.get('collection')));
@@ -201,7 +201,7 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
                 DS.set('counts', this.getCounts(DS.get('collection')));
                 DS.set('entity', 'photo');
                 DS.set('postId', e.target.closest('a').dataset.id);
-                DS.set('route', '/photos/' + DS.get('postId') + '/');
+                DS.set('route', '/photos/' + DS.get('postId'));
                 DS.set('usernickname', window.env.globals.current_user.usernickname);
                 Backbone.history.navigate(DS.get('route'), {trigger: false});
                 DS.set('render', true);
