@@ -1,6 +1,6 @@
 from app import app
-from flask import request
 from flask.ext.wtf import Form
+from flask.ext.login import current_user
 from wtforms import StringField, BooleanField, TextAreaField, SubmitField, PasswordField, SelectField
 from wtforms.validators import DataRequired, Email, Length
 from .models import User
@@ -64,7 +64,7 @@ class EditForm(Form):
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)
 
-    def validate(self, current_user=None):
+    def validate(self):
         if not Form.validate(self):
             return False
         if self.nickname.data != User.make_valid_nickname(self.nickname.data):

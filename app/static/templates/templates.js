@@ -754,7 +754,7 @@ output += "\n            ";
 if((lineno = 25, colno = 45, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"is_authenticated"), "current_user[\"is_authenticated\"]", context, []))) {
 output += "\n                ";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"nickname") == runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"nickname")) {
-output += "\n                    <a class=\"button button-primary\" href=\"/members/update/\" >Update Info</a>\n                    <a class=\"button button-primary\" href=\"/members/upload/\" >Change Image</a>\n                ";
+output += "\n                    <a class=\"button button-primary\" id=\"update-info\" href=\"/members/update/\" >Update Info</a>\n                    <a class=\"button button-primary\" id=\"change-image\" href=\"/members/upload/\" >Change Image</a>\n                ";
 ;
 }
 output += "\n            ";

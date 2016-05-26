@@ -18,6 +18,7 @@ define(['jquery', 'backbone', 'ds', 'nunjucks', 'models/photoModel', 'views/appV
                     newPostModel.set({'photo': photo});
                     newPostModel.set({'exifTags': DS.get('exifTags')});
                 }
+                var self = this;
                 newPostModel.save(null, {
                     type: 'POST',
                     success: function (model) {

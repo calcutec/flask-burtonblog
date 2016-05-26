@@ -15,7 +15,7 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
                     collection: MemberCollection
                 });
 
-                self = this;
+                var self = this;
                 DS.findAll('member').done(function(memberCollection) {
                     var current_user = {};
                     window.env.addGlobal("current_user", current_user);
@@ -85,7 +85,7 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
                 'click i.fa-upload':        'iconLink'
             },
 
-            resetDataStore: function(e) {
+            resetDataStore: function() {
                 DS.set({'route': null, 'collection': null, 'category': null, 'entity': null, 'nickname':
                     null, 'authenticated': window.env.globals.current_user.is_authenticated(), 'count': null,
                     'postId': null, 'template': null, 'render': null });
@@ -162,6 +162,7 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
                         this.filter('photo');
                     } else if (e.currentTarget.classList[1] == 'fa-home'){
                         DS.set('collection', DS.getAll('photo'));
+                        DS.set('counts', this.getCounts(DS.get('collection')));
                         DS.set('entity', 'home');
                         DS.set('route', '/home');
                         Backbone.history.navigate(DS.get('route'), {trigger: false});

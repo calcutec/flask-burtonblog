@@ -233,12 +233,15 @@ class Post(db.Model):
 
     def json_view(self):
         has_voted = None
+        exifdata = None
         if g.user.is_authenticated():
             has_voted = self.has_voted(g.user.id)
+        if self.stats:
+            exifdata = self.stats.json_view()
         return {'id': self.id, 'author': self.user_id, 'header': self.header, 'body': self.body, 'photo': self.photo,
                 'category': self.category, 'nickname': self.author.nickname, 'timestamp': self.timestamp,
                 'has_voted': has_voted, 'votes': self.votes, 'comments': [i.json_view() for i in self.comments.all()],
-                'exifData': self.stats.json_view()}
+                'exifData': exifdata}
 
     def get_absolute_url(self):
         return url_for('post', kwargs={"slug": self.slug})

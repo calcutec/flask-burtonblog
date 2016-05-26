@@ -25,8 +25,8 @@
             {% endif %}
             {% if current_user.is_authenticated() %}
                 {% if post.nickname == current_user.nickname %}
-                    <a class="button button-primary" href="/members/update/" >Update Info</a>
-                    <a class="button button-primary" href="/members/upload/" >Change Image</a>
+                    <a class="button button-primary" id="update-info" href="/members/update/" >Update Info</a>
+                    <a class="button button-primary" id="change-image" href="/members/upload/" >Change Image</a>
                 {% endif %}
             {% endif %}
             {% if post.about_me %}
