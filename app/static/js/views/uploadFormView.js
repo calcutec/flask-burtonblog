@@ -71,9 +71,11 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
                                if (data.exif) {
                                    options.orientation = data.exif[0x0112];
                                    self.displayExifData(data.exif);
+                                   self.createContent(img)
+                               } else {
+                                   alert('Please choose an image with exif data intact')
                                }
                            });
-                           self.createContent(img)
                        }
                    },
                    {maxWidth: 648}
@@ -109,14 +111,14 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
                 var row = $('<tr></tr>');
                 var cell = $('<td></td>');
                 var prop;
-                var exifTags = {}
+                var exifTags = {};
                 for (prop in tags) {
                   if (tags.hasOwnProperty(prop)) {
                     if(prop in {'Make':'', 'Model':'', 'DateTime':'', 'ShutterSpeedValue':'', 'FNumber':'',
                             'ExposureProgram':'', 'PhotographicSensitivity':'', 'FocalLength':'',
                             'FocalLengthIn35mmFilm':'', 'LensModel':'', 'Sharpness':'', 'PixelXDimension':'',
                             'PixelYDimension':'', 'Orientation':'', 'DateTimeOriginal':''}) {
-                            exifTags[prop] = tags[prop]
+                            exifTags[prop] = tags[prop];
                             table.append(
                                 row.clone()
                                     .append(cell.clone().text(prop))
@@ -125,7 +127,7 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
                     }
                   }
                 }
-                DS.set('exifTags', exifTags)
+                DS.set('exifTags', exifTags);
                 $('#exif').show()
             },
 
