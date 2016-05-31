@@ -1,3 +1,4 @@
+import datetime
 from collections import OrderedDict
 from app import app, db
 from flask.ext.login import current_user
@@ -172,8 +173,24 @@ class PhotoPage(BasePage):
                 self.assets['category'] = 'comment'
                 form = CommentForm()
                 exifdata = ExifStats.query.filter_by(post_id=self.posts[0].id).first()
-                exif_dict = dict((col, getattr(exifdata, col)) for col in exifdata.__table__.columns.keys())
-                exif_dict = OrderedDict(sorted(exif_dict.items()))
+                if exifdata:
+                    exif_dict = dict((col, getattr(exifdata, col)) for col in exifdata.__table__.columns.keys())
+                    exif_dict = OrderedDict(sorted(exif_dict.items()))
+                else:
+                    exif_dict = OrderedDict([
+                        ('DateTime', datetime.datetime(2013, 11, 30, 10, 27, 8)),
+                        ('DateTimeOriginal', datetime.datetime(2013, 11, 30, 10, 27, 8)),
+                        ('ExposureProgram', u'Aperture priority'), ('FNumber', u'2.6'),
+                        ('FocalLength', u'3.7'), ('FocalLengthIn35mmFilm', None),
+                        ('LensModel', None), ('Make', u'SAMSUNG'),
+                        ('Model', u'SGH-T999'), ('Orientation', u'top-left'),
+                        ('PhotographicSensitivity', u'80'),
+                        ('PixelXDimension', u'3264'),
+                        ('PixelYDimension', u'2448'),
+                        ('Sharpness', None),
+                        ('ShutterSpeedValue', u'10.234375'),
+                        ('id', 731),
+                        ('post_id', 120)])
                 story_context = {'post': self.posts[0], 'form': form, 'exifFields': exif_dict}
                 self.assets['archives'] = render_template("story_detail.html", **story_context)
 

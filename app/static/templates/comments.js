@@ -29,7 +29,6 @@ output += "</ul>\n";
 }
 }
 frame = frame.pop();
-output += "\n\n";
 if(parentTemplate) {
 parentTemplate.rootRenderFunc(env, context, frame, runtime, cb);
 } else {

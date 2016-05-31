@@ -18,9 +18,9 @@ define(['jquery', 'backbone', 'views/commentsView', 'collections/commentCollecti
                 comment.body =  form.comment;
                 comment.user_id = window.env.globals.current_user.id;
                 comment.post_id = this.model.id;
-                var comments = this.model.get('comments');
+                var comments = _.clone(this.model.get('comments'));
                 comments.push(comment);
-                this.model.set({comments: comments});
+                this.model.set('comments', comments);
                 var self = this;
                 this.model.save(this.model.changedAttributes(), {
                     patch: true,

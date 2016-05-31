@@ -1,3 +1,13 @@
-<li><b>{{ momentjs(comment.created_at).format('MMMM Do YYYY, h:mm:ss a') }}</b></li>
-<li>{{ comment.author.nickname }} commented:</li>
-<li>{{ comment.body }}</li>
+
+<li class="comment-outline">{{ comment.body }}</li>
+<li class="comment-photo">
+    {% if comment.author.photo %}
+        <img data-id="{{ post.id }}" src="https://aperturus.imgix.net/{{ comment.author.photo }}?usm=20&border=3%2CAAA&facepad=2.5&faceindex=1&fit=facearea&fm=png&mask=ellipse&h=120&w=120"
+        alt="{{ comment.author.photo }}">
+    {% else %}
+        <img src="https://aperturus.imgix.net/img/profile.jpg?usm=20&border=3%2CAAA&facepad=2.5&faceindex=1&fit=facearea&fm=png&mask=ellipse&h=120&w=120"
+        alt="user photo">
+    {% endif %}
+</li>
+<li class="comment-info">{{ comment.author.nickname }}</li>
+<li class="comment-date"><b>{{ momentjs(comment.created_at).format('MMMM Do YYYY, h:mm:ss a') }}</b></li>
