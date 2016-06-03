@@ -13,7 +13,9 @@ define(['jquery', 'backbone', 'views/commentView'],
             submitComment: function(e) {
                 e.preventDefault();
                 var form = this.$el.find('form').serializeObject();
-
+                if (form.comment == '') {
+                    return false;
+                }
                 var comment = {};
                 comment.comment =  form.comment;
                 comment.user_id = window.env.globals.current_user.id;
