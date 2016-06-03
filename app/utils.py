@@ -135,6 +135,8 @@ class BasePage(object):
                 response['user'] = self.assets['person'].json_view()
             elif 'category' in self.assets and self.assets['category'] == 'vote':
                 response['photo'] = self.posts[0].json_view()
+            elif 'category' in self.assets and self.assets['category'] == 'comment':
+                response['comment'] = self.assets['body_form']
             elif 'body_form' in self.assets:
                 response['uploadForm'] = self.assets['body_form']
             return json.dumps(response)
@@ -179,16 +181,13 @@ class PhotoPage(BasePage):
                 else:
                     exif_dict = OrderedDict([
                         ('DateTime', datetime.datetime(2013, 11, 30, 10, 27, 8)),
-                        ('DateTimeOriginal', datetime.datetime(2013, 11, 30, 10, 27, 8)),
                         ('ExposureProgram', u'Aperture priority'), ('FNumber', u'2.6'),
                         ('FocalLength', u'3.7'), ('FocalLengthIn35mmFilm', None),
                         ('LensModel', None), ('Make', u'SAMSUNG'),
                         ('Model', u'SGH-T999'), ('Orientation', u'top-left'),
-                        ('PhotographicSensitivity', u'80'),
-                        ('PixelXDimension', u'3264'),
-                        ('PixelYDimension', u'2448'),
+                        ('PhotographicSensitivity', None),
                         ('Sharpness', None),
-                        ('ShutterSpeedValue', u'10.234375'),
+                        ('ShutterSpeedValue', None),
                         ('id', 731),
                         ('post_id', 120)])
                 story_context = {'post': self.posts[0], 'form': form, 'exifFields': exif_dict}

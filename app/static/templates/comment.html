@@ -1,5 +1,4 @@
-
-<li class="comment-outline">{{ comment.body }}</li>
+<li class="comment-outline">{{ comment.comment }}</li>
 <li class="comment-photo">
     {% if comment.author.photo %}
         <img data-id="{{ post.id }}" src="https://aperturus.imgix.net/{{ comment.author.photo }}?usm=20&border=3%2CAAA&facepad=2.5&faceindex=1&fit=facearea&fm=png&mask=ellipse&h=120&w=120"

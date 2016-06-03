@@ -25,8 +25,9 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
                         authenticated = false;
                     } else {
                         authenticated = true;
-                        current_user['nickname'] = main_user.get('nickname');
                         current_user['id'] = main_user.get('id');
+                        current_user['nickname'] = main_user.get('nickname');
+                        current_user['photo'] = main_user.get('photo');
                     }
                     current_user['is_authenticated'] = function(){
                         return authenticated;
@@ -209,8 +210,10 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
                 AppView(new HeaderView({id: 'header'}));
                 AppView(new NavView({id: 'navbar'}));
                 var itemModel = DS.get('collection').get(DS.get('postId'));
+                itemModel.attributes.comments = _.sortBy(itemModel.get('comments'), 'created_at').reverse();
                 AppView(new DetailView({id: 'main-view', model: itemModel}));
             },
+
 
             filter: function(item){
                 if (DS.get('category') == 'all' || DS.get('category') == 'latest'){

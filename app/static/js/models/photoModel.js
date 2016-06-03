@@ -1,4 +1,5 @@
-define(['backbone'], function(Backbone) {
+define(['underscore', 'backbone'],
+    function(_, Backbone) {
     return Backbone.Model.extend({
         urlRoot: "/photos/",
         defaults: {
@@ -16,7 +17,12 @@ define(['backbone'], function(Backbone) {
 
         parse: function(response, xhr){
             if(xhr.patch){
-                return response.photo;
+                if (_.isObject(response.photo)) {
+                    return response.photo;
+                } else if (_.isObject(response.comment)) {
+                    return {};
+                }
+
             } else if (xhr.type == "POST") {
                 return response.uploadForm;
             } else {

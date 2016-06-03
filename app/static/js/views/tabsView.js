@@ -1,35 +1,38 @@
-define(['jquery', 'backbone', 'views/commentsView', 'collections/commentCollection', 'models/commentModel'],
-    function($, Backbone, CommentsView, CommentCollection, CommentModel){
+define(['jquery', 'backbone', 'views/commentView'],
+    function($, Backbone, CommentView){
         return Backbone.View.extend({
 
             events: {
                 'click #comment-form-submit': 'submitComment'
             },
 
-            initialize: function() {
-                this.listenTo(this.model, 'change', this.render, this);
-            },
+            // initialize: function() {
+            //     this.listenTo(this.model, 'change', this.render, this);
+            // },
 
             submitComment: function(e) {
                 e.preventDefault();
                 var form = this.$el.find('form').serializeObject();
 
                 var comment = {};
-                comment.body =  form.comment;
+                comment.comment =  form.comment;
                 comment.user_id = window.env.globals.current_user.id;
                 comment.post_id = this.model.id;
+                comment.author = {
+                    'nickname': window.env.globals.current_user.nickname,
+                    'photo': window.env.globals.current_user.photo
+                };
                 var comments = _.clone(this.model.get('comments'));
                 comments.push(comment);
                 this.model.set('comments', comments);
                 var self = this;
-                this.model.save(this.model.changedAttributes(), {
+                this.model.save(comment, {
                     patch: true,
                     wait:true,
-                    success: function(model) {
-                        var result = model;
-                        // var changeddata = {'id': self.model.id, 'followers': self.model.get('followers')};
-                        // window.socket.emit('my broadcast event', {data: changeddata});
-                        // return false;
+                    success: function(commentmodel) {
+                        var commentView = new CommentView({model: commentmodel});
+                        self.$el.find('form')[0].reset();
+                        self.$el.find('#comments').after(commentView.render().el);
                     },
                     fail: function(error) {
                         console.log(error);

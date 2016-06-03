@@ -8,7 +8,7 @@ define(['jquery', 'backbone', 'underscore', 'views/appView', 'views/tabsView'],
             },
 
             initialize: function() {
-                this.listenTo(this.model, 'change', this.render, this);
+                this.listenTo(this.model, 'change', this.renderMainView, this);
             },
 
             deletephoto: function() {
@@ -47,6 +47,11 @@ define(['jquery', 'backbone', 'underscore', 'views/appView', 'views/tabsView'],
                     }
                 });
             },
+
+            render: function() {
+                this.renderMainView();
+                this.renderTabView();
+            },
             
             renderTabView: function() {
                 var tabsView = new TabsView({id: 'links', className: 'item-list', model: this.model, collection:_.clone(this.model.get("comments"))});
@@ -54,7 +59,7 @@ define(['jquery', 'backbone', 'underscore', 'views/appView', 'views/tabsView'],
                 return this
             },
 
-            render: function() {
+            renderMainView: function() {
                 var post = this.model.toJSON();
                 post['author'] = { "nickname": post.nickname };
                 var votestatus = post.has_voted;
@@ -62,7 +67,6 @@ define(['jquery', 'backbone', 'underscore', 'views/appView', 'views/tabsView'],
                     return votestatus
                 };
                 $(this.el).html(window.env.render("photo_detail.html", {'post': post, 'momentjs': moment }));
-                this.renderTabView();
                 return this;
             }
         });

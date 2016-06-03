@@ -11,13 +11,16 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
             validateanddisplaysample: function(e) {
                 e.preventDefault();
                 //Get reference of FileUpload.
+                DS.set('serverBlob', null);
+                DS.set('currentFile', null);
                 var fileUpload = this.$el.find("#file-input");
                 //Check whether the file is valid Image.
                 var regex = new RegExp("([a-zA-Z0-9\s_\\.\-:])+(.jpg|.png|.jpeg)$");
                 if (regex.test(fileUpload.val().toLowerCase())) {
                     //Check whether HTML5 is supported.
                     if (fileUpload.prop('files') != "undefined") {
-                        window.currentFile = e.target.files[0];
+
+                        DS.set('currentFile', e.target.files[0]);
                         //Initiate the FileReader object.
                         var reader = new FileReader();
                         //Read the contents of Image File.
@@ -32,15 +35,15 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
                             image.onload = function () {
                                 var height = this.height;
                                 var width = this.width;
-                                var size = window.currentFile.size;
+                                var size = DS.get('currentFile').size;
                                 if (width < 648 || height < 432) {
                                     alert("Images must be at least 648px in width and 432px in height");
                                     return false;
                                 } else {
-                                    self.generateUploadFormThumb(window.currentFile);
+                                    self.generateUploadFormThumb(DS.get('currentFile'));
                                 }
                                 if (height > 4896 || width > 4896 || size > 2000000) {
-                                    self.generateServerFile(window.currentFile);
+                                    self.generateServerFile(DS.get('currentFile'));
                                 }
                             };
                         }
@@ -55,11 +58,6 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
             },
 
             generateUploadFormThumb: function(nowCurrentFile){
-                var options = {
-                  canvas: true,
-                  pixelRatio: window.devicePixelRatio,
-                  downsamplingRatio: 0.5
-                };
                 var self = this;
                 window.loadImage(
                    nowCurrentFile,
@@ -67,15 +65,18 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
                        if(img.type === "error") {
                            return false;
                        } else {
-                           window.loadImage.parseMetaData(nowCurrentFile, function (data) {
-                               if (data.exif) {
-                                   options.orientation = data.exif[0x0112];
-                                   self.displayExifData(data.exif);
-                                   self.createContent(img)
-                               } else {
-                                   alert('Please choose an image with exif data intact')
-                               }
-                           });
+                            if (DS.get('route') == '/members/upload') {
+                                self.createContent(img);
+                            } else {
+                                window.loadImage.parseMetaData(nowCurrentFile, function (data) {
+                                   if (data.exif) {
+                                       self.displayExifData(data.exif);
+                                       self.createContent(img)
+                                   } else {
+                                       alert('Please choose an image with exif data intact')
+                                   }
+                                });
+                            }
                        }
                    },
                    {maxWidth: 648}
@@ -92,7 +93,7 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
                             if (img.toBlob) {
                                 img.toBlob(
                                     function (blob) {
-                                        window.serverBlob = blob
+                                        DS.set('serverBlob', blob);
 
                                     },
                                     'image/jpeg'

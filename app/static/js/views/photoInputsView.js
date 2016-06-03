@@ -9,9 +9,15 @@ define(['jquery', 'backbone', 'ds', 'views/photoTextFormView'],
             submitPhoto: function(e) {
                 e.preventDefault();
                 var fd = new FormData();
-                window.uploadedfilename = 'user-images/' + DS.get('userid') + "/" + (new Date).getTime() + '-' + window.currentFile.name;
-                window.amazons3path = 'static/user-images/' + DS.get('userid') + "/" + (new Date).getTime() + '-' + window.currentFile.name;
-                fd.append('key', window.amazons3path);
+                var currentTime = (new Date).getTime()
+                if (DS.get('route') == '/members/upload') {
+                    DS.set('uploadedfilename', 'user-images/' + DS.get('userid') + "/profile_image/" + currentTime + '-' + DS.get('currentFile').name);
+                    DS.set('amazons3path', 'static/user-images/' + DS.get('userid') + "/profile_image/" + currentTime + '-' + DS.get('currentFile').name);
+                } else {
+                    DS.set('uploadedfilename', 'user-images/' + DS.get('userid') + "/" + currentTime + '-' + DS.get('currentFile').name);
+                    DS.set('amazons3path', 'static/user-images/' + DS.get('userid') + "/" + currentTime + '-' + DS.get('currentFile').name);
+                }
+                fd.append('key', DS.get('amazons3path'));
                 fd.append('acl', this.model.get('acl'));
                 fd.append('policy', this.model.get('policy'));
                 fd.append('success_action_status', this.model.get('success_action_status'));
@@ -19,10 +25,10 @@ define(['jquery', 'backbone', 'ds', 'views/photoTextFormView'],
                 fd.append('x-amz-credential', this.model.get('x-amz-credential'));
                 fd.append('x-amz-date', this.model.get('x-amz-date'));
                 fd.append('x-amz-signature',this.model.get('x-amz-signature'));
-                if (typeof(window.serverBlob) !== "undefined") {
-                    fd.append('file', window.serverBlob);
+                if (DS.get('serverBlob') !== null) {
+                    fd.append('file', DS.get('serverBlob'));
                 } else {
-                    fd.append('file', window.currentFile);
+                    fd.append('file', DS.get('currentFile'));
                 }
 
                 /**
@@ -39,8 +45,23 @@ define(['jquery', 'backbone', 'ds', 'views/photoTextFormView'],
                         if(xhr.status == 200){
                             self.model.destroy();
                             self.remove();
-                            var photoTextFormView = new PhotoTextFormView({id: "text-form-view"});
-                            $('#inputs-target').html(photoTextFormView.el)
+                            if (DS.get('route') == '/members/upload') {
+                                var targetUserModel = DS.get('target_user');
+                                targetUserModel.set({photo: DS.get('uploadedfilename')});
+                                targetUserModel.save(targetUserModel.changedAttributes(), {
+                                    patch: true,
+                                    wait:true,
+                                    success: function() {
+                                        $( ".fa-briefcase" ).trigger( "click" );
+                                    },
+                                    fail: function(error) {
+                                        console.log(error);
+                                    }
+                                });
+                            } else {
+                                var photoTextFormView = new PhotoTextFormView({id: "text-form-view"});
+                                $('#inputs-target').html(photoTextFormView.el)
+                            }
                         } else {
                             console.log(xhr.statusText);
                         }

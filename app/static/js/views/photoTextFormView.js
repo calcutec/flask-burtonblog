@@ -11,10 +11,10 @@ define(['jquery', 'backbone', 'ds', 'nunjucks', 'models/photoModel', 'views/appV
             postnewentry: function(e) {
                 e.preventDefault();
                 var newPostModel = new PhotoModel(this.$el.find('form').serializeObject());
-                if (window.currentFile === null){
+                if (DS.get('currentFile') === null){
                     alert("file upload has failed")
                 } else {
-                    var photo = window.uploadedfilename;
+                    var photo = DS.get('uploadedfilename')
                     newPostModel.set({'photo': photo});
                     newPostModel.set({'exifTags': DS.get('exifTags')});
                 }

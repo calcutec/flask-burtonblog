@@ -4,6 +4,7 @@ import re
 from app import db
 from flask import url_for, g
 from flask.ext.login import UserMixin
+from sqlalchemy import desc
 
 import json
 import datetime
@@ -27,7 +28,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     pwdhash = db.Column(db.String(100))
     posts = db.relationship('Post', backref='author', lazy='dynamic')
-    comments = db.relationship('Comment', backref='author', lazy='dynamic')
+    comments = db.relationship('Comment', backref='author', lazy='dynamic', order_by=desc('Comment.created_at'))
     about_me = db.Column(db.String(140))
     photo = db.Column(db.String(240))
     last_seen = db.Column(db.DateTime, default=datetime.datetime.utcnow)
@@ -163,7 +164,7 @@ class Post(db.Model):
     writing_type = db.Column(db.String(32), default="writing-type")
     category = db.Column(db.String(32))
     photo = db.Column(db.String(240))
-    comments = db.relationship('Comment', backref='original_post', lazy='dynamic')
+    comments = db.relationship('Comment', backref='original_post', lazy='dynamic', order_by=desc('Comment.created_at'))
     stats = db.relationship('ExifStats', uselist=False, backref='original_post', lazy='joined')
     slug = db.Column(db.String(255))
     votes = db.Column(db.Integer, default=1)
@@ -238,9 +239,10 @@ class Post(db.Model):
             has_voted = self.has_voted(g.user.id)
         if self.stats:
             exifdata = self.stats.json_view()
+        comments = self.comments.order_by('created_at').all()
         return {'id': self.id, 'author': self.user_id, 'header': self.header, 'body': self.body, 'photo': self.photo,
                 'category': self.category, 'nickname': self.author.nickname, 'timestamp': self.timestamp,
-                'has_voted': has_voted, 'votes': self.votes, 'comments': [i.json_view() for i in self.comments.all()],
+                'has_voted': has_voted, 'votes': self.votes, 'comments': [i.json_view() for i in comments],
                 'exifData': exifdata}
 
     def get_absolute_url(self):
@@ -283,15 +285,19 @@ class ExifStats(db.Model):
 class Comment(db.Model):
     __tablename__ = 'comment'
     id = db.Column(db.Integer, primary_key=True)
-    body = db.Column(db.String(500))
+    comment = db.Column(db.String(500))
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     created_at = db.Column(db.DateTime)
 
     def __repr__(self):  # pragma: no cover
-        return '<Comment %r>' % self.body
+        return '<Comment %r>' % self.comment
 
     def json_view(self):
-        author = {'nickname': User.query.get(self.user_id).nickname}
-        return {'id': self.id, 'body': self.body, 'post_id': self.post_id, 'user_id': self.user_id,
+        comment_author = User.query.get(self.user_id)
+        author = {
+            'nickname': comment_author.nickname,
+            'photo': comment_author.photo
+        }
+        return {'id': self.id, 'comment': self.comment, 'post_id': self.post_id, 'user_id': self.user_id,
                 'author': author, 'created_at': self.created_at}

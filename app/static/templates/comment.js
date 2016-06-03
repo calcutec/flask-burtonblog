@@ -5,8 +5,8 @@ var colno = null;
 var output = "";
 try {
 var parentTemplate = null;
-output += "\n<li class=\"comment-outline\">";
-output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "comment")),"body"), env.opts.autoescape);
+output += "<li class=\"comment-outline\">";
+output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "comment")),"comment"), env.opts.autoescape);
 output += "</li>\n<li class=\"comment-photo\">\n    ";
 if(runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "comment")),"author")),"photo")) {
 output += "\n        <img data-id=\"";
@@ -25,7 +25,7 @@ output += "\n        <img src=\"https://aperturus.imgix.net/img/profile.jpg?usm=
 output += "\n</li>\n<li class=\"comment-info\">";
 output += runtime.suppressValue(runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "comment")),"author")),"nickname"), env.opts.autoescape);
 output += "</li>\n<li class=\"comment-date\"><b>";
-output += runtime.suppressValue((lineno = 12, colno = 64, runtime.callWrap(runtime.memberLookup(((lineno = 12, colno = 37, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "comment")),"created_at")]))),"format"), "the return value of (momentjs)[\"format\"]", context, ["MMMM Do YYYY, h:mm:ss a"])), env.opts.autoescape);
+output += runtime.suppressValue((lineno = 11, colno = 64, runtime.callWrap(runtime.memberLookup(((lineno = 11, colno = 37, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "comment")),"created_at")]))),"format"), "the return value of (momentjs)[\"format\"]", context, ["MMMM Do YYYY, h:mm:ss a"])), env.opts.autoescape);
 output += "</b></li>\n";
 if(parentTemplate) {
 parentTemplate.rootRenderFunc(env, context, frame, runtime, cb);

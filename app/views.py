@@ -127,11 +127,20 @@ class MembersAPI(MethodView):
     @login_required
     def patch(self, member_id):
         person = User.query.get(member_id)
-        if request.json['is_following']:
-            category = "follow"
+        form = None
+        if 'photo' in request.json:
+            category = 'update'
+            form = EditForm(
+                photo=request.json['photo'],
+                nickname=g.user.nickname,
+                about_me=g.user.about_me
+            )
         else:
-            category = "unfollow"
-        page = MembersPage(person=person, category=category)
+            if request.json['is_following']:
+                category = "follow"
+            else:
+                category = "unfollow"
+        page = MembersPage(person=person, category=category, form=form)
         rendered_page = page.render()
         return rendered_page
 
@@ -206,10 +215,13 @@ class PhotoAPI(MethodView):
 
     @login_required
     def patch(self, post_id):
-        category = None
+        form = None
         if 'has_voted' in request.json:
             category = "vote"
-        page = PhotoPage(post_id=post_id, category=category)
+        else:
+            category = "comment"
+            form = CommentForm(comment=request.json['comment'])
+        page = PhotoPage(post_id=post_id, category=category, form=form)
         rendered_page = page.render()
         return rendered_page
 

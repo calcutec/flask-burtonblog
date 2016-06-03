@@ -165,11 +165,11 @@ class CommentFormProcessor(FormProcessor):
         self.form = CommentForm()
 
     def process_form(self):
-        if self.form.validate_on_submit():
+        if self.form.validate_on_submit() or self.form.validate():
             # eastern = pytz.timezone('America/New_York')
             # current_time = datetime.now(eastern).isoformat()
             current_time = datetime.utcnow()
-            comment = Comment(body=self.form.comment.data, post_id=self.page.post_id, user_id=current_user.id,
+            comment = Comment(comment=self.form.comment.data, post_id=self.page.post_id, user_id=current_user.id,
                               created_at=current_time)
             db.session.add(comment)
             db.session.commit()
