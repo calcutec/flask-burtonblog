@@ -826,3 +826,7 @@ input, textarea, select {
     background-color: darkolivegreen;
 }
 
+[data-medium-editor-element] {
+    padding: 1rem;
+}
+

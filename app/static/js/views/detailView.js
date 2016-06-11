@@ -51,6 +51,16 @@ define(['jquery', 'backbone', 'underscore', 'views/appView', 'views/tabsView'],
             render: function() {
                 this.renderMainView();
                 this.renderTabView();
+                var editor = new MediumEditor('.editable', {
+                    delay: 0,
+                    toolbar: {
+                        buttons: ['bold', 'italic', 'underline', 'h4', 'h5'],
+                    }
+                });
+                $('.editable').bind('input propertychange', function() {
+                    window.micropost = $(this).html();
+                    console.log(window.micropost);
+                });
             },
             
             renderTabView: function() {

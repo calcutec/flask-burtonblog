@@ -5,9 +5,9 @@ var colno = null;
 var output = "";
 try {
 var parentTemplate = null;
-output += "<div id=\"tabmenu\" class=\"photo-detail\">\n    <input id=\"tab1\" type=\"radio\" name=\"tabs\" checked>\n    <label for=\"tab1\">Story</label>\n\n    <input id=\"tab2\" type=\"radio\" name=\"tabs\">\n    <label for=\"tab2\">Comments</label>\n\n    <input id=\"tab3\" type=\"radio\" name=\"tabs\">\n    <label for=\"tab3\">Data</label>\n\n    <section id=\"content1\">\n        <h3>What makes this great...</h3>\n        <section>";
+output += "<div id=\"tabmenu\" class=\"photo-detail\">\n    <input id=\"tab1\" type=\"radio\" name=\"tabs\" checked>\n    <label for=\"tab1\">Story</label>\n\n    <input id=\"tab2\" type=\"radio\" name=\"tabs\">\n    <label for=\"tab2\">Comments</label>\n\n    <input id=\"tab3\" type=\"radio\" name=\"tabs\">\n    <label for=\"tab3\">Data</label>\n\n    <section id=\"content1\">\n        <section class=\"editable\">";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"body"), env.opts.autoescape);
-output += "</section>\n    </section>\n\n    <section id=\"content2\">\n        ";
+output += "</section>\n        <button class=\"btn btn-info\" id=\"comment-form-submit\" type=\"submit\">Submit</button>\n    </section>\n\n    <section id=\"content2\">\n        ";
 env.getTemplate("comment_form.html", false, "story_detail.html", null, function(t_3,t_1) {
 if(t_3) { cb(t_3); return; }
 t_1.render(context.getVariables(), frame, function(t_4,t_2) {
