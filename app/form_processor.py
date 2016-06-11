@@ -68,7 +68,16 @@ class PhotosFormProcessor(FormProcessor):
         self.form = PostForm
 
     def process_form(self):
-        pass
+        if self.form.validate():
+            update_post = Post.query.get(self.page.post_id)
+            update_post.body = self.form.data['body']
+            db.session.commit()
+            response = update_post.json_view()
+            response['updatedsuccess'] = True
+            return json.dumps(response)
+        else:
+            result = {'updatedsuccess': False}
+            return json.dumps(result)
 
 
 class UpdateFormProcessor(FormProcessor):

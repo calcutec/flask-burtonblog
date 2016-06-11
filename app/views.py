@@ -218,6 +218,14 @@ class PhotoAPI(MethodView):
         form = None
         if 'has_voted' in request.json:
             category = "vote"
+        elif 'body' in request.json:
+            category = "updatephoto"
+            post = Post.query.get(post_id)
+            form = PostForm(
+                body=request.json['body'],
+                photo=post.photo,
+                category=post.category
+            )
         else:
             category = "comment"
             form = CommentForm(comment=request.json['comment'])

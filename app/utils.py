@@ -35,7 +35,7 @@ class BasePage(object):
 
         self.get_entity()
 
-        if self.assets['category'] in ["login", "upload", "update", "signup", "comment"]:
+        if self.assets['category'] in ["login", "upload", "update", "signup", "comment", "updatephoto"]:
             self.get_rendered_form()
             if self.assets['category'] == "comment":
                 self.get_posts()
@@ -72,6 +72,7 @@ class BasePage(object):
             "upload": UploadFormProcessor,
             "signup": SignupFormProcessor,
             "photo":  PhotosFormProcessor,
+            "updatephoto": PhotosFormProcessor,
             "update": UpdateFormProcessor,
             "login": LoginFormProcessor,
             "comment": CommentFormProcessor

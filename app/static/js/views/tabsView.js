@@ -1,14 +1,28 @@
-define(['jquery', 'backbone', 'views/commentView'],
-    function($, Backbone, CommentView){
+define(['jquery', 'backbone', 'ds', 'views/commentView'],
+    function($, Backbone, DS, CommentView){
         return Backbone.View.extend({
 
             events: {
-                'click #comment-form-submit': 'submitComment'
+                'click #comment-form-submit': 'submitComment',
+                'click #updatestory': 'updatestory'
             },
 
-            // initialize: function() {
-            //     this.listenTo(this.model, 'change', this.render, this);
-            // },
+            updatestory: function(e) {
+                this.model.set('body', window.micropost);
+                var self = this;
+                this.model.save(this.model.changedAttributes(), {
+                    patch: true,
+                    wait:true,
+                    success: function(model) {
+                        DS.set('initialchange', true);
+                        $('#updatestory').toggleClass('hide');
+                        $('#comment-form-prompt').toggleClass('hide');
+                    },
+                    fail: function(error) {
+                        console.log(error);
+                    }
+                });
+            },
 
             submitComment: function(e) {
                 e.preventDefault();
@@ -59,7 +73,6 @@ define(['jquery', 'backbone', 'views/commentView'],
             },
 
             unrender: function() {
-                console.log('create unrender function')
             }
         });
     }

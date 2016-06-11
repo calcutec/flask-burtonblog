@@ -1,15 +1,15 @@
-define(['jquery', 'backbone', 'underscore', 'views/appView', 'views/tabsView'],
-    function($, Backbone, _, AppView, TabsView){
+define(['jquery', 'backbone', 'underscore', 'ds', 'views/appView', 'views/tabsView'],
+    function($, Backbone, _, DS, AppView, TabsView){
         return Backbone.View.extend({
             events: {
                 'click #deletephoto':   'deletephoto',
                 'click .vote':   'vote',
-                'click .unvote':   'vote',
-                'click #comment-form-submit': 'updatestory'
+                'click .unvote':   'vote'
             },
 
             initialize: function() {
                 this.listenTo(this.model, 'change', this.renderMainView, this);
+                DS.set('initialchange', true)
             },
 
             deletephoto: function() {
@@ -23,10 +23,6 @@ define(['jquery', 'backbone', 'underscore', 'views/appView', 'views/tabsView'],
                         console.log(response);
                       }
                 });
-            },
-
-            updatestory: function(e) {
-                console.log(window.micropost);
             },
 
             vote: function(e) {
@@ -56,27 +52,27 @@ define(['jquery', 'backbone', 'underscore', 'views/appView', 'views/tabsView'],
             render: function() {
                 this.renderMainView();
                 this.renderTabView();
-                var editor = new MediumEditor('.editable', {
+                new MediumEditor('.editable', {
                     delay: 0,
                     toolbar: {
-                        buttons: ['bold', 'italic', 'underline', 'h4', 'h5'],
+                        buttons: ['bold', 'italic', 'underline', 'h4', 'h5']
                     }
                 });
                 $('.editable').bind('input propertychange', function() {
                     window.micropost = $(this).html();
-                    if (this.initialchange === undefined){
-                        $('#comment-form-submit').removeClass('hide')
-                        $('#comment-form-prompt').addClass('hide')
-                    } else {
-                        this.initialchange === false;
+                    if (DS.get('initialchange') === true){
+                        $('#updatestory').toggleClass('hide');
+                        $('#comment-form-prompt').toggleClass('hide');
+                        DS.set('initialchange', false);
                     }
                 });
+                return this;
             },
             
             renderTabView: function() {
                 var tabsView = new TabsView({id: 'links', className: 'item-list', model: this.model, collection:_.clone(this.model.get("comments"))});
                 AppView(tabsView);
-                return this
+                return this;
             },
 
             renderMainView: function() {

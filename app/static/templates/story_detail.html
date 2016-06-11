@@ -10,11 +10,11 @@
 
     <section id="content1">
         {% if current_user.is_authenticated() and post.nickname == current_user.nickname %}
-            <section class="editable">{{ post.body }}</section>
+            <section class="editable">{{ post.body|safe }}</section>
             <h6 id="comment-form-prompt" style="color:grey">(Higlight text to edit)</h6>
-            <button class="btn btn-info hide" id="comment-form-submit">Submit</button>
+            <button class="btn btn-info hide" id="updatestory" type="submit">Submit</button>
         {% else %}
-            <section>{{ post.body }}</section>
+            <section>{{ post.body|safe }}</section>
         {% endif %}
     </section>
 

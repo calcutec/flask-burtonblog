@@ -8,13 +8,13 @@ var parentTemplate = null;
 output += "<div id=\"tabmenu\" class=\"photo-detail\">\n    <input id=\"tab1\" type=\"radio\" name=\"tabs\" checked>\n    <label for=\"tab1\">Story</label>\n\n    <input id=\"tab2\" type=\"radio\" name=\"tabs\">\n    <label for=\"tab2\">Comments</label>\n\n    <input id=\"tab3\" type=\"radio\" name=\"tabs\">\n    <label for=\"tab3\">Data</label>\n\n    <section id=\"content1\">\n        ";
 if((lineno = 11, colno = 41, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"is_authenticated"), "current_user[\"is_authenticated\"]", context, [])) && runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"nickname") == runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"nickname")) {
 output += "\n            <section class=\"editable\">";
-output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"body"), env.opts.autoescape);
-output += "</section>\n            <h6 id=\"comment-form-prompt\" style=\"color:grey\">(Higlight text to edit)</h6>\n            <button class=\"btn btn-info hide\" id=\"comment-form-submit\">Submit</button>\n        ";
+output += runtime.suppressValue(env.getFilter("safe").call(context, runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"body")), env.opts.autoescape);
+output += "</section>\n            <h6 id=\"comment-form-prompt\" style=\"color:grey\">(Higlight text to edit)</h6>\n            <button class=\"btn btn-info hide\" id=\"updatestory\" type=\"submit\">Submit</button>\n        ";
 ;
 }
 else {
 output += "\n            <section>";
-output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"body"), env.opts.autoescape);
+output += runtime.suppressValue(env.getFilter("safe").call(context, runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"body")), env.opts.autoescape);
 output += "</section>\n        ";
 ;
 }
