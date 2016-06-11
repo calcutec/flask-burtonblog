@@ -53,15 +53,6 @@ main {
     border-radius: 5px;
     margin: .7rem 0.5vw 1rem 0;
 }
-.details-well {
-    box-shadow: 0 0 5px #888;
-    background: rgba(0,0,0,0.5);
-    padding: 1rem;
-    border-radius: 5px;
-    width: auto;
-    margin-right: 0.5vw;
-    margin-bottom: 1rem;
-}
 .home-pic {
     width: 30%;
     max-width: 15rem;
@@ -362,7 +353,7 @@ label > .label-body {
     float: left;
 }
 ul.item-list > li:hover span.text-content {
-    display:table;
+    opacity: 1;
 }
 ul.item-list > li:hover span.rounded-icon {
     opacity: 1;
@@ -377,23 +368,19 @@ ul.item-list > li {
     position: relative;
     padding-right: .5vw;
 }
-
 span.text-content {
-    display:none;
     position: absolute;
     color: white;
-    height: 46vw;
     left: 0;
     bottom: 0;
-    width: 46vw;
     transition: opacity 1s ease-out;
-    opacity: 1;
-}
-span.text-content span {
-    display: table-cell;
+    opacity: 0;
+    box-shadow: 0 0 5px #888;
+    background: rgba(0,0,0,0.5);
     padding: 1rem;
     line-height: 1.5;
-    vertical-align: bottom;
+    width: auto;
+    border-radius: 0 10px 0 0;
 }
 span.rounded-icon {
     display: table;
@@ -644,10 +631,6 @@ input, textarea, select {
 /** 640 pixels or greater (larger than common mobiles in landscape) **/
 @media(min-width:40em) {
     .responsive-img { width: 30.5vw; }
-    span.text-content {
-        width: 30.5vw;
-        height: 30.5vw;
-    }
     .loginmenu > label[for*='1']:before { content: 'Login: '; }
     .loginmenu > label[for*='2']:before { content: 'Login: '; }
     .loginmenu > label[for*='3']:before { content: 'New User: '; }
@@ -697,10 +680,6 @@ input, textarea, select {
 @media(min-width:60em){
     ul.item-list > li:nth-child(4n) { padding-right: 0; }
     .responsive-img { width: 22.75vw; }
-    span.text-content {
-        width: 22.75vw;
-        height: 22.75vw;
-    }
 }
 
 /* |||| PAGES |||| */

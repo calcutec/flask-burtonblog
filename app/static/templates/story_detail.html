@@ -9,12 +9,19 @@
     <label for="tab3">Data</label>
 
     <section id="content1">
-        <section class="editable">{{ post.body }}</section>
-        <button class="btn btn-info" id="comment-form-submit" type="submit">Submit</button>
+        {% if current_user.is_authenticated() and post.nickname == current_user.nickname %}
+            <section class="editable">{{ post.body }}</section>
+            <h6 id="comment-form-prompt" style="color:grey">(Higlight text to edit)</h6>
+            <button class="btn btn-info hide" id="comment-form-submit">Submit</button>
+        {% else %}
+            <section>{{ post.body }}</section>
+        {% endif %}
     </section>
 
     <section id="content2">
-        {% include "comment_form.html" %}
+        {% if current_user.is_authenticated() %}
+            {% include "comment_form.html" %}
+        {% endif %}
         {% include "comments.html" %}
     </section>
 

@@ -7,14 +7,10 @@
     https://aperturus.imgix.net/{{ post.photo }}?w=1290&q=85&auto=format 1290w"
     alt="{{ post.photo }}" class="main-responsive-img">
     <span onclick="" class="text-content">
-        <span>
-            <span class="details-well">
-                <a class="link-button member-link" href="/members/{{ post.author.nickname }}/" rel="tag">{{ post.author.nickname }}</a><br>
-                <b>{{ momentjs(post.timestamp).calendar() }}</b><br>
-                {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
-                {{ post.body }}
-            </span>
-        </span>
+        <a class="link-button member-link" href="/members/{{ post.author.nickname }}/" rel="tag">{{ post.author.nickname }}</a><br>
+        <b>{{ momentjs(post.timestamp).calendar() }}</b><br>
+        {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
+        {{ post.body }}
     </span>
     <a class="detail-link" data-id="{{ post.id }}" href="/photos/{{ post.id }}">
         <span class="main rounded-icon">

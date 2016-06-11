@@ -29,23 +29,23 @@ output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLook
 output += "\">\n";
 ;
 }
-output += "\n<span onclick=\"\" class=\"text-content\">\n    <span>\n        <span class=\"details-well\">\n            ";
+output += "\n<span onclick=\"\" class=\"text-content\">\n    ";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"nickname")) {
-output += "\n                <a class=\"link-button member-link\" href=\"/members/";
+output += "\n        <a class=\"link-button member-link\" href=\"/members/";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"nickname"), env.opts.autoescape);
 output += "\">";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"nickname"), env.opts.autoescape);
-output += "</a>\n            ";
+output += "</a>\n    ";
 ;
 }
-output += "\n            ";
+output += "\n    ";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"last_seen")) {
-output += "\n                <p><em>Last seen:</em></p>\n                <p><em>";
-output += runtime.suppressValue((lineno = 29, colno = 55, runtime.callWrap(runtime.memberLookup(((lineno = 29, colno = 32, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"last_seen")]))),"format"), "the return value of (momentjs)[\"format\"]", context, ["MMM do YYYY"])), env.opts.autoescape);
-output += "</em></p>\n            ";
+output += "\n        <p><em>Last seen:</em></p>\n        <p><em>";
+output += runtime.suppressValue((lineno = 27, colno = 47, runtime.callWrap(runtime.memberLookup(((lineno = 27, colno = 24, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"last_seen")]))),"format"), "the return value of (momentjs)[\"format\"]", context, ["MMM do YYYY"])), env.opts.autoescape);
+output += "</em></p>\n    ";
 ;
 }
-output += "\n        </span>\n    </span>\n</span>";
+output += "\n</span>";
 if(parentTemplate) {
 parentTemplate.rootRenderFunc(env, context, frame, runtime, cb);
 } else {

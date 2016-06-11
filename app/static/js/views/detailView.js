@@ -4,7 +4,8 @@ define(['jquery', 'backbone', 'underscore', 'views/appView', 'views/tabsView'],
             events: {
                 'click #deletephoto':   'deletephoto',
                 'click .vote':   'vote',
-                'click .unvote':   'vote'
+                'click .unvote':   'vote',
+                'click #comment-form-submit': 'updatestory'
             },
 
             initialize: function() {
@@ -22,6 +23,10 @@ define(['jquery', 'backbone', 'underscore', 'views/appView', 'views/tabsView'],
                         console.log(response);
                       }
                 });
+            },
+
+            updatestory: function(e) {
+                console.log(window.micropost);
             },
 
             vote: function(e) {
@@ -59,7 +64,12 @@ define(['jquery', 'backbone', 'underscore', 'views/appView', 'views/tabsView'],
                 });
                 $('.editable').bind('input propertychange', function() {
                     window.micropost = $(this).html();
-                    console.log(window.micropost);
+                    if (this.initialchange === undefined){
+                        $('#comment-form-submit').removeClass('hide')
+                        $('#comment-form-prompt').addClass('hide')
+                    } else {
+                        this.initialchange === false;
+                    }
                 });
             },
             

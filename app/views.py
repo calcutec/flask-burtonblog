@@ -65,7 +65,7 @@ class LoginAPI(MethodView):
             if email is None:
                 flash('Authentication failed.')
                 return redirect("/photos/recent/")
-            currentuser = User.query.filter_by(email=email).first()
+            currentuser = User.query.filter_by(email=email.lower()).first()
             if not currentuser:
                 currentuser = User(nickname=nickname, email=email, photo="profile.jpg")
                 db.session.add(currentuser)

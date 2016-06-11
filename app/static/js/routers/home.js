@@ -29,8 +29,6 @@ define(["jquery", "backbone", "nunjucks", "socketio", "ds", "collections/photoCo
                 window.namespace = '/greatpic'; // change to an empty string to use the global namespace
                 window.socket = socketio.connect('http://' + document.domain + ':' + location.port + namespace);
 
-                console.log('socket connected');
-
                 $.fn.serializeObject = function() {
                     var o = {};
                     var a = this.serializeArray();

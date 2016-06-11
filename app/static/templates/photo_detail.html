@@ -7,24 +7,20 @@
         https://aperturus.imgix.net/{{ post.photo }}?w=1290&q=85&auto=format 1290w"
         alt="{{ post.photo }}" class="main-responsive-img">
         <span onclick="" class="text-content">
-            <span>
-                <div class="details-well">
-                        <a class="link-button member-link" href="/members/{{ post.author.nickname }}/" rel="tag">{{ post.author.nickname }}</a><br>
-                            <b>{{ momentjs(post.timestamp).calendar() }}</b><br>
-                    {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
-                    {% if current_user.is_authenticated() and post.author.nickname == current_user.nickname %}
-                        <a class="link-button red" id="deletephoto" href="#">Delete</a>
-                    {% endif %}
-                    {% if current_user.is_authenticated() and post.author.nickname != current_user.nickname %}
-                        {% if post.has_voted(current_user.id) %}
-                            <a class="unvote" data-voted="true" style="color:#eb6864;" href="/photos/{{ post.id }}/vote" class="{{ post.id }} likeme"><i class="fa fa-smile-o fa-lg icon-white"></i></a>
-                        {% else %}
-                            <a class="vote" data-voted="false" style="color:#000;" href="/photos/{{ post.id }}/vote" class="{{ post.id }} likeme"><i class="fa fa-meh-o fa-lg icon-white"></i></a>
-                        {% endif %}
-                            Like/Unlike <br>
-                    {% endif %}
-                </div>
-            </span>
+            <a class="link-button member-link" href="/members/{{ post.author.nickname }}/" rel="tag">{{ post.author.nickname }}</a><br>
+                    <b>{{ momentjs(post.timestamp).calendar() }}</b><br>
+            {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
+            {% if current_user.is_authenticated() and post.author.nickname == current_user.nickname %}
+                <a class="link-button red" id="deletephoto" href="#">Delete</a>
+            {% endif %}
+            {% if current_user.is_authenticated() and post.author.nickname != current_user.nickname %}
+                {% if post.has_voted(current_user.id) %}
+                    <a class="unvote" data-voted="true" style="color:#eb6864;" href="/photos/{{ post.id }}/vote" class="{{ post.id }} likeme"><i class="fa fa-smile-o fa-lg icon-white"></i></a>
+                {% else %}
+                    <a class="vote" data-voted="false" style="color:#000;" href="/photos/{{ post.id }}/vote" class="{{ post.id }} likeme"><i class="fa fa-meh-o fa-lg icon-white"></i></a>
+                {% endif %}
+                    Like/Unlike <br>
+            {% endif %}
         </span>
     </li>
 </ul>

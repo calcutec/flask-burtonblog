@@ -20,15 +20,11 @@
         alt="{{ post.photo }}">
 {% endif %}
 <span onclick="" class="text-content">
-    <span>
-        <span class="details-well">
-            {% if post.nickname %}
-                <a class="link-button member-link" href="/members/{{ post.nickname }}">{{ post.nickname }}</a>
-            {% endif %}
-            {% if post.last_seen %}
-                <p><em>Last seen:</em></p>
-                <p><em>{{ momentjs(post.last_seen).format('MMM do YYYY') }}</em></p>
-            {% endif %}
-        </span>
-    </span>
+    {% if post.nickname %}
+        <a class="link-button member-link" href="/members/{{ post.nickname }}">{{ post.nickname }}</a>
+    {% endif %}
+    {% if post.last_seen %}
+        <p><em>Last seen:</em></p>
+        <p><em>{{ momentjs(post.last_seen).format('MMM do YYYY') }}</em></p>
+    {% endif %}
 </span>

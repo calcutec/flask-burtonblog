@@ -10,25 +10,21 @@
     alt="{{ post.photo }}">
 </a>
 <span onclick="" class="text-content">
-    <span class="inner-span">
-        <span class="details-well">
-            {% if assets %}
-                {% if assets.entity not in ['member', 'author'] %}
-                    <a class="link-button member-link" href="/members/{{ post.author.nickname }}/" rel="tag">{{ post.author.nickname }}</a><br>
-                {% endif %}
+        {% if assets %}
+            {% if assets.entity not in ['member', 'author'] %}
+                <a class="link-button member-link" href="/members/{{ post.author.nickname }}/" rel="tag">{{ post.author.nickname }}</a><br>
             {% endif %}
-            <b>{{ momentjs(post.timestamp).calendar() }}</b><br>
-            {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
-            {% if post.all_comments|length > 0 %}
-                <a href="/photos/{{ post.id }}">
-                        {{ post.all_comments|length }} comment{% if post.all_comments|length != 1 %}s{% endif %}
-                </a><br>
-            {% endif %}
-            {% if assets %}
-                <a href="#" class="link-button gallery">Gallery</a>
-            {% endif %}
-        </span>
-    </span>
+        {% endif %}
+        <b>{{ momentjs(post.timestamp).calendar() }}</b><br>
+        {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
+        {% if post.all_comments|length > 0 %}
+            <a href="/photos/{{ post.id }}">
+                    {{ post.all_comments|length }} comment{% if post.all_comments|length != 1 %}s{% endif %}
+            </a><br>
+        {% endif %}
+        {% if assets %}
+            <a href="#" class="link-button gallery">Gallery</a>
+        {% endif %}
 </span>
 {% if assets %}
         <a class="detail-link" data-id="{{ post.id }}" href="/photos/{{ post.id }}">

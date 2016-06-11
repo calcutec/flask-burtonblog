@@ -43,7 +43,7 @@ class User(UserMixin, db.Model):
         self.nickname = self.make_unique_nickname(self.make_valid_nickname(nickname))
         self.email = email.lower()
         self.photo = photo
-        self.followers = followers
+        # self.followers = followers.query.all()
         if password is not None:
             self.set_password(password)
         if firstname is not None:

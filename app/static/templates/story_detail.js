@@ -5,14 +5,30 @@ var colno = null;
 var output = "";
 try {
 var parentTemplate = null;
-output += "<div id=\"tabmenu\" class=\"photo-detail\">\n    <input id=\"tab1\" type=\"radio\" name=\"tabs\" checked>\n    <label for=\"tab1\">Story</label>\n\n    <input id=\"tab2\" type=\"radio\" name=\"tabs\">\n    <label for=\"tab2\">Comments</label>\n\n    <input id=\"tab3\" type=\"radio\" name=\"tabs\">\n    <label for=\"tab3\">Data</label>\n\n    <section id=\"content1\">\n        <section class=\"editable\">";
+output += "<div id=\"tabmenu\" class=\"photo-detail\">\n    <input id=\"tab1\" type=\"radio\" name=\"tabs\" checked>\n    <label for=\"tab1\">Story</label>\n\n    <input id=\"tab2\" type=\"radio\" name=\"tabs\">\n    <label for=\"tab2\">Comments</label>\n\n    <input id=\"tab3\" type=\"radio\" name=\"tabs\">\n    <label for=\"tab3\">Data</label>\n\n    <section id=\"content1\">\n        ";
+if((lineno = 11, colno = 41, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"is_authenticated"), "current_user[\"is_authenticated\"]", context, [])) && runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"nickname") == runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"nickname")) {
+output += "\n            <section class=\"editable\">";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"body"), env.opts.autoescape);
-output += "</section>\n        <button class=\"btn btn-info\" id=\"comment-form-submit\" type=\"submit\">Submit</button>\n    </section>\n\n    <section id=\"content2\">\n        ";
+output += "</section>\n            <h6 id=\"comment-form-prompt\" style=\"color:grey\">(Higlight text to edit)</h6>\n            <button class=\"btn btn-info hide\" id=\"comment-form-submit\">Submit</button>\n        ";
+;
+}
+else {
+output += "\n            <section>";
+output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"body"), env.opts.autoescape);
+output += "</section>\n        ";
+;
+}
+output += "\n    </section>\n\n    <section id=\"content2\">\n        ";
+if((lineno = 21, colno = 41, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"is_authenticated"), "current_user[\"is_authenticated\"]", context, []))) {
+output += "\n            ";
 env.getTemplate("comment_form.html", false, "story_detail.html", null, function(t_3,t_1) {
 if(t_3) { cb(t_3); return; }
 t_1.render(context.getVariables(), frame, function(t_4,t_2) {
 if(t_4) { cb(t_4); return; }
 output += t_2
+output += "\n        ";
+})});
+}
 output += "\n        ";
 env.getTemplate("comments.html", false, "story_detail.html", null, function(t_7,t_5) {
 if(t_7) { cb(t_7); return; }
@@ -21,7 +37,7 @@ if(t_8) { cb(t_8); return; }
 output += t_6
 output += "\n    </section>\n\n    <section id=\"content3\">\n        <table>\n            <tbody>\n                ";
 frame = frame.push();
-var t_11 = (lineno = 23, colno = 55, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "exifFields")),"iteritems"), "exifFields[\"iteritems\"]", context, []));
+var t_11 = (lineno = 30, colno = 55, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "exifFields")),"iteritems"), "exifFields[\"iteritems\"]", context, []));
 if(t_11) {var t_9;
 if(runtime.isArray(t_11)) {
 var t_10 = t_11.length;
@@ -103,7 +119,7 @@ parentTemplate.rootRenderFunc(env, context, frame, runtime, cb);
 } else {
 cb(null, output);
 }
-})})})});
+})});
 } catch (e) {
   cb(runtime.handleError(e, lineno, colno));
 }

@@ -25,23 +25,23 @@ output += "?w=320&h=320&fit=crop&q=85&auto=format 320w,\n    https://aperturus.i
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"photo"), env.opts.autoescape);
 output += "?w=640&h=640&fit=crop&q=85&auto=format 640w\"\n    sizes=\"(min-width: 40em) 30.5vw, (min-width: 60em) 22.75vw, 46vw\"\n    class=\"responsive-img\"\n    alt=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"photo"), env.opts.autoescape);
-output += "\">\n</a>\n<span onclick=\"\" class=\"text-content\">\n    <span class=\"inner-span\">\n        <span class=\"details-well\">\n            ";
+output += "\">\n</a>\n<span onclick=\"\" class=\"text-content\">\n        ";
 if(runtime.contextOrFrameLookup(context, frame, "assets")) {
-output += "\n                ";
+output += "\n            ";
 if(!runtime.inOperator(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity"),["member","author"])) {
-output += "\n                    <a class=\"link-button member-link\" href=\"/members/";
+output += "\n                <a class=\"link-button member-link\" href=\"/members/";
 output += runtime.suppressValue(runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"author")),"nickname"), env.opts.autoescape);
 output += "/\" rel=\"tag\">";
 output += runtime.suppressValue(runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"author")),"nickname"), env.opts.autoescape);
-output += "</a><br>\n                ";
+output += "</a><br>\n            ";
 ;
 }
-output += "\n            ";
+output += "\n        ";
 ;
 }
-output += "\n            <b>";
-output += runtime.suppressValue((lineno = 19, colno = 49, runtime.callWrap(runtime.memberLookup(((lineno = 19, colno = 24, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"timestamp")]))),"calendar"), "the return value of (momentjs)[\"calendar\"]", context, [])), env.opts.autoescape);
-output += "</b><br>\n            ";
+output += "\n        <b>";
+output += runtime.suppressValue((lineno = 17, colno = 45, runtime.callWrap(runtime.memberLookup(((lineno = 17, colno = 20, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"timestamp")]))),"calendar"), "the return value of (momentjs)[\"calendar\"]", context, [])), env.opts.autoescape);
+output += "</b><br>\n        ";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"votes") > 0) {
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"votes"), env.opts.autoescape);
 output += " like";
@@ -52,26 +52,26 @@ output += "s";
 output += "<br>";
 ;
 }
-output += "\n            ";
+output += "\n        ";
 if(env.getFilter("length").call(context, runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"all_comments")) > 0) {
-output += "\n                <a href=\"/photos/";
+output += "\n            <a href=\"/photos/";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
-output += "\">\n                        ";
+output += "\">\n                    ";
 output += runtime.suppressValue(env.getFilter("length").call(context, runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"all_comments")), env.opts.autoescape);
 output += " comment";
 if(env.getFilter("length").call(context, runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"all_comments")) != 1) {
 output += "s";
 ;
 }
-output += "\n                </a><br>\n            ";
+output += "\n            </a><br>\n        ";
 ;
 }
-output += "\n            ";
+output += "\n        ";
 if(runtime.contextOrFrameLookup(context, frame, "assets")) {
-output += "\n                <a href=\"#\" class=\"link-button gallery\">Gallery</a>\n            ";
+output += "\n            <a href=\"#\" class=\"link-button gallery\">Gallery</a>\n        ";
 ;
 }
-output += "\n        </span>\n    </span>\n</span>\n";
+output += "\n</span>\n";
 if(runtime.contextOrFrameLookup(context, frame, "assets")) {
 output += "\n        <a class=\"detail-link\" data-id=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
