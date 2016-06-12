@@ -8,7 +8,6 @@ define(['jquery', 'backbone', 'underscore', 'ds', 'views/appView', 'views/tabsVi
             },
 
             initialize: function() {
-                this.listenTo(this.model, 'change', this.renderMainView, this);
                 DS.set('initialchange', true)
             },
 
@@ -38,6 +37,7 @@ define(['jquery', 'backbone', 'underscore', 'ds', 'views/appView', 'views/tabsVi
                     patch: true,
                     wait:true,
                     success: function() {
+                        self.renderMainView();
                         var changeddata = {'id': self.model.id, 'votes': self.model.get('votes')};
                         window.socket.emit('my broadcast event', {data: changeddata});
                         return false;
