@@ -811,3 +811,7 @@ input, textarea, select {
     padding: 1rem;
 }
 
+a.gallery-image {
+    cursor: default;
+}
+
