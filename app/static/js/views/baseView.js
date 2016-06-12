@@ -63,13 +63,11 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
                 });
 
                 socket.on('followup', function(msg) {
-                    console.log('FollowUp' + ': ' + msg.data);
                     var member = DS.getAll('member').get(msg.data.id);
                     member.set({'followers': msg.data.followers});
                 });
 
                 socket.on('voteup', function(msg) {
-                    console.log('VoteUp' + ': ' + msg.data);
                     var photo = DS.getAll('photo').get(msg.data.id);
                     photo.set({'votes': msg.data.votes});
                 });

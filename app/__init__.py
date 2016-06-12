@@ -28,7 +28,6 @@ app = Flask(__name__, static_folder=staticdirectory)
 app.config['STATIC_FOLDER'] = staticdirectory
 
 async_mode = 'eventlet'
-print('async_mode is ' + async_mode)
 
 # monkey patching is necessary because this application uses a background
 # thread
@@ -72,10 +71,6 @@ app.config['OAUTH_CREDENTIALS'] = {
         'id': os.environ['GOOGLE_AUTH'],
         'secret': os.environ['GOOGLE_AUTH_SECRET']
     }
-    # 'twitter': {
-    #     'id': os.environ['TWITTER_AUTH'],
-    #     'secret': os.environ['TWITTER_AUTH_SECRET']
-    # }
 }
 
 if not app.debug and MAIL_SERVER != '':
