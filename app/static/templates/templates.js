@@ -5,7 +5,7 @@ var colno = null;
 var output = "";
 try {
 var parentTemplate = null;
-output += "<a class=\"gallery-image\" href=\"https://aperturus.imgix.net/";
+output += "<a class=\"gallery-image\" onclick=\"return false\" href=\"https://aperturus.imgix.net/";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"photo"), env.opts.autoescape);
 output += "?w=640&q=85&auto=format 640w\" data-id=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
