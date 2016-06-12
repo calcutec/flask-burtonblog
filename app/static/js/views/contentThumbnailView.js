@@ -22,7 +22,7 @@ define(['jquery', 'backbone', 'blueimp'],
                 event.preventDefault();
                 var target = event.target || event.srcElement,
                     link = target.src ? target.parentNode : target,
-                    options = {index: link, event: event},
+                    options = {index: link, event: event, speed: 200},
                     links = window.document.getElementsByClassName('gallery-image');
                 var currentgallery = blueimp(links, options);
                 currentgallery.slide($(this.el).index());
