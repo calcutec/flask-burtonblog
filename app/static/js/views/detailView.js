@@ -4,9 +4,9 @@ define(['jquery', 'backbone', 'underscore', 'ds', 'views/appView', 'views/tabsVi
             events: {
                 'click #deletephoto':   'deletephoto',
                 'click .vote':   'vote',
-                'click .unvote':   'vote'
+                'click .unvote':   'vote',
             },
-
+            
             initialize: function() {
                 DS.set('initialchange', true);
                 this.model.on("change:has_voted", this.updateLike, this);

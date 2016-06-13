@@ -77,7 +77,7 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
                 'click a.member-link':      'memberLink',
                 'click a.detail-link':      'detailLink',
                 'change #element':          'filterOnSelect',
-                'click i.fa-picture-o':     'iconLink',
+                // 'click i.fa-picture-o':     'iconLink',
                 'click i.fa-users':         'iconLink',
                 'click i.fa-briefcase':     'iconLink',
                 'click i.fa-home':          'iconLink',
