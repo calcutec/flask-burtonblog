@@ -1,6 +1,5 @@
-define(['jquery', 'backbone', 'ds', 'nunjucks', 'models/photoModel', 'views/appView', 'views/detailView', 
-    'views/navView', 'views/headerView'],
-    function($, Backbone, DS, nunjucks, PhotoModel, AppView, DetailView, NavView, HeaderView){
+define(['jquery', 'backbone', 'ds', 'nunjucks', 'models/photoModel'],
+    function($, Backbone, DS, nunjucks, PhotoModel){
         return Backbone.View.extend({
             initialize: function(){
                 this.render()
@@ -14,11 +13,11 @@ define(['jquery', 'backbone', 'ds', 'nunjucks', 'models/photoModel', 'views/appV
                 if (DS.get('currentFile') === null){
                     alert("file upload has failed")
                 } else {
-                    var photo = DS.get('uploadedfilename')
+                    var photo = DS.get('uploadedfilename');
                     newPostModel.set({'photo': photo});
                     newPostModel.set({'exifTags': DS.get('exifTags')});
                 }
-                var self = this;
+
                 newPostModel.save(null, {
                     type: 'POST',
                     success: function (model) {

@@ -4,7 +4,7 @@ define(['jquery', 'backbone', 'underscore', 'ds', 'views/appView', 'views/tabsVi
             events: {
                 'click #deletephoto':   'deletephoto',
                 'click .vote':   'vote',
-                'click .unvote':   'vote',
+                'click .unvote':   'vote'
             },
             
             initialize: function() {
