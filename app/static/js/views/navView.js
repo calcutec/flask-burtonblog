@@ -2,15 +2,6 @@ define(['jquery', 'backbone', 'ds'],
     function($, Backbone, DS){
         return Backbone.View.extend({
 
-            events: {
-                'click .fa-picture-o': 'alertClick'
-            },
-
-            alertClick: function(e) {
-                e.preventDefault();
-                alert('pictureclicked');
-            },
-
             render: function(){
                 var assets = {};
                 assets['category_counts'] = DS.get('counts');

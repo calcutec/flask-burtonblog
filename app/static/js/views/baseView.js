@@ -77,7 +77,7 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
                 'click a.member-link':      'memberLink',
                 'click a.detail-link':      'detailLink',
                 'change #element':          'filterOnSelect',
-                // 'click i.fa-picture-o':     'iconLink',
+                'click i.fa-picture-o':     'iconLink',
                 'click i.fa-users':         'iconLink',
                 'click i.fa-briefcase':     'iconLink',
                 'click i.fa-home':          'iconLink',
@@ -147,6 +147,7 @@ define(['jquery', 'backbone', 'ds', 'views/contentMainView', 'views/profileMainV
                         Backbone.history.navigate(DS.get('route'), {trigger: false});
                         this.filter('member');
                     } else if (e.currentTarget.classList[1] == 'fa-picture-o'){
+                        alert('picture icon clicked');
                         DS.set('entity', 'photos');
                         DS.set('route', '/photos/' + DS.get('category'));
                         Backbone.history.navigate(DS.get('route'), {trigger: false});
