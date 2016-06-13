@@ -1,0 +1,5 @@
+{% if g.user.is_following(post) %}
+    <a class="link-button unfollow" href="/members/{{ post.nickname }}/unfollow/"><strong>Unfollow</strong></a>
+{% else %}
+    <a class="link-button follow" href="/members/{{ post.nickname }}/follow/"><strong>Follow</strong></a>
+{% endif %}

@@ -10,7 +10,7 @@ define(['jquery', 'backbone', 'underscore', 'ds', 'views/appView', 'views/tabsVi
             initialize: function() {
                 DS.set('initialchange', true);
                 this.model.on("change:has_voted", this.updateLike, this);
-                this.model.on("change:attributeName", this.updateCount, this);
+                this.model.on("change:votes", this.updateCount, this);
             },
 
             deletephoto: function() {
@@ -39,7 +39,6 @@ define(['jquery', 'backbone', 'underscore', 'ds', 'views/appView', 'views/tabsVi
                     patch: true,
                     wait:true,
                     success: function() {
-                        self.updateCount();
                         var changeddata = {'id': self.model.id, 'votes': self.model.get('votes')};
                         window.socket.emit('my broadcast event', {data: changeddata});
                         return false;

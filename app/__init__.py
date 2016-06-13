@@ -59,7 +59,7 @@ js_templates = Bundle('templates/archive_entry.js', 'templates/member.js', 'temp
                       'templates/home_page.js', 'templates/comments.js', 'templates/comment.js',
                       'templates/upload_form.js', 'templates/photo_text_form.js', 'templates/photo_inputs.js',
                       'templates/comment_form.js', 'templates/story_detail.js', 'templates/votes.js',
-                      output='templates/templates.js')
+                      'templates/followers.js', output='templates/templates.js')
 assets.register('js_templates', js_templates)
 
 

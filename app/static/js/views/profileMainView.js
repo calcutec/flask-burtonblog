@@ -3,12 +3,14 @@ define(['jquery', 'backbone', 'ds', 'views/appView', 'views/headerView', 'views/
         return Backbone.View.extend({
 
             initialize: function() {
-                this.listenTo(this.model, 'change', this.render, this);
+                // this.listenTo(this.model, 'change', this.render, this);
+                this.model.on("change:is_following", this.updateFollowing, this);
+                this.model.on("change:followers", this.updateCount, this);
             },
             
             events: {
-                'click .follow':   'followuser',
-                'click .unfollow':   'unfollowuser',
+                'click .follow':   'followstatus',
+                'click .unfollow':   'followstatus',
                 // 'click #update-info':   'updateInfo',
                 'click #change-image': 'changeImage'
             },
@@ -25,9 +27,13 @@ define(['jquery', 'backbone', 'ds', 'views/appView', 'views/headerView', 'views/
                 AppView(new UploadFormView({id: 'main-view'}));
             },
 
-            unfollowuser: function(e) {
+            followstatus: function(e) {
                 e.preventDefault();
-                this.model.set({is_following: false});
+                if (this.model.get('is_following') == true){
+                    this.model.set({is_following: false});
+                } else {
+                    this.model.set({is_following: true});
+                }
                 var self = this;
                 this.model.save(this.model.changedAttributes(), {
                     patch: true,
@@ -84,6 +90,25 @@ define(['jquery', 'backbone', 'ds', 'views/appView', 'views/headerView', 'views/
                 this.$el.html(window.env.render("person.html", {'post': post, 'g': g, 'momentjs': moment }));
 
                 return this;
+            },
+
+            updateFollowing: function() {
+                var post = this.model.toJSON();
+                post['author'] = { "nickname": post.nickname };
+                var currentfollowers = post.followers;
+                var currentfollowed = post.followed;
+                post['followers'] = { "count": function(){ return currentfollowers } };
+                post['followed'] = { "count": function(){ return currentfollowed } };
+                var g = {};
+                g.user = {};
+                g.user['is_following'] = function(){
+                    return post.is_following;
+                };
+                this.$el.find('#followers-icon').html(window.env.render("followers.html", {'post': post, 'g': g }));
+            },
+
+            updateCount: function() {
+                this.$el.find( "#followers" ).html('Followers: ' + this.model.get('followers'));
             }
         });
     }
