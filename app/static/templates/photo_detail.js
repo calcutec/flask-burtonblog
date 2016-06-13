@@ -25,18 +25,13 @@ output += "/\" rel=\"tag\">";
 output += runtime.suppressValue(runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"author")),"nickname"), env.opts.autoescape);
 output += "</a><br>\n                    <b>";
 output += runtime.suppressValue((lineno = 10, colno = 57, runtime.callWrap(runtime.memberLookup(((lineno = 10, colno = 32, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"timestamp")]))),"calendar"), "the return value of (momentjs)[\"calendar\"]", context, [])), env.opts.autoescape);
-output += "</b><br>\n            ";
-if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"votes") > 0) {
-output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"votes"), env.opts.autoescape);
-output += " like";
-if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"votes") != 1) {
-output += "s";
-;
-}
-output += "<br>";
-;
-}
-output += "\n            ";
+output += "</b><br>\n            <span id=\"votes\">";
+env.getTemplate("votes.html", false, "photo_detail.html", null, function(t_3,t_1) {
+if(t_3) { cb(t_3); return; }
+t_1.render(context.getVariables(), frame, function(t_4,t_2) {
+if(t_4) { cb(t_4); return; }
+output += t_2
+output += "</span>\n            ";
 if((lineno = 12, colno = 45, runtime.callWrap(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"is_authenticated"), "current_user[\"is_authenticated\"]", context, [])) && runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"author")),"nickname") == runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "current_user")),"nickname")) {
 output += "\n                <a class=\"link-button red\" id=\"deletephoto\" href=\"#\">Delete</a>\n            ";
 ;
@@ -69,7 +64,7 @@ parentTemplate.rootRenderFunc(env, context, frame, runtime, cb);
 } else {
 cb(null, output);
 }
-;
+})});
 } catch (e) {
   cb(runtime.handleError(e, lineno, colno));
 }

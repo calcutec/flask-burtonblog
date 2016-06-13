@@ -8,7 +8,9 @@ define(['jquery', 'backbone', 'underscore', 'ds', 'views/appView', 'views/tabsVi
             },
 
             initialize: function() {
-                DS.set('initialchange', true)
+                DS.set('initialchange', true);
+                this.model.on("change:has_voted", this.updateLike, this);
+                this.model.on("change:attributeName", this.updateCount, this);
             },
 
             deletephoto: function() {
@@ -37,7 +39,7 @@ define(['jquery', 'backbone', 'underscore', 'ds', 'views/appView', 'views/tabsVi
                     patch: true,
                     wait:true,
                     success: function() {
-                        self.renderMainView();
+                        self.updateCount();
                         var changeddata = {'id': self.model.id, 'votes': self.model.get('votes')};
                         window.socket.emit('my broadcast event', {data: changeddata});
                         return false;
@@ -84,7 +86,20 @@ define(['jquery', 'backbone', 'underscore', 'ds', 'views/appView', 'views/tabsVi
                 };
                 $(this.el).html(window.env.render("photo_detail.html", {'post': post, 'momentjs': moment }));
                 return this;
+            },
+
+            updateLike: function() {
+                if (this.model.get('has_voted') === true) {
+                    this.$el.find('.fa-meh-o').addClass('fa-smile-o').removeClass('fa-meh-o');
+                } else {
+                    this.$el.find('.fa-smile-o').addClass('fa-meh-o').removeClass('fa-smile-o');
+                }
+            },
+
+            updateCount: function() {
+                this.$el.find( "span#votes" ).html(window.env.render("votes.html", {'post': {'votes': this.model.get('votes')}}));
             }
+
         });
     }
 );

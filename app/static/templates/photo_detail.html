@@ -9,7 +9,7 @@
         <span onclick="" class="text-content">
             <a class="link-button member-link" href="/members/{{ post.author.nickname }}/" rel="tag">{{ post.author.nickname }}</a><br>
                     <b>{{ momentjs(post.timestamp).calendar() }}</b><br>
-            {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
+            <span id="votes">{% include 'votes.html' %}</span>
             {% if current_user.is_authenticated() and post.author.nickname == current_user.nickname %}
                 <a class="link-button red" id="deletephoto" href="#">Delete</a>
             {% endif %}
