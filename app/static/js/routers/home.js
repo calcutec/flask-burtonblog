@@ -59,6 +59,12 @@ define(["jquery", "backbone", "nunjucks", "socketio", "ds", "collections/photoCo
                     }
                     return counts;
                 };
+                
+                $.fn.resetDataStore = function() {
+                    DS.set({'route': null, 'collection': null, 'category': null, 'entity': null, 'nickname':
+                        null, 'authenticated': window.env.globals.current_user.is_authenticated(), 'count': null,
+                        'postId': null, 'template': null, 'render': null });
+                };
             },
 
             routes: {
