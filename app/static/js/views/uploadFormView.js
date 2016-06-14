@@ -105,23 +105,38 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
                 );
             },
 
+            oddOrEven: function(rownumber) {
+                return ( x & 1 ) ? "odd" : "even";
+            },
 
             displayExifData: function(exif) {
-                var tags = exif.getAll();
+                var unorderedtags = exif.getAll();
+                var tags = {};
+                Object.keys(unorderedtags).sort().forEach(function(key) {
+                  tags[key] = unorderedtags[key];
+                });
                 var table = this.$el.find('table').empty();
                 var row = $('<tr></tr>');
                 var cell = $('<td></td>');
                 var prop;
                 var exifTags = {};
+                var rownumber = 0;
                 for (prop in tags) {
                   if (tags.hasOwnProperty(prop)) {
-                    if(prop in {'Make':'', 'Model':'', 'DateTime':'', 'ShutterSpeedValue':'', 'FNumber':'',
-                            'ExposureProgram':'', 'PhotographicSensitivity':'', 'FocalLength':'',
-                            'FocalLengthIn35mmFilm':'', 'LensModel':'', 'Sharpness':'', 'PixelXDimension':'',
-                            'PixelYDimension':'', 'Orientation':'', 'DateTimeOriginal':''}) {
+                    if(prop in {"ExposureTime":'', "ShutterSpeedValue":'', 'BrightnessValue':''}) {
+                        var numb = Number(tags[prop]);
+                        tags[prop] = +numb.toFixed(4);
+                    }
+                    if(prop in {'ApertureValue':'', 'BrightnessValue':'', 'ExposureProgram':'', 'Make':'', 'Model':'',
+                            'ShutterSpeedValue':'', 'FNumber':'', 'PhotographicSensitivity':'', 'FocalLength':'',
+                            'FocalLengthIn35mmFilm':'', 'LensModel':'', 'Sharpness':'', 'ImageHeight':'',
+                            'MeteringMode':'', 'WhiteBalance':'', 'Flash':'', 'ExposureTime':'', 'ImageUniqueID':'',
+                            'ImageWidth':'', 'Orientation':'', 'DateTimeOriginal':''
+                            } && (tags[prop] != "" || tags[prop] != "None") ) {
                             exifTags[prop] = tags[prop];
+                            rownumber += 1;
                             table.append(
-                                row.clone()
+                                row.clone().addClass(this.oddOrEven(rownumber))
                                     .append(cell.clone().text(prop))
                                     .append(cell.clone().text(tags[prop]))
                             );
