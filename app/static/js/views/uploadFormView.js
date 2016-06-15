@@ -106,7 +106,7 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
             },
 
             oddOrEven: function(rownumber) {
-                return ( x & 1 ) ? "odd" : "even";
+                return ( rownumber & 1 ) ? "odd" : "even";
             },
 
             displayExifData: function(exif) {
@@ -135,9 +135,10 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
                             } && (tags[prop] != "" || tags[prop] != "None") ) {
                             exifTags[prop] = tags[prop];
                             rownumber += 1;
+                            var fullprop = prop.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); })
                             table.append(
                                 row.clone().addClass(this.oddOrEven(rownumber))
-                                    .append(cell.clone().text(prop))
+                                    .append(cell.clone().text(fullprop))
                                     .append(cell.clone().text(tags[prop]))
                             );
                     }
