@@ -68,7 +68,7 @@ output += "\n            </a><br>\n        ";
 }
 output += "\n        ";
 if(runtime.contextOrFrameLookup(context, frame, "assets")) {
-output += "\n            <a href=\"#\" class=\"link-button gallery\">Gallery</a>\n        ";
+output += "\n            <span class=\"gallery\">\n                <i class=\"fa fa-play-circle-o fa-2x\" aria-hidden=\"true\"></i>\n            </span>\n        ";
 ;
 }
 output += "\n</span>\n";
@@ -77,7 +77,7 @@ output += "\n        <a class=\"detail-link\" data-id=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
 output += "\" href=\"/photos/";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
-output += "\">\n        <span class=\"rounded-icon\">\n            <svg version=\"1.1\" width=\"22\" height=\"22\" viewBox=\"0 0 22 22\">\n                <path d=\"M3.4 20.2L9 14.5 7.5 13l-5.7 5.6L1 14H0v7.5l.5.5H8v-1l-4.6-.8M18.7 1.9L13 7.6 14.4 9l5.7-5.7.5 4.7h1.2V.6l-.5-.5H14v1.2l4.7.6\">\n                </path>\n            </svg>\n        </span>\n        </a>\n";
+output += "\">\n            <span class=\"rounded-icon\">\n                <i class=\"fa fa-camera-retro fa-c2x\"></i>\n            </span>\n        </a>\n";
 ;
 }
 output += "\n";
@@ -674,7 +674,7 @@ output += "\n    </span>\n    <a class=\"detail-link\" data-id=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
 output += "\" href=\"/photos/";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
-output += "\">\n        <span class=\"main rounded-icon\">\n            <svg width=\"22\" height=\"22\" viewBox=\"0 0 22 22\">\n                <path d=\"M3.4 20.2L9 14.5 7.5 13l-5.7 5.6L1 14H0v7.5l.5.5H8v-1l-4.6-.8M18.7 1.9L13 7.6 14.4 9l5.7-5.7.5 4.7h1.2V.6l-.5-.5H14v1.2l4.7.6\">\n                </path>\n            </svg>\n        </span>\n    </a>\n    </li>\n</ul>";
+output += "\">\n        <span class=\"main rounded-icon\">\n            <i class=\"fa fa-camera-retro fa-c2x\"></i>\n        </span>\n    </a>\n    </li>\n</ul>";
 if(parentTemplate) {
 parentTemplate.rootRenderFunc(env, context, frame, runtime, cb);
 } else {
@@ -989,7 +989,7 @@ var colno = null;
 var output = "";
 try {
 var parentTemplate = null;
-output += "<div class=\"well\" id=\"inputs-target\"></div>\n<div id=\"loadingcircle\" class=\"hide\"><div id=\"loadingcircletarget\"></div></div>\n<div id=\"inputs\"></div>\n<div id=\"exif\" class=\"exif\">\n    <table></table>\n</div>";
+output += "<div class=\"well\" id=\"inputs-target\"></div>\n<div id=\"loadingcircle\" class=\"hide\"><i class=\"fa fa-refresh fa-spin fa-3x fa-fw\"></i></div>\n<div id=\"inputs\"></div>\n<div id=\"exif\" class=\"exif\">\n    <table></table>\n</div>";
 if(parentTemplate) {
 parentTemplate.rootRenderFunc(env, context, frame, runtime, cb);
 } else {
@@ -1151,20 +1151,20 @@ frame.set("loop.last", t_9 === t_10 - 1);
 frame.set("loop.length", t_10);
 output += "\n                    ";
 if(!runtime.inOperator(t_12,["post_id","id"])) {
-output += "\n                    ";
+output += "\n                        ";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "loop")),"index") % 2 == 0) {
-output += "\n                        <tr class=\"even\">\n                    ";
+output += "\n                            <tr class=\"even\">\n                        ";
 ;
 }
 else {
-output += "\n                        <tr class=\"odd\">\n                    ";
+output += "\n                            <tr class=\"odd\">\n                        ";
 ;
 }
-output += "\n                        <td>";
+output += "\n                            <td>";
 output += runtime.suppressValue(t_12, env.opts.autoescape);
-output += "</td>\n                        <td>";
+output += "</td>\n                            <td>";
 output += runtime.suppressValue(t_13, env.opts.autoescape);
-output += "</td>\n                    </tr>\n                    ";
+output += "</td>\n                        </tr>\n                    ";
 ;
 }
 output += "\n                ";
@@ -1187,20 +1187,20 @@ frame.set("loop.last", t_9 === t_10 - 1);
 frame.set("loop.length", t_10);
 output += "\n                    ";
 if(!runtime.inOperator(t_14,["post_id","id"])) {
-output += "\n                    ";
+output += "\n                        ";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "loop")),"index") % 2 == 0) {
-output += "\n                        <tr class=\"even\">\n                    ";
+output += "\n                            <tr class=\"even\">\n                        ";
 ;
 }
 else {
-output += "\n                        <tr class=\"odd\">\n                    ";
+output += "\n                            <tr class=\"odd\">\n                        ";
 ;
 }
-output += "\n                        <td>";
+output += "\n                            <td>";
 output += runtime.suppressValue(t_14, env.opts.autoescape);
-output += "</td>\n                        <td>";
+output += "</td>\n                            <td>";
 output += runtime.suppressValue(t_15, env.opts.autoescape);
-output += "</td>\n                    </tr>\n                    ";
+output += "</td>\n                        </tr>\n                    ";
 ;
 }
 output += "\n                ";

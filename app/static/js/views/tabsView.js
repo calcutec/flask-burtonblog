@@ -1,5 +1,5 @@
-define(['jquery', 'backbone', 'ds', 'views/commentView'],
-    function($, Backbone, DS, CommentView){
+define(['jquery', 'backbone', 'underscore', 'ds', 'views/commentView'],
+    function($, Backbone, _, DS, CommentView){
         return Backbone.View.extend({
 
             events: {
@@ -7,13 +7,12 @@ define(['jquery', 'backbone', 'ds', 'views/commentView'],
                 'click #updatestory': 'updatestory'
             },
 
-            updatestory: function(e) {
+            updatestory: function() {
                 this.model.set('body', window.micropost);
-                var self = this;
                 this.model.save(this.model.changedAttributes(), {
                     patch: true,
                     wait:true,
-                    success: function(model) {
+                    success: function() {
                         DS.set('initialchange', true);
                         $('#updatestory').toggleClass('hide');
                         $('#comment-form-prompt').toggleClass('hide');
@@ -63,7 +62,21 @@ define(['jquery', 'backbone', 'ds', 'views/commentView'],
                     var unordered = self.model.get('exifData');
                     const ordered = {};
                     Object.keys(unordered).sort().forEach(function(key) {
-                      ordered[key] = unordered[key];
+                        var fullkey = key.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); });
+                        if (key in {'ApertureValue':'', 'BrightnessValue':'', 'ExposureProgram':'', 'Make':'', 'Model':'',
+                            'ShutterSpeedValue':'', 'FNumber':'', 'PhotographicSensitivity':'', 'FocalLength':'',
+                            'FocalLengthIn35mmFilm':'', 'LensModel':'', 'Sharpness':'', 'ImageHeight':'',
+                            'MeteringMode':'', 'WhiteBalance':'', 'Flash':'', 'ExposureTime':'', 'ImageUniqueID':'',
+                            'ImageWidth':'', 'Orientation':'', 'DateTimeOriginal':'', 'PixelXDimension':'',
+                            'PixelYDimension':'', 'ResolutionUnit':'', 'XResolution':'', 'YResolution':''
+                            } && unordered[key] !== null  ) {
+                            if(key in {"ExposureTime":'', "ShutterSpeedValue":'', 'BrightnessValue':''}) {
+                                var numb = Number(unordered[key]);
+                                ordered[fullkey] = +numb.toFixed(4);
+                            } else {
+                                ordered[fullkey] = unordered[key];
+                            }
+                        }
                     });
                     return ordered;
                 };

@@ -64,8 +64,6 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
                 inputs.empty();
                 var loadingcircle = this.$el.find('#loadingcircle');
                 loadingcircle.removeClass('hide');
-                var loadingcircletarget = this.$el.find('#loadingcircletarget')
-                loadingcircletarget.attr('data-loader', 'arrow-circle');
                 var self = this;
                 window.loadImage(
                    nowCurrentFile,
@@ -74,13 +72,11 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
                            return false;
                        } else {
                             if (DS.get('route') == '/members/upload') {
-                                loadingcircletarget.removeAttr('data-loader');
                                 loadingcircle.addClass('hide');
                                 self.createContent(img);
                             } else {
                                 window.loadImage.parseMetaData(nowCurrentFile, function (data) {
                                    if (data.exif) {
-                                       loadingcircletarget.removeAttr('data-loader');
                                        loadingcircle.addClass('hide');
                                        self.displayExifData(data.exif);
                                        self.createContent(img)
@@ -125,40 +121,40 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
                 var unorderedtags = exif.getAll();
                 var tags = {};
                 Object.keys(unorderedtags).sort().forEach(function(key) {
-                  tags[key] = unorderedtags[key];
+                    if(key in {'ApertureValue':'', 'BrightnessValue':'', 'ExposureProgram':'', 'Make':'', 'Model':'',
+                        'ShutterSpeedValue':'', 'FNumber':'', 'PhotographicSensitivity':'', 'FocalLength':'',
+                        'FocalLengthIn35mmFilm':'', 'LensModel':'', 'Sharpness':'', 'ImageHeight':'',
+                        'MeteringMode':'', 'WhiteBalance':'', 'Flash':'', 'ExposureTime':'', 'ImageUniqueID':'',
+                        'ImageWidth':'', 'Orientation':'', 'DateTimeOriginal':'', 'PixelXDimension':'',
+                        'PixelYDimension':'', 'ResolutionUnit':'', 'XResolution':'', 'YResolution':''}
+                        && unorderedtags[key] !== null ) {
+
+                        if(key in {"ExposureTime":'', "ShutterSpeedValue":'', 'BrightnessValue':''}) {
+                            var numb = Number(unorderedtags[key]);
+                            tags[key] = +numb.toFixed(4);
+                        } else {
+                            tags[key] = unorderedtags[key];
+                        }
+                    }
                 });
                 var table = this.$el.find('table');
                 var row = $('<tr></tr>');
                 var cell = $('<td></td>');
                 var prop;
-                var exifTags = {};
                 var rownumber = 0;
                 for (prop in tags) {
                   if (tags.hasOwnProperty(prop)) {
-                    if(prop in {"ExposureTime":'', "ShutterSpeedValue":'', 'BrightnessValue':''}) {
-                        var numb = Number(tags[prop]);
-                        tags[prop] = +numb.toFixed(4);
-                    }
-                    if(prop in {'ApertureValue':'', 'BrightnessValue':'', 'ExposureProgram':'', 'Make':'', 'Model':'',
-                            'ShutterSpeedValue':'', 'FNumber':'', 'PhotographicSensitivity':'', 'FocalLength':'',
-                            'FocalLengthIn35mmFilm':'', 'LensModel':'', 'Sharpness':'', 'ImageHeight':'',
-                            'MeteringMode':'', 'WhiteBalance':'', 'Flash':'', 'ExposureTime':'', 'ImageUniqueID':'',
-                            'ImageWidth':'', 'Orientation':'', 'DateTimeOriginal':'', 'PixelXDimension':'',
-                            'PixelYDimension':'', 'ResolutionUnit':'', 'XResolution':'', 'YResolution':''
-                            } && (tags[prop] != "" || tags[prop] != "None") ) {
-                            exifTags[prop] = tags[prop];
-                            rownumber += 1;
-                            var fullprop = prop
-                                .replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); });
-                            table.append(
-                                row.clone().addClass(this.oddOrEven(rownumber))
-                                    .append(cell.clone().text(fullprop))
-                                    .append(cell.clone().text(tags[prop]))
-                            );
-                    }
+                    rownumber += 1;
+                    var fullprop = prop
+                        .replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); });
+                    table.append(
+                        row.clone().addClass(this.oddOrEven(rownumber))
+                            .append(cell.clone().text(fullprop))
+                            .append(cell.clone().text(tags[prop]))
+                    );
                   }
                 }
-                DS.set('exifTags', exifTags);
+                DS.set('exifTags', tags);
                 $('#exif').show()
             },
 

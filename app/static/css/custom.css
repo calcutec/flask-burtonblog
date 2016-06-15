@@ -389,8 +389,8 @@ span.rounded-icon {
     display: table;
     transition: opacity 1s ease-out;
     opacity: 0;
-    width: 3rem;
-    height: 3rem;
+    width: 3.5rem;
+    height: 3.5rem;
     right: 1em;
     top: .5em;
     vertical-align: middle;
@@ -398,16 +398,7 @@ span.rounded-icon {
     background-color: #005689;
     fill: #ffffff;
 }
-span.rounded-icon svg {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    width: 60%;
-    height: 60%;
-    margin: auto;
-}
+
 /** Navbar styling **/
 #title {
     display: inline-block;
@@ -821,4 +812,14 @@ a.gallery-image {
     margin-right: auto;
     width: 6em
 }
+
+.fa-c2x {
+    font-size: 2.5rem;
+    margin: .5rem 0 0 .4rem;
+}
+
+.gallery {
+    cursor: pointer;
+}
+
 

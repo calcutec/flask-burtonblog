@@ -55,20 +55,20 @@ frame.set("loop.last", t_9 === t_10 - 1);
 frame.set("loop.length", t_10);
 output += "\n                    ";
 if(!runtime.inOperator(t_12,["post_id","id"])) {
-output += "\n                    ";
+output += "\n                        ";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "loop")),"index") % 2 == 0) {
-output += "\n                        <tr class=\"even\">\n                    ";
+output += "\n                            <tr class=\"even\">\n                        ";
 ;
 }
 else {
-output += "\n                        <tr class=\"odd\">\n                    ";
+output += "\n                            <tr class=\"odd\">\n                        ";
 ;
 }
-output += "\n                        <td>";
+output += "\n                            <td>";
 output += runtime.suppressValue(t_12, env.opts.autoescape);
-output += "</td>\n                        <td>";
+output += "</td>\n                            <td>";
 output += runtime.suppressValue(t_13, env.opts.autoescape);
-output += "</td>\n                    </tr>\n                    ";
+output += "</td>\n                        </tr>\n                    ";
 ;
 }
 output += "\n                ";
@@ -91,20 +91,20 @@ frame.set("loop.last", t_9 === t_10 - 1);
 frame.set("loop.length", t_10);
 output += "\n                    ";
 if(!runtime.inOperator(t_14,["post_id","id"])) {
-output += "\n                    ";
+output += "\n                        ";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "loop")),"index") % 2 == 0) {
-output += "\n                        <tr class=\"even\">\n                    ";
+output += "\n                            <tr class=\"even\">\n                        ";
 ;
 }
 else {
-output += "\n                        <tr class=\"odd\">\n                    ";
+output += "\n                            <tr class=\"odd\">\n                        ";
 ;
 }
-output += "\n                        <td>";
+output += "\n                            <td>";
 output += runtime.suppressValue(t_14, env.opts.autoescape);
-output += "</td>\n                        <td>";
+output += "</td>\n                            <td>";
 output += runtime.suppressValue(t_15, env.opts.autoescape);
-output += "</td>\n                    </tr>\n                    ";
+output += "</td>\n                        </tr>\n                    ";
 ;
 }
 output += "\n                ";
