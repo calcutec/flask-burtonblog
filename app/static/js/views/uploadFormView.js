@@ -58,6 +58,14 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
             },
 
             generateUploadFormThumb: function(nowCurrentFile){
+                var table = this.$el.find('table');
+                table.empty();
+                var inputs = this.$el.find('#inputs');
+                inputs.empty();
+                var loadingcircle = this.$el.find('#loadingcircle');
+                loadingcircle.removeClass('hide');
+                var loadingcircletarget = this.$el.find('#loadingcircletarget')
+                loadingcircletarget.attr('data-loader', 'arrow-circle');
                 var self = this;
                 window.loadImage(
                    nowCurrentFile,
@@ -66,10 +74,14 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
                            return false;
                        } else {
                             if (DS.get('route') == '/members/upload') {
+                                loadingcircletarget.removeAttr('data-loader');
+                                loadingcircle.addClass('hide');
                                 self.createContent(img);
                             } else {
                                 window.loadImage.parseMetaData(nowCurrentFile, function (data) {
                                    if (data.exif) {
+                                       loadingcircletarget.removeAttr('data-loader');
+                                       loadingcircle.addClass('hide');
                                        self.displayExifData(data.exif);
                                        self.createContent(img)
                                    } else {
@@ -115,7 +127,7 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
                 Object.keys(unorderedtags).sort().forEach(function(key) {
                   tags[key] = unorderedtags[key];
                 });
-                var table = this.$el.find('table').empty();
+                var table = this.$el.find('table');
                 var row = $('<tr></tr>');
                 var cell = $('<td></td>');
                 var prop;
@@ -131,11 +143,13 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
                             'ShutterSpeedValue':'', 'FNumber':'', 'PhotographicSensitivity':'', 'FocalLength':'',
                             'FocalLengthIn35mmFilm':'', 'LensModel':'', 'Sharpness':'', 'ImageHeight':'',
                             'MeteringMode':'', 'WhiteBalance':'', 'Flash':'', 'ExposureTime':'', 'ImageUniqueID':'',
-                            'ImageWidth':'', 'Orientation':'', 'DateTimeOriginal':''
+                            'ImageWidth':'', 'Orientation':'', 'DateTimeOriginal':'', 'PixelXDimension':'',
+                            'PixelYDimension':'', 'ResolutionUnit':'', 'XResolution':'', 'YResolution':''
                             } && (tags[prop] != "" || tags[prop] != "None") ) {
                             exifTags[prop] = tags[prop];
                             rownumber += 1;
-                            var fullprop = prop.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); })
+                            var fullprop = prop
+                                .replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); });
                             table.append(
                                 row.clone().addClass(this.oddOrEven(rownumber))
                                     .append(cell.clone().text(fullprop))
