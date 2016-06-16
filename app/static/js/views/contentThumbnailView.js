@@ -36,7 +36,7 @@ define(['jquery', 'backbone', 'blueimp'],
                     },
                     links = window.document.getElementsByClassName('gallery-image');
                 var currentgallery = blueimp(links, options);
-                currentgallery.slide($(this.el).index());
+                currentgallery.slide($(this.el).index()+1);
             }
         });
     }

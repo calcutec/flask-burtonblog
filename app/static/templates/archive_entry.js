@@ -40,7 +40,7 @@ output += "\n        ";
 ;
 }
 output += "\n        <b>";
-output += runtime.suppressValue((lineno = 17, colno = 45, runtime.callWrap(runtime.memberLookup(((lineno = 17, colno = 20, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"timestamp")]))),"calendar"), "the return value of (momentjs)[\"calendar\"]", context, [])), env.opts.autoescape);
+output += runtime.suppressValue((lineno = 17, colno = 43, runtime.callWrap(runtime.memberLookup(((lineno = 17, colno = 20, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"timestamp")]))),"format"), "the return value of (momentjs)[\"format\"]", context, ["M/D/YY"])), env.opts.autoescape);
 output += "</b><br>\n        ";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"votes") > 0) {
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"votes"), env.opts.autoescape);
@@ -49,21 +49,6 @@ if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"
 output += "s";
 ;
 }
-output += "<br>";
-;
-}
-output += "\n        ";
-if(env.getFilter("length").call(context, runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"all_comments")) > 0) {
-output += "\n            <a href=\"/photos/";
-output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
-output += "\">\n                    ";
-output += runtime.suppressValue(env.getFilter("length").call(context, runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"all_comments")), env.opts.autoescape);
-output += " comment";
-if(env.getFilter("length").call(context, runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"all_comments")) != 1) {
-output += "s";
-;
-}
-output += "\n            </a><br>\n        ";
 ;
 }
 output += "\n        ";

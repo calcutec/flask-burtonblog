@@ -15,13 +15,8 @@
                 <a class="link-button member-link" href="/members/{{ post.author.nickname }}/" rel="tag">{{ post.author.nickname }}</a><br>
             {% endif %}
         {% endif %}
-        <b>{{ momentjs(post.timestamp).calendar() }}</b><br>
-        {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
-        {% if post.all_comments|length > 0 %}
-            <a href="/photos/{{ post.id }}">
-                    {{ post.all_comments|length }} comment{% if post.all_comments|length != 1 %}s{% endif %}
-            </a><br>
-        {% endif %}
+        <b>{{ momentjs(post.timestamp).format('M/D/YY') }}</b><br>
+        {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}{% endif %}
         {% if assets %}
             <span class="gallery">
                 <i class="fa fa-play-circle-o fa-2x" aria-hidden="true"></i>

@@ -16,7 +16,7 @@
 
         <!-- CSS
         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-        <link rel="stylesheet" href="{{ local_static_url }}buildcss/main.css">
+        <link rel="stylesheet" href="{{ local_static_url }}css/main.css">
         <script src="{{ local_static_url }}js/libs/moment/moment.min.js"></script>
         <!-- Favicon
         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
@@ -46,9 +46,11 @@
         {% assets "js_templates" %}
             <script type="text/javascript" src="{{ local_static_url }}templates/templates.js"></script>
         {% endassets %}
-        <script src="{{ local_static_url }}js/libs/loadimage/canvas-to-blob.min.js"></script>
+        <script src="{{ local_static_url }}js/libs/prefixfree/prefixfree.min.js"></script>
+        <script src="{{ local_static_url }}js/libs/prefixfree/prefixfree.viewport-units.js"></script>
         <script src="{{ local_static_url }}js/libs/loadimage/load-image.all.min.js"></script>
         <script src="{{ local_static_url }}js/libs/medium/medium-editor.min.js"></script>
+
         <script data-main="{{ local_static_url }}js/main" src="{{ local_static_url }}js/libs/require.js"></script>
 	</body>
 </html>

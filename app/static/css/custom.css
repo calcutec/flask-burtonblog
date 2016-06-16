@@ -818,8 +818,10 @@ a.gallery-image {
     margin: .5rem 0 0 .4rem;
 }
 
-.gallery {
+.gallery, .vote, .unvote {
+    float: right;
     cursor: pointer;
+    padding-left: 2rem;
 }
 
 

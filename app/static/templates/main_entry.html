@@ -1,16 +1,20 @@
 <ul id="main-image" class="item-list">
     <li>
-    <img data-id="{{ post.id }}" sizes="92.5vw" src="https://aperturus.imgix.net/{{ post.photo }}?w=300&q=85&auto=format"
-    srcset="https://aperturus.imgix.net/{{ post.photo }}?w=300&q=85&auto=format 300w,
-    https://aperturus.imgix.net/{{ post.photo }}?w=600&q=85&auto=format 600w,
-    https://aperturus.imgix.net/{{ post.photo }}?w=900&q=85&auto=format 900w,
-    https://aperturus.imgix.net/{{ post.photo }}?w=1290&q=85&auto=format 1290w"
-    alt="{{ post.photo }}" class="main-responsive-img">
+    <a class="gallery-image" onclick="return false" href="https://aperturus.imgix.net/{{ post.photo }}?w=640&q=85&auto=format 640w" data-id="{{ post.id }}" title="#{{ post.id }}" onmouseover="this.title=''">
+        <img data-id="{{ post.id }}" sizes="92.5vw" src="https://aperturus.imgix.net/{{ post.photo }}?w=300&q=85&auto=format"
+        srcset="https://aperturus.imgix.net/{{ post.photo }}?w=300&q=85&auto=format 300w,
+        https://aperturus.imgix.net/{{ post.photo }}?w=600&q=85&auto=format 600w,
+        https://aperturus.imgix.net/{{ post.photo }}?w=900&q=85&auto=format 900w,
+        https://aperturus.imgix.net/{{ post.photo }}?w=1290&q=85&auto=format 1290w"
+        alt="{{ post.photo }}" class="main-responsive-img">
+    </a>
     <span onclick="" class="text-content">
         <a class="link-button member-link" href="/members/{{ post.author.nickname }}/" rel="tag">{{ post.author.nickname }}</a><br>
-        <b>{{ momentjs(post.timestamp).calendar() }}</b><br>
+        <b>{{ momentjs(post.timestamp).format('M/D/YY') }}</b><br>
         {% if post.votes > 0 %}{{ post.votes }} like{% if post.votes != 1 %}s{% endif %}<br>{% endif %}
-        {{ post.body }}
+        <span class="gallery">
+            <i class="fa fa-play-circle-o fa-2x" aria-hidden="true"></i>
+        </span>
     </span>
     <a class="detail-link" data-id="{{ post.id }}" href="/photos/{{ post.id }}">
         <span class="main rounded-icon">

@@ -24,7 +24,7 @@ output += runtime.suppressValue(runtime.memberLookup((runtime.memberLookup((runt
 output += "/\" rel=\"tag\">";
 output += runtime.suppressValue(runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"author")),"nickname"), env.opts.autoescape);
 output += "</a><br>\n                    <b>";
-output += runtime.suppressValue((lineno = 10, colno = 57, runtime.callWrap(runtime.memberLookup(((lineno = 10, colno = 32, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"timestamp")]))),"calendar"), "the return value of (momentjs)[\"calendar\"]", context, [])), env.opts.autoescape);
+output += runtime.suppressValue((lineno = 10, colno = 55, runtime.callWrap(runtime.memberLookup(((lineno = 10, colno = 32, runtime.callWrap(runtime.contextOrFrameLookup(context, frame, "momentjs"), "momentjs", context, [runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"timestamp")]))),"format"), "the return value of (momentjs)[\"format\"]", context, ["M/D/YY"])), env.opts.autoescape);
 output += "</b><br>\n            <span id=\"votes\">";
 env.getTemplate("votes.html", false, "photo_detail.html", null, function(t_3,t_1) {
 if(t_3) { cb(t_3); return; }
@@ -44,7 +44,7 @@ output += "\n                    <a class=\"unvote\" data-voted=\"true\" style=\
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
 output += "/vote\" class=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
-output += " likeme\"><i class=\"fa fa-smile-o fa-lg icon-white\"></i></a>\n                ";
+output += " likeme\"><i class=\"fa fa-smile-o fa-2x icon-white\"></i></a>\n                ";
 ;
 }
 else {
@@ -52,10 +52,10 @@ output += "\n                    <a class=\"vote\" data-voted=\"false\" style=\"
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
 output += "/vote\" class=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
-output += " likeme\"><i class=\"fa fa-meh-o fa-lg icon-white\"></i></a>\n                ";
+output += " likeme\"><i class=\"fa fa-meh-o fa-2x icon-white\"></i></a>\n                ";
 ;
 }
-output += "\n                    Like/Unlike <br>\n            ";
+output += "\n            ";
 ;
 }
 output += "\n        </span>\n    </li>\n</ul>\n";
