@@ -3,7 +3,7 @@ define(['jquery', 'underscore', 'backbone', 'ds', 'blueimp', 'views/appView', 'v
         return Backbone.View.extend({
             tagName: "li",
             events: {
-                'click a.detail-link':      'detailLink',
+                'click .detail-link':      'detailLink',
                 'click .gallery':   'gallery'
             },
             render: function() {
