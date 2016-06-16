@@ -129,7 +129,7 @@ define(['jquery', 'backbone', 'ds', 'models/s3FormModel', 'views/photoInputsView
                         'PixelYDimension':'', 'ResolutionUnit':'', 'XResolution':'', 'YResolution':''}
                         && unorderedtags[key] !== null ) {
 
-                        if(key in {"ExposureTime":'', "ShutterSpeedValue":'', 'BrightnessValue':''}) {
+                        if(key in {"ExposureTime":'', "ShutterSpeedValue":'', 'BrightnessValue':'', 'ApertureValue':''}) {
                             var numb = Number(unorderedtags[key]);
                             tags[key] = +numb.toFixed(4);
                         } else {

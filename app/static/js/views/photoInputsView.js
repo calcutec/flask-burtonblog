@@ -36,7 +36,7 @@ define(['jquery', 'backbone', 'ds', 'views/photoTextFormView'],
                  */
                 var xhr = new XMLHttpRequest();
                 xhr.upload.addEventListener('progress',function(e){
-                    $( "#progress-bar").html(e.loaded+" of "+e.total+" bytes loaded");
+                    $( "#progress-bar").html(e.loaded+" of "+e.total);
                 }, false);
 
                 var self=this;

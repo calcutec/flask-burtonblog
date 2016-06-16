@@ -70,7 +70,7 @@ define(['jquery', 'backbone', 'underscore', 'ds', 'views/commentView'],
                             'ImageWidth':'', 'Orientation':'', 'DateTimeOriginal':'', 'PixelXDimension':'',
                             'PixelYDimension':'', 'ResolutionUnit':'', 'XResolution':'', 'YResolution':''
                             } && unordered[key] !== null  ) {
-                            if(key in {"ExposureTime":'', "ShutterSpeedValue":'', 'BrightnessValue':''}) {
+                            if(key in {"ExposureTime":'', "ShutterSpeedValue":'', 'BrightnessValue':'', 'ApertureValue':''}) {
                                 var numb = Number(unordered[key]);
                                 ordered[fullkey] = +numb.toFixed(4);
                             } else {

@@ -73,7 +73,6 @@ define(['jquery', 'backbone', 'underscore', 'ds', 'views/contentMainView', 'view
 
             events: {
                 'click a.member-link':      'memberLink',
-                'click a.detail-link':      'detailLink',
                 'click #change-image': 'changeImage'
             },
 
@@ -105,24 +104,6 @@ define(['jquery', 'backbone', 'underscore', 'ds', 'views/contentMainView', 'view
                 AppView(new ProfileMainView({id: 'main-view', model: DS.get('target_user')}));
                 AppView(new ArchiveView({id: 'links', tagName: 'ul', className: 'item-list',
                         'collection': DS.get('collection')}));
-            },
-
-            detailLink: function(e) {
-                e.preventDefault();
-                this.$el.resetDataStore();
-                DS.set('collection', DS.getAll('photo'));
-                DS.set('counts', this.$el.getCounts(DS.get('collection')));
-                DS.set('entity', 'photo');
-                DS.set('postId', e.target.closest('a').dataset.id);
-                DS.set('route', '/photos/' + DS.get('postId'));
-                DS.set('usernickname', window.env.globals.current_user.usernickname);
-                Backbone.history.navigate(DS.get('route'), {trigger: false});
-                DS.set('render', true);
-                AppView(new HeaderView({id: 'header'}));
-                AppView(new NavView({id: 'navbar'}));
-                var itemModel = DS.get('collection').get(DS.get('postId'));
-                itemModel.attributes.comments = _.sortBy(itemModel.get('comments'), 'created_at').reverse();
-                AppView(new DetailView({id: 'main-view', model: itemModel}));
             }
         });
     }
