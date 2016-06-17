@@ -58,7 +58,7 @@ output += "\n            <span class=\"gallery\">\n                <i class=\"fa
 }
 output += "\n</span>\n";
 if(runtime.contextOrFrameLookup(context, frame, "assets")) {
-output += "\n        <a class=\"detail-link\" data-id=\"";
+output += "\n        <a onclick=\"\" class=\"detail-link\" data-id=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
 output += "\" href=\"/photos/";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
@@ -659,7 +659,7 @@ output += "s";
 output += "<br>";
 ;
 }
-output += "\n        <span class=\"gallery\">\n            <i class=\"fa fa-play-circle-o fa-2x\" aria-hidden=\"true\"></i>\n        </span>\n    </span>\n    <a class=\"detail-link\" data-id=\"";
+output += "\n        <span class=\"gallery\">\n            <i class=\"fa fa-play-circle-o fa-2x\" aria-hidden=\"true\"></i>\n        </span>\n    </span>\n    <a onclick=\"\" class=\"detail-link\" data-id=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
 output += "\" href=\"/photos/";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
