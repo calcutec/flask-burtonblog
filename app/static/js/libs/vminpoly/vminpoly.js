@@ -357,7 +357,7 @@
   };
 
   if (!browserSupportsUnitsNatively()) {
-    console.log('Browser supports vw units: ', browserSupportsUnitsNatively());
+    alert('Browser supports vw units: ' + str(browserSupportsUnitsNatively()));
     initLayoutEngine();
   }
 
