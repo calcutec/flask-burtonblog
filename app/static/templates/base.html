@@ -16,7 +16,8 @@
 
         <!-- CSS
         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-        <link rel="stylesheet" href="{{ local_static_url }}css/main.css">
+        <link rel="stylesheet" href="{{ local_static_url }}buildcss/main.css">
+        <link rel="stylesheet" href="{{ local_static_url }}css/custom.css">
         <script src="{{ local_static_url }}js/libs/moment/moment.min.js"></script>
         <!-- Favicon
         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
@@ -46,11 +47,34 @@
         {% assets "js_templates" %}
             <script type="text/javascript" src="{{ local_static_url }}templates/templates.js"></script>
         {% endassets %}
-        <script src="{{ local_static_url }}js/libs/prefixfree/prefixfree.min.js"></script>
-        <script src="{{ local_static_url }}js/libs/prefixfree/prefixfree.viewport-units.js"></script>
+{#        <script src="{{ local_static_url }}js/libs/prefixfree/prefixfree.min.js"></script>#}
+{#        <script src="{{ local_static_url }}js/libs/prefixfree/prefixfree.viewport-units.js"></script>#}
+        <script type="text/javascript">
+            if (!Array.prototype.filter) {
+                Array.prototype.filter = function(fun /*, thisp*/) {
+                    var len = this.length;
+                    if (typeof fun != "function") {
+                        throw new TypeError();
+                    }
+                    var res = new Array();
+                    var thisp = arguments[1];
+                    for (var i = 0; i < len; i++) {
+                        if (i in this) {
+                            var val = this[i]; // in case fun mutates this
+                            if (fun.call(thisp, val, i, this)) {
+                                res.push(val);
+                            }
+                        }
+                    }
+                    return res;
+                };
+            }
+        </script>
+        <script src="{{ local_static_url }}js/libs/vminpoly/tokenizer.js"></script>
+        <script src="{{ local_static_url }}js/libs/vminpoly/parser.js"></script>
+        <script src="{{ local_static_url }}js/libs/vminpoly/vminpoly.js"></script>
         <script src="{{ local_static_url }}js/libs/loadimage/load-image.all.min.js"></script>
         <script src="{{ local_static_url }}js/libs/medium/medium-editor.min.js"></script>
-
         <script data-main="{{ local_static_url }}js/main" src="{{ local_static_url }}js/libs/require.js"></script>
 	</body>
 </html>
