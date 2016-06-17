@@ -26,7 +26,7 @@ define(['jquery', 'underscore', 'backbone', 'ds', 'blueimp', 'views/appView', 'v
                 DS.set('collection', DS.getAll('photo'));
                 DS.set('counts', this.$el.getCounts(DS.get('collection')));
                 DS.set('entity', 'photo');
-                DS.set('postId', e.target.closest('a').dataset.id);
+                DS.set('postId', this.$el.find('.detail-link')[0].dataset.id);
                 DS.set('route', '/photos/' + DS.get('postId'));
                 DS.set('usernickname', window.env.globals.current_user.usernickname);
                 Backbone.history.navigate(DS.get('route'), {trigger: false});
