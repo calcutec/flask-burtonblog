@@ -6,7 +6,7 @@
         https://aperturus.imgix.net/{{ post.photo }}?w=900&q=85&auto=format 900w,
         https://aperturus.imgix.net/{{ post.photo }}?w=1290&q=85&auto=format 1290w"
         alt="{{ post.photo }}" class="main-responsive-img">
-        <span onclick="" class="text-content">
+        <span class="text-content">
             <a class="link-button member-link" href="/members/{{ post.author.nickname }}/" rel="tag">{{ post.author.nickname }}</a><br>
                     <b>{{ momentjs(post.timestamp).format('M/D/YY') }}</b><br>
             <span id="votes">{% include 'votes.html' %}</span>

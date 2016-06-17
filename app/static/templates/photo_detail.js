@@ -19,7 +19,7 @@ output += "?w=900&q=85&auto=format 900w,\n        https://aperturus.imgix.net/";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"photo"), env.opts.autoescape);
 output += "?w=1290&q=85&auto=format 1290w\"\n        alt=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"photo"), env.opts.autoescape);
-output += "\" class=\"main-responsive-img\">\n        <span onclick=\"\" class=\"text-content\">\n            <a class=\"link-button member-link\" href=\"/members/";
+output += "\" class=\"main-responsive-img\">\n        <span class=\"text-content\">\n            <a class=\"link-button member-link\" href=\"/members/";
 output += runtime.suppressValue(runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"author")),"nickname"), env.opts.autoescape);
 output += "/\" rel=\"tag\">";
 output += runtime.suppressValue(runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"author")),"nickname"), env.opts.autoescape);

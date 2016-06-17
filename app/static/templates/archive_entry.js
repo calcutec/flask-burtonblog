@@ -5,7 +5,7 @@ var colno = null;
 var output = "";
 try {
 var parentTemplate = null;
-output += "<a class=\"gallery-image\" onclick=\"return false\" href=\"https://aperturus.imgix.net/";
+output += "<a class=\"gallery-image\" href=\"https://aperturus.imgix.net/";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"photo"), env.opts.autoescape);
 output += "?w=640&q=85&auto=format 640w\" data-id=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
@@ -25,7 +25,7 @@ output += "?w=320&h=320&fit=crop&q=85&auto=format 320w,\n    https://aperturus.i
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"photo"), env.opts.autoescape);
 output += "?w=640&h=640&fit=crop&q=85&auto=format 640w\"\n    sizes=\"(min-width: 40em) 30.5vw, (min-width: 60em) 22.75vw, 46vw\"\n    class=\"responsive-img\"\n    alt=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"photo"), env.opts.autoescape);
-output += "\">\n</a>\n<span onclick=\"\" class=\"text-content\">\n        ";
+output += "\">\n</a>\n<span class=\"text-content\">\n        ";
 if(runtime.contextOrFrameLookup(context, frame, "assets")) {
 output += "\n            ";
 if(!runtime.inOperator(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "assets")),"entity"),["member","author"])) {
@@ -58,7 +58,7 @@ output += "\n            <span class=\"gallery\">\n                <i class=\"fa
 }
 output += "\n</span>\n";
 if(runtime.contextOrFrameLookup(context, frame, "assets")) {
-output += "\n        <a onclick=\"\" class=\"detail-link\" data-id=\"";
+output += "\n        <a class=\"detail-link\" data-id=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
 output += "\" href=\"/photos/";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);

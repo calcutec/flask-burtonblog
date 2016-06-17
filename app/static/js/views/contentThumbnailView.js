@@ -4,8 +4,23 @@ define(['jquery', 'underscore', 'backbone', 'ds', 'blueimp', 'views/appView', 'v
             tagName: "li",
             events: {
                 'click .detail-link':      'detailLink',
-                'click .gallery':   'gallery'
+                'click .gallery':   'gallery',
+                'click':    'showbuttons'
             },
+            
+            showbuttons: function(e) {
+                e.preventDefault();
+                this.$el.addClass('current');
+                var allotherpics = $('ul.item-list > li:not(.current)')
+                allotherpics.removeClass("click");
+                allotherpics.find('span.text-content').hide();
+                allotherpics.find('span.rounded-icon').hide();
+                this.$el.removeClass('current');
+                this.$el.find('span.text-content').toggle();
+                this.$el.find('span.rounded-icon').toggle();
+                this.$el.toggleClass("click");
+            },
+
             render: function() {
                 var post = this.model.toJSON();
                 post['author'] = { "nickname": post.nickname };

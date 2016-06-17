@@ -1,9 +1,23 @@
-define(['jquery', 'backbone', 'ds', 'blueimp', 'views/appView', 'views/headerView', 'views/detailView'],
-    function($, Backbone, DS, blueimp, AppView, HeaderView, DetailView){
+define(['jquery', 'underscore', 'backbone', 'ds', 'blueimp', 'views/appView', 'views/headerView', 'views/detailView'],
+    function($, _, Backbone, DS, blueimp, AppView, HeaderView, DetailView){
         return Backbone.View.extend({
             events: {
+                'click .detail-link': 'detailLink',
                 'click .gallery': 'gallery',
-                'click .detail-link': 'detailLink'
+                'click':    'showbuttons'
+            },
+
+            showbuttons: function(e) {
+                e.preventDefault();
+                this.$el.find('li').addClass('current');
+                var allotherpics = $('ul.item-list > li:not(.current)');
+                allotherpics.removeClass("click");
+                allotherpics.find('span.text-content').hide();
+                allotherpics.find('span.rounded-icon').hide();
+                this.$el.find('li').removeClass('current');
+                this.$el.find('span.text-content').toggle();
+                this.$el.find('span.rounded-icon').toggle();
+                this.$el.find('li').toggleClass("click");
             },
 
             detailLink: function(e) {
@@ -42,7 +56,7 @@ define(['jquery', 'backbone', 'ds', 'blueimp', 'views/appView', 'views/headerVie
 
                     },
                     links = window.document.getElementsByClassName('gallery-image');
-                var currentgallery = blueimp(links, options);
+                blueimp(links, options);
             },
 
             render: function() {

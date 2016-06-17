@@ -3,8 +3,21 @@ define(['jquery', 'backbone'],
         return Backbone.View.extend({
             tagName: "li",
             events: {
-                'click .gallery':   'gallery'
+                'click .gallery':   'gallery',
+                'click':    'showbuttons'
             },
+
+            showbuttons: function(e) {
+                e.preventDefault();
+                this.$el.addClass('current');
+                var allotherpics = $('li:not(.current)');
+                allotherpics.removeClass("click");
+                allotherpics.find('span.text-content').hide();
+                this.$el.removeClass('current');
+                this.$el.find('span.text-content').toggle();
+                this.$el.toggleClass("click");
+            },
+
             render: function() {
                 var post = this.model.toJSON();
                 post['author'] = { "nickname": post.nickname };

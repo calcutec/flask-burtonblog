@@ -352,13 +352,23 @@ label > .label-body {
     display: block;
     float: left;
 }
-ul.item-list > li:hover span.text-content {
+
+li.click span.rounded-icon {
     opacity: 1;
-    /*display: inline-block;*/
+    -moz-transition: opacity 0.2s ease;
+    -o-transition: opacity 0.2s ease;
+    -webkit-transition: opacity 0.2s ease;
+    transition: opacity 0.2s ease;
 }
-ul.item-list > li:hover span.rounded-icon {
+
+li.click span.text-content {
     opacity: 1;
+    -moz-transition: opacity 0.2s ease;
+    -o-transition: opacity 0.2s ease;
+    -webkit-transition: opacity 0.2s ease;
+    transition: opacity 0.2s ease;
 }
+
 ul.item-list {
     list-style-type: none;
     margin: 0;
@@ -370,10 +380,14 @@ ul.item-list > li {
     padding-right: .5vw;
 }
 span.text-content {
+    display: none;
     position: absolute;
-    /*display: none;*/
     opacity: 0;
-    /*transition: opacity 1s ease-out;*/
+    -moz-transition: opacity 0.2s ease 0s;
+    -o-transition: opacity 0.2s ease 0s;
+    -webkit-transition: opacity 0.2s ease;
+    -webkit-transition-delay: 0s;
+    transition: opacity 0.2s ease 0s;
     color: white;
     left: 0;
     bottom: 0;
@@ -385,10 +399,14 @@ span.text-content {
     border-radius: 0 10px 0 0;
 }
 span.rounded-icon {
+    display: none;
     position: absolute;
-    /*display: table;*/
-    /*transition: opacity 1s ease-out;*/
     opacity: 0;
+    -moz-transition: opacity 0.2s ease 0s;
+    -o-transition: opacity 0.2s ease 0s;
+    -webkit-transition: opacity 0.2s ease;
+    -webkit-transition-delay: 0s;
+    transition: opacity 0.2s ease 0s;
     width: 3.5rem;
     height: 3.5rem;
     right: 1em;

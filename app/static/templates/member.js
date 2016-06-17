@@ -29,7 +29,7 @@ output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLook
 output += "\">\n";
 ;
 }
-output += "\n<span onclick=\"\" class=\"text-content\">\n    ";
+output += "\n<span class=\"text-content\">\n    ";
 if(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"nickname")) {
 output += "\n        <a class=\"link-button member-link\" href=\"/members/";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"nickname"), env.opts.autoescape);

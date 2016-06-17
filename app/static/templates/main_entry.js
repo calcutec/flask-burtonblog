@@ -25,7 +25,7 @@ output += "?w=900&q=85&auto=format 900w,\n        https://aperturus.imgix.net/";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"photo"), env.opts.autoescape);
 output += "?w=1290&q=85&auto=format 1290w\"\n        alt=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"photo"), env.opts.autoescape);
-output += "\" class=\"main-responsive-img\">\n    </a>\n    <span onclick=\"\" class=\"text-content\">\n        <a class=\"link-button member-link\" href=\"/members/";
+output += "\" class=\"main-responsive-img\">\n    </a>\n    <span class=\"text-content\">\n        <a class=\"link-button member-link\" href=\"/members/";
 output += runtime.suppressValue(runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"author")),"nickname"), env.opts.autoescape);
 output += "/\" rel=\"tag\">";
 output += runtime.suppressValue(runtime.memberLookup((runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"author")),"nickname"), env.opts.autoescape);
@@ -42,7 +42,7 @@ output += "s";
 output += "<br>";
 ;
 }
-output += "\n        <span class=\"gallery\">\n            <i class=\"fa fa-play-circle-o fa-2x\" aria-hidden=\"true\"></i>\n        </span>\n    </span>\n    <a onclick=\"\" class=\"detail-link\" data-id=\"";
+output += "\n        <span class=\"gallery\">\n            <i class=\"fa fa-play-circle-o fa-2x\" aria-hidden=\"true\"></i>\n        </span>\n    </span>\n    <a class=\"detail-link\" data-id=\"";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);
 output += "\" href=\"/photos/";
 output += runtime.suppressValue(runtime.memberLookup((runtime.contextOrFrameLookup(context, frame, "post")),"id"), env.opts.autoescape);

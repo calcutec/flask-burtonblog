@@ -4,7 +4,14 @@ define(['jquery', 'backbone', 'underscore', 'ds', 'views/appView', 'views/tabsVi
             events: {
                 'click #deletephoto':   'deletephoto',
                 'click .vote':   'vote',
-                'click .unvote':   'vote'
+                'click .unvote':   'vote',
+                'click':    'showbuttons'
+            },
+
+            showbuttons: function(e) {
+                e.preventDefault();
+                this.$el.find('span.text-content').toggle();
+                this.$el.find('li').toggleClass("click");
             },
             
             initialize: function() {
